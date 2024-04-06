@@ -14,10 +14,10 @@ const page: FC<Props> = (props) => {
   const [route, setRoute] = useState("");
   const { user } = useSelector((state: any) => state.auth);
   return (
-    <div>
+    <>
         <Heading
-          title="profile"
-          description="Notematesync description"
+          title="Moocs"
+          description="Moocs description"
           keywords="notes,books,notes pdf"
         />
         <Header
@@ -28,7 +28,7 @@ const page: FC<Props> = (props) => {
           route={route}
         />
         <Moocs />
-    </div>
+    </>
   );
 };
 

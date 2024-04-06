@@ -7,7 +7,13 @@ import {
   TableRow,
   TableCell,
   Tooltip,
+  Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
+import { IoIosMore } from "react-icons/io";
 
 type Props = {};
 
@@ -46,7 +52,10 @@ const MoocsTable = (props: Props) => {
             Verification Url
           </TableColumn>
           <TableColumn className="!bg-transparent !text-white text-center">
-            Document Upload
+            Status
+          </TableColumn>
+          <TableColumn className="!bg-transparent !text-white text-center">
+            Action
           </TableColumn>
         </TableHeader>
 
@@ -120,6 +129,30 @@ const MoocsTable = (props: Props) => {
                   } bg-opacity-15  w-full font-medium !rounded-none !min-h-unit-10 border-2 items-center justify-center flex max-w-[9rem]`}
                 >
                   <span className="!mx-2 line-clamp-1 ">Verifying</span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div>
+                  <Dropdown
+                    placement="bottom-end"
+                    className="dark:bg-slate-900"
+                  >
+                    <DropdownTrigger>
+                      <Button
+                        isIconOnly
+                        className="bg-transparent rounded-full"
+                      >
+                        <IoIosMore size={25} className="dark:text-slate-200" />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                      aria-label="Action event example"
+                      onAction={(key) => alert(key)}
+                    >
+                      <DropdownItem key="Copy link">Edit</DropdownItem>
+                      <DropdownItem key="Report">Delete</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
                 </div>
               </TableCell>
             </TableRow>

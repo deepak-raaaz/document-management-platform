@@ -14,7 +14,7 @@ const page: FC<Props> = (props) => {
   const [route, setRoute] = useState("");
   const { user } = useSelector((state: any) => state.auth);
   return (
-    <div>
+    <>
         <Heading
           title={`${user?.name} profile`}
           description="Notematesync description"
@@ -28,7 +28,7 @@ const page: FC<Props> = (props) => {
           route={route}
         />
         <Dashboard />
-    </div>
+    </>
   );
 };
 

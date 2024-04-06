@@ -1,570 +1,68 @@
-// 'use client'
-// import {FC, useEffect, useState} from 'react'
-// import { ProSidebar,Menu,MenuItem } from 'react-pro-sidebar'
-// import { Box,IconButton, Typography } from '@mui/material'
-// import "react-pro-sidebar/dist/css/styles.css"
-// import{
-//   HomeOutlinedIcon,
-//   ArrowForwardIosIcon,
-//   ArrowBackIosIcon,
-//   PeopleOutlinedIcon,
-//   ReceiptOutlinedIcon,
-//   BarChartOutlinedIcon,
-//   MapOutlinedIcon,
-//   GroupsIcon,
-//   OndemandVideoIcon,
-//   VideoCallIcon,
-//   WebIcon,
-//   QuizIcon,
-//   WysiwygIcon,
-//   ManageHistoryIcon,
-//   SettingsIcon,
-//   ExitToAppIcon,
-// } from "./Icon";
-// import avatarDefault from "../../../../public/assets/images/user-avatar.png";
-// import  {useSelector} from "react-redux";
-// import Link from 'next/link'
-// import Image from 'next/image'
-// import { useTheme } from 'next-themes'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
+import { FaGraduationCap, FaUsers } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
+import { PiCertificateFill } from "react-icons/pi";
+import { FaRectangleList } from "react-icons/fa6";
+import { HiUserAdd } from "react-icons/hi";
 
-// interface itemProps{
-//   title: string;
-//   to: string;
-//   icon: JSX.Element;
-//   selected: string;
-//   setSelected:any;
-// }
+type Props = {};
+const sidebarList = [
+  {
+    title: "Dashboard",
+    icon: MdDashboard,
+    url: "/admin/dashboard",
+  },
+  {
+    title: "Students",
+    icon: FaUsers,
+    url: "/admin/students",
+  },
+  {
+    title: "Moocs",
+    icon: FaGraduationCap,
+    url: "/admin/moocs",
+  },
+  {
+    title: "Mar",
+    icon: PiCertificateFill,
+    url: "/admin/mar",
+  },
+  {
+    title: "Moocs List",
+    icon: FaRectangleList,
+    url: "/admin/moocs-list",
+  },
+  {
+    title: "Mar List",
+    icon: FaRectangleList,
+    url: "/admin/mar-list",
+  },
+  {
+    title: "New Registration",
+    icon: HiUserAdd,
+    url: "/admin/new-registration",
+  },
+];
+const AdminSidebar = (props: Props) => {
+  const pathname = usePathname();
+  return (
+    <div className="w-[16rem] bg-slate-100 h-full py-4 px-3 overflow-hidden border-slate-200 border-1 items-stretch flex-grow">
+      {sidebarList.map((item) => (
+        <Link href={item.url} >
+          <div
+            className={`space-x-4 flex items-center text-slate-500 my-2  py-2 px-2 rounded-lg hover:bg-white cursor-pointer transition ${
+              pathname === item.url ? "bg-white" : "bg-transparent"
+            }`}
+          >
+            <item.icon size={20} className="text-slate-500"/>
+            <span className="font-medium text-lg">{item.title}</span>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+};
 
-// const Item: FC<itemProps> = ({title,to , icon,selected,setSelected}) => {
-//   return (
-//     <MenuItem
-//     active={selected === title}
-//     onClick={() => setSelected(title)}
-//     icon={icon}
-//     >
-//       <Typography className='!text-[16px] !font-Poppins'>{title}</Typography>
-//       <Link href={to}/>
-//     </MenuItem>
-//   );
-// };
-
-// const Sidebar = () => {
-//   const {user} = useSelector((state:any) => state.auth);
-//   const [logout, setlogout] = useState(false);
-//   const [isCollapsed, setIsCollapsed] = useState(false);
-//   const [selected, setSelected] = useState("Dashboard");
-//   const [mounted, setMounted] = useState(false);
-//   const {theme,setTheme} = useTheme();
-
-//   useEffect(() => setMounted(true), []);
-
-//   if(!mounted){
-//     return null;
-//   }
-
-//   const logoutHandler = () => {
-//     setlogout(true);
-//   };
-
-//   return (
-//     <Box
-//     sx={{
-//       "& .pro-sidebar-inner": {
-//         background: `${
-//           theme === "dark" ? "#111C43 !important" : "#fff !important"
-//         }`,
-//       },
-//       "& .pro-icon-wrapper": {
-//         backgroundColor: "transparent !important",
-//       },
-//       "& .pro-inner-item:hover": {
-//         color:"#868dfb !important",
-//       },
-//       "& .pro-menu-item.active": {
-//         color: "#6870fa !important",
-//       },
-//       "& .pro-inner-item":{
-//         padding: "5px 35px 5px 20px !important",
-//         opacity: 1,
-//       },
-//       "& .pro-menu-item": {
-//         color: `${theme !== "dark" && "#000"}`,
-//       },
-//     }}
-//     className="!bg-white dark:bg-[#111C43]"
-//     >
-//       <ProSidebar
-//       breakPoint="md" 
-//       toggled={true}
-//       collapsed={isCollapsed}
-//       style={{
-//         position: "fixed",
-//         top: 0,
-//         left: 0,
-//         height: "100vh",
-//         width: isCollapsed ? "0%" : "20%",
-//       }}
-//       >
-//         <Menu iconShape='square'>
-//           {/* Logo and menu icon  */}
-//           <MenuItem 
-//           onClick={() => setIsCollapsed(!isCollapsed)}
-//           icon={isCollapsed? <ArrowForwardIosIcon/> : undefined}
-//           style={{
-//             margin: "10px 0 20px 0",
-//           }}
-//           >
-//             {!isCollapsed && (
-//               <Box
-//               display="flex"
-//               justifyContent="space-between"
-//               alignItems="center"
-//               ml="15px"
-//               >
-//                 <Link href="/">
-//                   <h3 className='text-[25px] font-Poppins uppercase dark:text-white text-black'>
-//                     NMS
-//                   </h3>
-//                 </Link>
-//                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)} className='inline-block'>
-//                   <ArrowBackIosIcon className="text-black dark:text-[#ffffffc1]" />
-//                 </IconButton>
-//               </Box>
-//             )}
-//           </MenuItem>
-
-//           {!isCollapsed && (
-//             <Box mb="25px">
-//               <Box display="flex" justifyContent="center" alignItems="center">
-//                 <Image
-//                 alt='profile-user'
-//                 width={100}
-//                 height={100}
-//                 src={user.avatar ? user.avatar.url : avatarDefault}
-//                 style={{
-//                   cursor: "pointer",
-//                   borderRadius: "50%",
-//                   border: "3px solid #5b6fe6",
-//                 }}
-//                 />
-//               </Box>
-//               <Box textAlign="center">
-//                 <Typography
-//                 variant='h4'
-//                 className='!text-[20px] text-black dark:text-[#ffffffc1]'
-//                 sx={{m: "10px 0 0 0"}}
-//                 >
-//                   {user?.name}
-//                 </Typography>
-//                 <Typography
-//                 variant='h6'
-//                 sx={{m: "10px 0 0 0"}}
-//                 className='!text-[20px] text-black dark:text-[#ffffffc1] capitalize'
-//                 >
-//                   -{user?.role}
-//                 </Typography>
-//               </Box>
-//             </Box>
-//           )}
-
-//           <Box padding={isCollapsed ? undefined : "1rem"}>
-//             <Item 
-//             title="Dashboard"
-//             to="/admin"
-//             icon={<HomeOutlinedIcon/>}
-//             selected={selected}
-//             setSelected={setSelected}
-//             />
-
-//               <Typography
-//                 variant='h5'
-//                 sx={{m: "15px 0 5px 25px"}}
-//                 className='!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]'
-//                 >
-//                   {!isCollapsed && "Date"}
-//                 </Typography>
-//                 <Item 
-//                 title='Users'
-//                 to='/admin/users'
-//                 icon={<GroupsIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-
-//                 <Item
-//                 title='Invoices'
-//                 to='/admin/invoices'
-//                 icon={<ReceiptOutlinedIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-
-//               <Typography
-//                 variant='h5'
-//                 className='!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]'
-//                 sx={{m: "15px 0 5px 25px"}}
-//                 >
-//                   {!isCollapsed && "Content"}
-//                 </Typography>
-//                 <Item 
-//                 title='Create Course'
-//                 to='/admin/create-course'
-//                 icon={<VideoCallIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-//                 <Item
-//                 title='Live courses'
-//                 to='/admin/courses'
-//                 icon={<OndemandVideoIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-
-//               <Typography
-//                 variant='h5'
-//                 className='!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]'
-//                 sx={{m: "15px 0 5px 25px"}}
-//                 >
-//                   {!isCollapsed && "Customization"}
-//                 </Typography>
-//                 <Item 
-//                 title='Hero'
-//                 to='/admin/hero'
-//                 icon={<WebIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-//                 <Item
-//                 title='FAQ'
-//                 to='/faq'
-//                 icon={<QuizIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-//                 <Item
-//                 title='Categories'
-//                 to='/admin/categories'
-//                 icon={<WysiwygIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-
-//               <Typography
-//                 variant='h5'
-//                 className='!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]'
-//                 sx={{m: "15px 0 5px 20px"}}
-//                 >
-//                   {!isCollapsed && "Controllers"}
-//                 </Typography>
-//                 <Item
-//                 title='Manage Team'
-//                 to='/admin/team'
-//                 icon={<PeopleOutlinedIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-
-//             <Typography
-//                 variant='h6'
-//                 className='!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]'
-//                 sx={{m: "15px 0 5px 20px"}}
-//                 >
-//                   {!isCollapsed && "Analytics"}
-//                 </Typography>
-//                 <Item
-//                 title='Courses Analytics'
-//                 to='/admin/courses-analytics'
-//                 icon={<BarChartOutlinedIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-//                 <Item
-//                 title='Orders Analytics'
-//                 to='/admin/orders-analytics'
-//                 icon={<MapOutlinedIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-
-//                 <Item
-//                 title='Users Analytics'
-//                 to='/admin/users-analytics'
-//                 icon={<ManageHistoryIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-
-//               <Typography
-//                 variant='h6'
-//                 className='!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]'
-//                 sx={{m: "15px 0 5px 20px"}}
-//                 >
-//                   {!isCollapsed && "Extras"}
-//                 </Typography>
-//                 <Item
-//                 title='Settings'
-//                 to='/admin/settings'
-//                 icon={<SettingsIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-//                 <div onClick={logoutHandler}>
-//                 <Item
-//                 title='Logout'
-//                 to='/'
-//                 icon={<ExitToAppIcon/>}
-//                 selected={selected}
-//                 setSelected={setSelected}
-//                 />
-//                 </div>
-//           </Box>
-//         </Menu>
-//       </ProSidebar>
-//     </Box>
-//   );
-// };
-
-// export default Sidebar
-
-
-
-
-
-
-
-// import { Switch, Typography } from '@mui/material';
-// import React from 'react';
-// import { BsCalendar } from 'react-icons/bs';
-// import { Sidebar, Menu, MenuItem, SubMenu,menuClasses, MenuItemStyles } from 'react-pro-sidebar';
-// import { Badge } from './Badges';
-// import { SidebarFooter } from './SidebarFooter';
-// import { SidebarHeader } from './SidebarHeader';
-// import { FiBarChart } from 'react-icons/fi';
-// import { CgShoppingCart } from 'react-icons/cg';
-// import { FaDiamond } from 'react-icons/fa6';
-// import { RiInkBottleFill } from 'react-icons/ri';
-// import { SlGlobeAlt } from 'react-icons/sl';
-// import { GrServices } from 'react-icons/gr';
-// import { CiBookmark } from 'react-icons/ci';
-
-// type Theme = 'light' | 'dark';
-
-// const themes = {
-//   light: {
-//     sidebar: {
-//       backgroundColor: '#ffffff',
-//       color: '#607489',
-//     },
-//     menu: {
-//       menuContent: '#fbfcfd',
-//       icon: '#0098e5',
-//       hover: {
-//         backgroundColor: '#c5e4ff',
-//         color: '#44596e',
-//       },
-//       disabled: {
-//         color: '#9fb6cf',
-//       },
-//     },
-//   },
-//   dark: {
-//     sidebar: {
-//       backgroundColor: '#0b2948',
-//       color: '#8ba1b7',
-//     },
-//     menu: {
-//       menuContent: '#082440',
-//       icon: '#59d0ff',
-//       hover: {
-//         backgroundColor: '#00458b',
-//         color: '#b6c8d9',
-//       },
-//       disabled: {
-//         color: '#3e5e7e',
-//       },
-//     },
-//   },
-// };
-
-// // hex to rgba converter
-// const hexToRgba = (hex: string, alpha: number) => {
-//   const r = parseInt(hex.slice(1, 3), 16);
-//   const g = parseInt(hex.slice(3, 5), 16);
-//   const b = parseInt(hex.slice(5, 7), 16);
-
-//   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-// };
-
-// const SideNavbar: React.FC = () => {
-//   const [collapsed, setCollapsed] = React.useState(false);
-//   const [toggled, setToggled] = React.useState(false);
-//   const [broken, setBroken] = React.useState(false);
-//   const [theme, setTheme] = React.useState<Theme>('light');
-
- 
-//   // handle on theme change event
-//   const handleThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     setTheme(e.target.checked ? 'dark' : 'light');
-//   };
-
-//   const menuItemStyles: MenuItemStyles = {
-//     root: {
-//       fontSize: '13px',
-//       fontWeight: 400,
-//     },
-//     icon: {
-//       color: themes[theme].menu.icon,
-//       [`&.${menuClasses.disabled}`]: {
-//         color: themes[theme].menu.disabled.color,
-//       },
-//     },
-//     SubMenuExpandIcon: {
-//       color: '#b6b7b9',
-//     },
-//     subMenuContent: ({ level }) => ({
-//       backgroundColor:
-//           'transparent',
-//     }),
-//     button: {
-//       [`&.${menuClasses.disabled}`]: {
-//         color: themes[theme].menu.disabled.color,
-//       },
-//       '&:hover': {
-//         color: themes[theme].menu.hover.color,
-//       },
-//     },
-//     label: ({ open }) => ({
-//       fontWeight: open ? 600 : undefined,
-//     }),
-//   };
-
-//   return (
-//     <div style={{ display: 'flex', height: '100%' }}>
-//       <Sidebar
-//         collapsed={collapsed}
-//         toggled={toggled}
-//         onBackdropClick={() => setToggled(false)}
-//         onBreakPoint={setBroken}
-//         breakPoint="md"
-//         // backgroundColor={hexToRgba(themes[theme].sidebar.backgroundColor, false ? 0.9 : 1)}
-//         // rootStyles={{
-//         //   color: themes[theme].sidebar.color,
-//         // }}
-//         className='bg-green-900 dark:bg-red-800 !bg-opacity-100'
-//       >
-//         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-//           <SidebarHeader rtl={false} style={{ marginBottom: '24px', marginTop: '16px' }} />
-//           <div style={{ flex: 1, marginBottom: '32px' }}>
-//             <div style={{ padding: '0 24px', marginBottom: '8px' }}>
-//               <Typography
-//                 variant="body2"
-//                 fontWeight={600}
-//                 style={{ opacity: collapsed ? 0 : 0.7, letterSpacing: '0.5px' }}
-//               >
-//                 General
-//               </Typography>
-//             </div>
-//             <Menu menuItemStyles={menuItemStyles}>
-//               <SubMenu
-//                 label="Charts"
-//                 icon={<FiBarChart />}
-//                 suffix={
-//                   <Badge variant="danger" shape="circle">
-//                     6
-//                   </Badge>
-//                 }
-//               >
-//                 <MenuItem> Pie charts</MenuItem>
-//                 <MenuItem> Line charts</MenuItem>
-//                 <MenuItem> Bar charts</MenuItem>
-//               </SubMenu>
-//               <SubMenu label="Maps" icon={<SlGlobeAlt />}>
-//                 <MenuItem> Google maps</MenuItem>
-//                 <MenuItem> Open street maps</MenuItem>
-//               </SubMenu>
-//               <SubMenu label="Theme" icon={<RiInkBottleFill />}>
-//                 <MenuItem> Dark</MenuItem>
-//                 <MenuItem> Light</MenuItem>
-//               </SubMenu>
-//               <SubMenu label="Components" icon={<FaDiamond />}>
-//                 <MenuItem> Grid</MenuItem>
-//                 <MenuItem> Layout</MenuItem>
-//                 <SubMenu label="Forms">
-//                   <MenuItem> Input</MenuItem>
-//                   <MenuItem> Select</MenuItem>
-//                   <SubMenu label="More">
-//                     <MenuItem> CheckBox</MenuItem>
-//                     <MenuItem> Radio</MenuItem>
-//                   </SubMenu>
-//                 </SubMenu>
-//               </SubMenu>
-//               <SubMenu label="E-commerce" icon={<CgShoppingCart />}>
-//                 <MenuItem> Product</MenuItem>
-//                 <MenuItem> Orders</MenuItem>
-//                 <MenuItem> Credit card</MenuItem>
-//               </SubMenu>
-//             </Menu>
-
-//             <div style={{ padding: '0 24px', marginBottom: '8px', marginTop: '32px' }}>
-//               <Typography
-//                 variant="body2"
-//                 fontWeight={600}
-//                 style={{ opacity: collapsed ? 0 : 0.7, letterSpacing: '0.5px' }}
-//               >
-//                 Extra
-//               </Typography>
-//             </div>
-
-//             <Menu menuItemStyles={menuItemStyles}>
-//               <MenuItem icon={<BsCalendar />} suffix={<Badge variant="success">New</Badge>}>
-//                 Calendar
-//               </MenuItem>
-//               <MenuItem icon={<CiBookmark />}>Documentation</MenuItem>
-//               <MenuItem disabled icon={<GrServices />}>
-//                 Examples
-//               </MenuItem>
-//             </Menu>
-//           </div>
-//           <SidebarFooter collapsed={collapsed} />
-//         </div>
-//       </Sidebar>
-
-//       <main>
-//         <div style={{ padding: '16px 24px', color: '#44596e' }}>
-//           {/* Menu button (toggle) */}
-//           <div style={{ marginBottom: '16px' }}>
-//             {broken && (
-//               <button className="sb-button" onClick={() => setToggled(!toggled)}>
-//                 Toggle
-//               </button>
-//             )}
-//           </div>
-//           <div style={{ padding: '0 8px' }}>
-//             <div style={{ marginBottom: 16 }}>
-
-//               {/* collapsed button  */}
-//               <Switch
-//                 id="collapse"
-//                 checked={collapsed}
-//                 onChange={() => setCollapsed(!collapsed)}
-              
-//               />
-//             </div>
-//               {/* theme change button  */}
-//             <div style={{ marginBottom: 16 }}>
-//               <Switch
-//                 id="theme"
-//                 checked={theme === 'dark'}
-//                 onChange={handleThemeChange}
-//               />
-//             </div>
-
-//           </div>
-//         </div>
-//       </main>
-//     </div>
-//   );
-// };
-
-// export default SideNavbar;
+export default AdminSidebar;

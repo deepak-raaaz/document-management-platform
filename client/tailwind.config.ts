@@ -41,6 +41,9 @@ const config: Config = {
         myShadow1: "4.1px -5px 0 0 rgb(17,24,39)",
         myShadow2: "-4.1px -5px 0 0 rgb(17,24,39)",
       },
+      gridTemplateColumns: {
+        '16': 'repeat(16, minmax(0, 1fr))',
+      }
     },
   },
   plugins: [nextui()],

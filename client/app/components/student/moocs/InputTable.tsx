@@ -10,16 +10,54 @@ import {
   SelectItem,
   Button,
 } from "@nextui-org/react";
-import { animals, year } from "./data";
+import { moocs, year } from "./data";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { FaCloudUploadAlt } from "react-icons/fa";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+
 
 type Props = {};
 
+const schema = Yup.object().shape({
+  title: Yup.string()
+    .required("please Select Title of Course!"),
+    startDate: Yup.string().required("Please enter your Date of Joining!"),
+    endDate: Yup.string().required("Please enter your Date of Completion!"),
+    year: Yup.string().required("Please enter Year"),
+    verificationUrl: Yup.string().required("Please enter Certificate Verfication Url"),
+});
+
 const InputTable = (props: Props) => {
+  const [value, setValue] = React.useState("");
+  const [platform, setPlatform] = React.useState("");
+  const [credit, setCredit] = React.useState("");
+  const handleSelect = (e:any) => {
+    const moocsSelect = moocs.find(moocs => moocs.label === e.target.value);
+    if (moocsSelect) {
+      setPlatform(moocsSelect.platform)
+      setCredit(moocsSelect.credit)
+    } else {
+      setPlatform("")
+      setCredit("")
+    }
+  }
+
+
+  const formik = useFormik({
+    initialValues: { title: "", startDate: "",endDate: "",year: "",verificationUrl: "" },
+    validationSchema: schema,
+    onSubmit: async ({ title, startDate,endDate,year,verificationUrl }) => {
+      // await login({ email, password });
+      console.log(title);
+    },
+  });
+
+  const { errors, touched, values, handleChange, handleSubmit } = formik;
+
   return (
     <form>
       <Table
@@ -63,25 +101,29 @@ const InputTable = (props: Props) => {
                 label=""
                 className="w-full selector-white"
                 placeholder="Select Title"
+                onChange={handleChange}
               >
-                {animals.map((animal) => (
+                {moocs.map((item) => (
                   <SelectItem
-                    key={animal.value}
-                    value={animal.value}
+                    key={item.value}
+                    value={item.value}
                     className=""
                   >
-                    {animal.label}
+                    {item.label}
                   </SelectItem>
                 ))}
               </Select>
             </TableCell>
             <TableCell className="!px-1">
-              <button className="bg-white px-3 !min-h-unit-10 border-1  w-full">
-                Coursera
-              </button>
+              <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 items-center flex ">
+                <span className="!mx-2 line-clamp-1">{platform || "Platform"}</span>
+              </div>
             </TableCell>
             <TableCell className="min-w-[5rem]">
-              <input
+            <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 items-center flex justify-center">
+                <span className="!mx-2 line-clamp-1 text-center">{credit || "credit"}</span>
+              </div>
+              {/* <input
                 type="number"
                 name=""
                 // value={values.email}
@@ -89,7 +131,7 @@ const InputTable = (props: Props) => {
                 id="verification_url"
                 placeholder="Credit"
                 className={` input !mt-0 !bg-white text-center`}
-              />
+              /> */}
               {/* <button className="bg-white px-3 !min-h-unit-10 border-1  w-full">
                 2
               </button> */}
@@ -138,7 +180,7 @@ const InputTable = (props: Props) => {
             </TableCell>
             <TableCell>
               <Button
-                startContent={<FaCloudUploadAlt className="text-slate-600"/>}
+                startContent={<FaCloudUploadAlt className="text-slate-600" />}
                 className="!bg-white border-1 rounded-sm"
               >
                 Upload
@@ -147,9 +189,9 @@ const InputTable = (props: Props) => {
           </TableRow>
         </TableBody>
       </Table>
-      
+
       {/* <input type="file" className="" /> */}
-      <Button color="primary" className="!rounded-md gradient-bg my-4" >
+      <Button color="primary" className="!rounded-md gradient-bg my-4">
         Save
       </Button>
     </form>

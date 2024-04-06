@@ -2,25 +2,27 @@ import { useLogOutQuery } from "@/redux/features/auth/authApi";
 import { Tooltip } from "@nextui-org/react";
 import { signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
 
-type Props = {};
+type Props = {
+  title: string;
+};
 
-const TopHeader = (props: Props) => {
+const TopHeader: FC<Props> = ({ title }) => {
   const { user } = useSelector((state: any) => state.auth);
-  const [logout, setLogout] =useState(false);
-  const {} = useLogOutQuery(undefined,{
+  const [logout, setLogout] = useState(false);
+  const {} = useLogOutQuery(undefined, {
     skip: !logout ? true : false,
-  })
+  });
   const logOutHandler = async () => {
     setLogout(true);
     await signOut();
-  }
+  };
 
   return (
     <div className="flex justify-between flex-wrap my-3 px-3 mx-3">
-      <h1 className="font-medium text-slate-600">Student dashboard</h1>
+      <h1 className="font-medium text-slate-600">{title}</h1>
       <div className="flex space-x-3 ">
         <span className="font-medium">
           Welcome : <span className="uppercase">{user.name}</span>
@@ -34,10 +36,7 @@ const TopHeader = (props: Props) => {
               // arrow color
               "before:bg-neutral-400 dark:before:bg-white",
             ],
-            content: [
-              "py-2 px-4 shadow-xl",
-              "bg-slate-800 text-white",
-            ],
+            content: ["py-2 px-4 shadow-xl", "bg-slate-800 text-white"],
           }}
         >
           <div className="cursor-pointer" onClick={() => logOutHandler()}>
