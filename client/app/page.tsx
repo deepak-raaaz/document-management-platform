@@ -7,6 +7,7 @@ import userAuth from "./hooks/userAuth";
 import { redirect } from "next/navigation";
 import { Fab } from "@mui/material";
 import { ThemeSwitcher } from "./utils/ThemeSwitcher";
+import adminAuth from "./hooks/adminAuth";
 
 interface Props {}
 
@@ -14,11 +15,14 @@ const Page: FC<Props> = (props) => {
   const [open, setOpen] = useState(false);
   const [activeItem, setActiveItem] = useState(0);
   const [route, setRoute] = useState("Login");
+  const [loginType, setLoginType] = useState("Login");
 
-  const isAuthenticated = userAuth();
-  
-  return isAuthenticated ? (
+  const isUser = userAuth();
+  const isAdmin = adminAuth();
+  return isUser ? (
     redirect("/student/dashboard")
+  ) : isAdmin ? (
+    redirect("/admin/dashboard")
   ) : (
     <div className="">
       <Heading
@@ -32,9 +36,9 @@ const Page: FC<Props> = (props) => {
         activeItem={activeItem}
         setRoute={setRoute}
         route={route}
+        loginType={loginType} 
       />
-      <LandingPage setOpen={setOpen} setRoute={setRoute} route={route} />
-      
+      <LandingPage setOpen={setOpen} setRoute={setRoute} route={route} loginType={loginType} setLoginType={setLoginType} />
     </div>
   );
 };

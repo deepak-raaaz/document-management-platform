@@ -13,6 +13,7 @@ import { IoMdLock } from "react-icons/io";
 type Props = {
   setRoute: (route: string) => void;
   setOpen: (open: boolean) => void;
+  loginType: string;
 };
 
 const schema = Yup.object().shape({
@@ -22,16 +23,17 @@ const schema = Yup.object().shape({
   password: Yup.string().required("Please enter your password!").min(6),
 });
 
-const Login: FC<Props> = ({ setRoute, setOpen }) => {
+const Login: FC<Props> = ({ setRoute, setOpen ,loginType}) => {
   const [show, setShow] = useState(false);
 
   const [login, { isSuccess, error }] = useLoginMutation();
-
+  const role = (loginType === "student") ? "user" :((loginType === "administrator")? "admin": ((loginType === "teacher/evalutor") ? "teacher" : "user"))
+  
   const formik = useFormik({
     initialValues: { email: "", password: "" },
     validationSchema: schema,
     onSubmit: async ({ email, password }) => {
-      await login({ email, password });
+      await login({ email, password, role});
     },
   });
 
@@ -51,7 +53,7 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
 
   return (
     <div className="w-full px-8 pt-5 pb-8">
-      <h1 className="title uppercase">Student Login</h1>
+      <h1 className="title uppercase">{loginType} Login</h1>
       <form onSubmit={handleSubmit}>
         <div className="w-full relative mt-4 mb-1 ">
           <label className="label" htmlFor="email">

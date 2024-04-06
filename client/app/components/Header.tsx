@@ -21,9 +21,10 @@ type Props = {
   activeItem: number;
   route: string;
   setRoute: (route: string) => void;
+  loginType: string;
 };
 
-const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
+const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute,loginType }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
@@ -206,6 +207,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
               setRoute={setRoute}
               activeItem={activeItem}
               component={Login}
+              loginType={loginType}
             />
           )}
         </>

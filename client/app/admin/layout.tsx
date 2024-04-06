@@ -16,6 +16,8 @@ export default function Layout({
   const [open, setOpen] = useState(false);
   const [activeItem, setActiveItem] = useState(0);
   const [route, setRoute] = useState("");
+  const [loginType, setLoginType] = useState("Login");
+
   const { user } = useSelector((state: any) => state.auth);
   return (
     <AdminProtected>
@@ -25,6 +27,7 @@ export default function Layout({
         activeItem={activeItem}
         setRoute={setRoute}
         route={route}
+        loginType={loginType} 
       />
       <div className="max-w-screen-1300px mx-auto min-h-[70vh] pb-10">
         <TopHeader title="Admin Pannel" />
