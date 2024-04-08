@@ -3,11 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node-dev --respawn --transpile-only server.ts"
+    
+    
   },
+  "ts-node-dev": "^2.0.0",
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
@@ -25,8 +30,13 @@
     "clsx": "^2.1.0",
     "dayjs": "^1.11.10",
     "formik": "^2.4.5",
+<<<<<<< Updated upstream
     "framer-motion": "^11.0.24",
     "next": "14.1.0",
+=======
+    "framer-motion": "^11.0.6",
+    "next": "^14.1.0",
+>>>>>>> Stashed changes
     "next-auth": "^4.24.6",
     "next-themes": "^0.2.1",
     "pdfjs-dist": "^3.4.120",
