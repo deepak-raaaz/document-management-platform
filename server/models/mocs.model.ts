@@ -55,6 +55,6 @@ const mocsDbSchema = new Schema<IMocsDb>({
     }
 });
 
-const mocsModel: Model<IMocsDb> =mongoose.model("Mocs",mocsDbSchema);
+const mocsModel: Model<IMocsDb> =mongoose.model("Moocs",mocsDbSchema);
 
 export default mocsModel;
