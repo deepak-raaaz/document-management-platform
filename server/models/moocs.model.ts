@@ -6,7 +6,7 @@ import { Model } from "mongoose";
 
 
 
-export interface IMocsDb extends Document{
+export interface IMoocsDb extends Document{
     user : object,
     title : string;
     platform : string;
@@ -17,8 +17,12 @@ export interface IMocsDb extends Document{
     document:object
 };
 
-const mocsDbSchema = new Schema<IMocsDb>({
-    user :Object,
+const moocsDbSchema = new Schema<IMoocsDb>({
+    user :{
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref:"User"
+    },
     title:{
         type:String,
         required:true,
@@ -55,6 +59,6 @@ const mocsDbSchema = new Schema<IMocsDb>({
     }
 });
 
-const mocsModel: Model<IMocsDb> =mongoose.model("Moocs",mocsDbSchema);
+const moocsModel: Model<IMoocsDb> =mongoose.model("Moocs",moocsDbSchema);
 
-export default mocsModel;
+export default moocsModel;
