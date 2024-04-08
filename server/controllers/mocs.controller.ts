@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from "express";
 import cloudinary from "cloudinary";
 import { create } from 'domain';
 import { createMocsDb } from '../services/mocs.service';
-import mocsModel from '../models/mocs.model';
+import mocsModel from '../models/moocs.model';
 
 export const uploadMocs = CatchAsyncError(async(req: Request, res: Response, next: NextFunction)=>{
     try {

@@ -68,7 +68,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
     },
     moocs:[
         {
-            moocsId:Schema.Types.ObjectId,
+            type:Schema.Types.ObjectId,
             ref: "Moocs",
         }
     ],
