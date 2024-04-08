@@ -6,6 +6,7 @@ import cors from "cors"
 import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
 import mocsRouter from "./routes/mocs.route";
+import adminRouter from "./routes/admin.route";
 
 app.use(express.json({limit:"50mb"}));
 
@@ -21,6 +22,7 @@ app.use(
   );
 app.use("/api/v2",userRouter);
 app.use("/api/v2",mocsRouter);
+app.use("/api/v2",adminRouter);
 
 // testing api
 app.get("/test",(req:Request,res:Response,next:NextFunction) =>{
