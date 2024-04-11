@@ -213,8 +213,8 @@ export const getMoocsList = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-      const moocsList = await moocsCourseModel.find({ verified: true }).sort({ createdAt: -1 });
-      
+      const  moocsList =  await moocsCourseModel.find({ isActive: true }).select('id platform title credit').sort({ createdAt: -1 });
+     
         res.status(201).json({
           success: true,
           moocsList,
@@ -224,5 +224,56 @@ export const getMoocsList = CatchAsyncError(
     }
   }
 );
+
+// edit moocs list by user 
+
+export const editMoocsList = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const moocsId = req.params.id;
+      const { title, startDate, endDate, year, verificationUrl } = req.body;
+
+      // Find the Moocs document by its ID
+      const moocs = await moocsModel.findById(moocsId);
+      if (!moocs) {
+        return next(new ErrorHandler("Moocs document not found", 404));
+      }
+
+      // Update the fields if they're provided in the request body
+      if (title) {
+        // Find the moocs course id by title
+        const course = await moocsCourseModel.findById(title);
+        if (!course) {
+          return next(new ErrorHandler("Course not found", 400));
+        }
+        moocs.moocsCourse = course._id;
+      }
+      if (startDate) {
+        moocs.startDate = startDate;
+      }
+      if (endDate) {
+        moocs.endDate = endDate;
+      }
+      if (year) {
+        moocs.year = year;
+      }
+      if (verificationUrl) {
+        moocs.verificationUrl = verificationUrl;
+      }
+
+      // Save the updated Moocs document
+      await moocs.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Moocs document updated successfully",
+        moocs,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 
 
