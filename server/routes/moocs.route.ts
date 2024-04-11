@@ -1,7 +1,6 @@
 import { isAuthenticate } from "../middleware/auth";
 import express from "express";
 import {
-  createMoocsCourse,
   editMocs,
   uploadMoocs,
 } from "../controllers/mocs.controller";
@@ -18,6 +17,5 @@ mocsRouter.post(
   editMocs
 );
 
-mocsRouter.post("/create-moocs-course", isAuthenticate, createMoocsCourse);
 
 export default mocsRouter;
