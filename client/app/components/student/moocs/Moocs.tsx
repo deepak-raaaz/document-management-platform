@@ -17,7 +17,7 @@ const Moocs: FC<Props> = ({}) => {
 
   return (
     <div className="max-w-screen-1300px mx-auto h-auto pb-10">
-      <TopHeader />
+      <TopHeader title=""/>
 
       <div className="bg-white border-1 border-slate-300 p-2 rounded-lg h-auto">
         <div className="w-full gradient-bg flex justify-center items-center py-2 rounded-md">

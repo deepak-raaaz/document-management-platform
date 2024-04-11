@@ -5,13 +5,12 @@ export const app = express();
 import cors from "cors"
 import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
-import mocsRouter from "./routes/mocs.route";
+import mocsRouter from "./routes/moocs.route";
 import adminRouter from "./routes/admin.route";
 
 app.use(express.json({limit:"50mb"}));
 
 app.use(cookieParser());
-
 
 //cors = cross origin resource sharing
 app.use(

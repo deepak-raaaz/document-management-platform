@@ -1,63 +1,170 @@
-import { Document } from 'mongoose';
+import { Document } from "mongoose";
 import ErrorHandler from "../utlis/ErrorHandler";
 import { CatchAsyncError } from "../middleware/CatchAsyncError";
 import { NextFunction, Request, Response } from "express";
 import cloudinary from "cloudinary";
-import { create } from 'domain';
-import { createMocsDb } from '../services/mocs.service';
-import mocsModel from '../models/moocs.model';
+import {
+  documentsModel,
+  moocsCourseModel,
+  moocsModel,
+} from "../models/moocs.model";
+import userModel from "../models/user.model";
+import multer from "multer";
+import fs from "fs";
 
-export const uploadMocs = CatchAsyncError(async(req: Request, res: Response, next: NextFunction)=>{
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage }).single("file");
+
+interface IMoocsUpload {
+  title: string;
+  startDate: Date;
+  endDate: Date;
+  year: number;
+  verificationUrl: string;
+}
+
+export const uploadMoocs = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const data = req.body;
-        const document = data.document;
-        if(document){
-            const myCloud = await cloudinary.v2.uploader.upload(document,{
-                folder:"Document_Mocs"
-            });
-
-            data.document ={
-                public_id:myCloud.public_id,
-                url:myCloud.secure_url
+      upload(req, res, async (err: any) => {
+          if (err) {
+            return next(new ErrorHandler("File upload failed", 400));
+          }
+        try {
+            const { title, startDate, endDate, year, verificationUrl } =
+              req.body as IMoocsUpload;
+    
+            // Find moocs course id by title
+            const course = await moocsCourseModel.findById(title);
+    
+            if (!course) {
+                return next(new ErrorHandler("Course not found", 400));
             }
+            const user = await userModel.findById(req.user?._id);
+
+            if (!user) {
+                return next(new ErrorHandler("User not found", 400));
+            }
+            
+            const file = req.file; // Access the uploaded file
+            if (!file) {
+              return next(new ErrorHandler("No file uploaded", 400));
+            }
+    
+            // Create a temporary file path
+            const tempFilePath = `temp_${Date.now()}_${file.originalname}`;
+    
+            // Write the buffer to the temporary file
+            fs.writeFileSync(tempFilePath, file.buffer);
+    
+            // Upload temporary file to Cloudinary
+            const myCloud = await cloudinary.v2.uploader.upload(tempFilePath, {
+              folder: "Document_Moocs",
+            });
+    
+            // Delete the temporary file
+            fs.unlinkSync(tempFilePath);
+            
+            const documentData = {
+              user: user?._id,
+              public_id: myCloud.public_id,
+              url: myCloud.secure_url,
+              pageCount: myCloud.pages,
+              size: myCloud.bytes,
+              format: myCloud.format,
+            };
+    
+            const moocsDocument = await documentsModel.create(documentData);
+            const data = {
+              user: user?._id,
+              moocsCourse: course?._id,
+              startDate: startDate,
+              endDate: endDate,
+              year: year,
+              document: moocsDocument?._id,
+              verificationUrl: verificationUrl,
+            };
+    
+            const moocs = await moocsModel.create(data);
+            res.status(201).json({
+              success: true,
+              moocs,
+            });
+            
+        } catch (error:any) {
+            return next(new ErrorHandler(error.message, 400));
         }
-        createMocsDb(data,res,next);
-    } catch (error:any) {
-        return next(new ErrorHandler(error.message, 400)); 
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
     }
-});
+  }
+);
 
 // edit mocs
-export const editMocs = CatchAsyncError(async(req: Request, res: Response, next: NextFunction)=>{
+export const editMocs = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const data = req.body;
-        const document = data.document;
-        if(document){
-            await cloudinary.v2.uploader.destroy(document.public_id)
-            const myCloud = await cloudinary.v2.uploader.upload(document,{
-                folder:"Document_Mocs"
-            });
+      const data = req.body;
+      const document = data.document;
+      if (document) {
+        await cloudinary.v2.uploader.destroy(document.public_id);
+        const myCloud = await cloudinary.v2.uploader.upload(document, {
+          folder: "Document_Moocs",
+        });
 
-            data.document ={
-                public_id:myCloud.public_id,
-                url:myCloud.secure_url
-            };
+        data.document = {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+        };
+      }
+
+      const mocsId = req.params.id;
+      const mocs = await moocsModel.findByIdAndUpdate(
+        mocsId,
+        {
+          $set: data,
+        },
+        { new: true }
+      );
+      res.status(201).json({
+        success: true,
+        mocs,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+
+export const createMoocsCourse = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const {title,platform,credit} = req.body;
+        if(!title){
+            return next(new ErrorHandler("Enter Course Title", 400));
+        }
+        if(!platform){
+            return next(new ErrorHandler("Enter Course Platform", 400));
+        }
+        if(!credit){
+            return next(new ErrorHandler("Enter Course Credit", 400));
         }
 
-        const mocsId = req.params.id;
-        const mocs = await mocsModel.findByIdAndUpdate(
-            mocsId,
-            {
-                $set:data,
-            },
-            {new:true}
-        );
+        const data = {
+            title:title,
+            platform:platform,
+            credit:credit,
+        }
+
+        const moocsCourse = await moocsCourseModel.create(data);
         res.status(201).json({
-            success:true,
-            mocs
-        })
-        
-    } catch (error:any) {
-        return next(new ErrorHandler(error.message, 400)); 
+          success: true,
+          moocsCourse
+        });
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
     }
-});
+  );

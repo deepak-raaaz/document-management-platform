@@ -1,19 +1,19 @@
 import { Button, Select, SelectItem } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { moocs, year } from "./data";
 import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { FaCloudUploadAlt } from "react-icons/fa";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
+import { useUploadMoocsMutation } from "@/redux/features/api/moocsSlice";
 
 type Props = {};
-function checkIfFilesAreTooBig(files?: any) {
+function checkIfFileAreTooBig(file?: any) {
   let valid = false;
-  if (files) {
-    const size = files.size;
+  if (file) {
+    const size = file.size;
     if (size <= 524288) {
       valid = true;
     }
@@ -21,10 +21,10 @@ function checkIfFilesAreTooBig(files?: any) {
   return valid;
 }
 
-function checkIfFilesAreCorrectType(files?: any) {
+function checkIfFileAreCorrectType(file?: any) {
   let valid = false;
-  if (files) {
-    if ("application/pdf" === files.type) {
+  if (file) {
+    if ("application/pdf" === file.type) {
       valid = true;
     }
   }
@@ -39,22 +39,25 @@ const schema = Yup.object().shape({
   verificationUrl: Yup.string().required(
     "Please enter Certificate Verfication Url"
   ),
-  files: Yup.mixed()
+  file: Yup.mixed()
     .nullable()
     .required("Select file")
     .test(
       "is-correct-file",
       "pdf should be less than 500kb.",
-      checkIfFilesAreTooBig
+      checkIfFileAreTooBig
     )
     .test(
       "is-big-file",
       "Sorry, only PDF files are supported for upload",
-      checkIfFilesAreCorrectType
+      checkIfFileAreCorrectType
     ),
 });
 
 const MoocsSubmissionForm = (props: Props) => {
+  const [uploadMoocs, { isSuccess, error, isLoading }] =
+    useUploadMoocsMutation();
+
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -62,15 +65,42 @@ const MoocsSubmissionForm = (props: Props) => {
       endDate: null,
       year: "",
       verificationUrl: "",
-      files: null,
+      file: null,
     },
     validationSchema: schema,
-    onSubmit: ({ title, startDate, endDate, year, verificationUrl, files }) => {
-      // await login({ email, password });
-      toast.success("All Set!");
-      console.log({ title, startDate, endDate, year, verificationUrl, files });
+    onSubmit: async ({
+      title,
+      startDate,
+      endDate,
+      year,
+      verificationUrl,
+      file,
+    }) => {
+      await uploadMoocs({
+        title,
+        startDate,
+        endDate,
+        year,
+        verificationUrl,
+        file,
+      });
     },
   });
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Successfully Submitted!");
+      formik.resetForm();
+      resetTitle();
+      setFieldValue("year", null);
+    }
+    if (error) {
+      if ("data" in error) {
+        const errorData = error as any;
+        toast.error(errorData.data.message);
+      }
+    }
+  }, [isSuccess, error]);
 
   const { errors, touched, values, handleChange, handleSubmit, setFieldValue } =
     formik;
@@ -93,16 +123,11 @@ const MoocsSubmissionForm = (props: Props) => {
     }
   };
 
-  // const pdfHandler = async (e: any) => {
-  //   const fileReader = new FileReader();
-  //   console.log(e.target.files[0]);
-  //   fileReader.onload = () => {
-  //     if (fileReader.readyState === 0) {
-  //       const pdf = fileReader.result;
-  //       alert(pdf);
-  //     }
-  //   };
-  // };
+  const resetTitle = () => {
+    setFieldValue("title", "", true);
+    setPlatform("");
+    setCredit("");
+  };
 
   return (
     <div>
@@ -125,10 +150,9 @@ const MoocsSubmissionForm = (props: Props) => {
               placeholder="Select Title"
               id="title"
               name="title"
-              //   value={values.title}
+              value={values.title}
               onChange={(e: any) => {
                 handleTitleChange(e);
-                // handleChange("title")(e.target.value);
               }}
             >
               {moocs.map((item) => (
@@ -294,30 +318,25 @@ const MoocsSubmissionForm = (props: Props) => {
                 className=" block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-slate-500 file:py-2.5 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-700 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
                 accept="application/pdf"
                 onChange={(event: any) => {
-                  setFieldValue("files", event.target.files[0], true);
+                  setFieldValue("file", event.target.files[0], true);
                 }}
               />
-              {errors.files && touched.files && (
+              {errors.file && touched.file && (
                 <span className="text-red-500 pt-2 block text-tiny mx-1">
-                  {errors.files}
+                  {errors.file}
                 </span>
               )}
-              {/* <Button
-                startContent={<FaCloudUploadAlt className="text-slate-600" />}
-                className="!bg-white border-1 rounded-sm"
-              >
-                Upload
-              </Button> */}
             </div>
           </div>
           <div className="col-span-12 grid grid-cols-12">
-            {/* <input type="file" className="" /> */}
             <Button
               color="primary"
-              className="!rounded-md gradient-bg my-4 col-span-1 "
+              className="!rounded-md gradient-bg my-4 col-span-2 max-md:col-span-3 max-sm:col-span-12 "
               type="submit"
+              disabled={isLoading}
+              isLoading={isLoading}
             >
-              Submit
+              {isLoading ? "Submitting" : "Submit"}
             </Button>
           </div>
         </div>

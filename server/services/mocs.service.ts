@@ -1,9 +1,9 @@
 import { CatchAsyncError } from "../middleware/CatchAsyncError";
-import { Response } from "express";
-import marModel from "../models/moocs.model";
+import { NextFunction, Response } from "express";
+import { moocsModel } from "../models/moocs.model";
 
-export const createMocsDb = CatchAsyncError(async(data:any,res:Response)=>{
-    const mocs = await marModel.create(data);
+export const createMoocsDb = CatchAsyncError(async(data:any,res:Response,next:NextFunction)=>{
+    const mocs = await moocsModel.create(data);
     res.status(201).json({
         success:true,
         mocs

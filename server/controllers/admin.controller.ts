@@ -29,6 +29,9 @@ export const singleStudentDetail = CatchAsyncError(
     try {
       const universityRoll = req.params.universityRoll;
       const singleStudent = await userModel.findById(universityRoll);
+      if(!universityRoll){
+        return next(new ErrorHandler("Not record found!", 400));
+      }
       res.status(201).json({
         success: true,
         singleStudent,
@@ -46,7 +49,10 @@ export const verifyStudent = CatchAsyncError(
     try {
       const student = await userModel.findById(req.params.id);
       if (!student) {
-        return next(new Error("USer not found"));
+        return next(new Error("User not found"));
+      }
+      if(student.isVerfied){
+        return next(new Error("Already verified!"));
       }
       if (!student.isVerfied) {
         student.isVerfied = true;
