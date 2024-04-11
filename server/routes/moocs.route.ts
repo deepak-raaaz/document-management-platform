@@ -2,20 +2,22 @@ import { isAuthenticate } from "../middleware/auth";
 import express from "express";
 import {
   editMocs,
+  getMyMoocs,
   uploadMoocs,
 } from "../controllers/mocs.controller";
 import { authorizeRoles } from "../middleware/auth";
 
-const mocsRouter = express.Router();
+const moocsRouter = express.Router();
 
-mocsRouter.post("/upload-moocs", isAuthenticate, uploadMoocs);
+moocsRouter.post("/upload-moocs", isAuthenticate, uploadMoocs);
 
-mocsRouter.post(
+moocsRouter.post(
   "/edit-moocs",
   isAuthenticate,
   authorizeRoles("admin"),
   editMocs
 );
 
+moocsRouter.get("/my-moocs", isAuthenticate, getMyMoocs);
 
-export default mocsRouter;
+export default moocsRouter;

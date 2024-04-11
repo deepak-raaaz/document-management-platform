@@ -8,6 +8,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
 import { useUploadMoocsMutation } from "@/redux/features/api/moocsSlice";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
+import { useSelector } from "react-redux";
 
 type Props = {};
 function checkIfFileAreTooBig(file?: any) {
@@ -58,6 +60,9 @@ const MoocsSubmissionForm = (props: Props) => {
   const [uploadMoocs, { isSuccess, error, isLoading }] =
     useUploadMoocsMutation();
 
+    const [loadUser, setLoadUser] = useState(false);
+    const {} = useLoadUserQuery(undefined, {skip: loadUser ? false : true})
+    const { user } = useSelector((state: any) => state.auth);
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -93,6 +98,7 @@ const MoocsSubmissionForm = (props: Props) => {
       formik.resetForm();
       resetTitle();
       setFieldValue("year", null);
+      setLoadUser(true);
     }
     if (error) {
       if ("data" in error) {
