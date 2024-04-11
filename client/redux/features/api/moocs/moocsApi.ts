@@ -1,5 +1,5 @@
 import { apiSlice } from "../apiSlice";
-import { moocsList, myMoocs } from "../moocsSlice";
+import {  myMoocs } from "../moocsSlice";
 
 export const moocsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -46,18 +46,6 @@ export const moocsApi = apiSlice.injectEndpoints({
           method: "GET",
           credentials: "include" as const,
         }),
-        async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-          try {
-            const result = await queryFulfilled;
-            dispatch(
-              moocsList({
-                moocsList: result.data.moocs,
-              })
-            );
-          } catch (error: any) {
-            console.log(error);
-          }
-        },
       }),
   }),
 });

@@ -1,5 +1,5 @@
 import { Button, Select, SelectItem } from "@nextui-org/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { year } from "./data";
 import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -7,15 +7,19 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
-import {
-  useMyMoocsQuery,
-  useUploadMoocsMutation,
-} from "@/redux/features/api/moocs/moocsSlice";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
+import { useMyMoocsQuery, useUploadMoocsMutation } from "@/redux/features/api/moocs/moocsApi";
 
-type Props = {};
+type Props = {
+  moocs:Array<{
+    _id: string;
+    title:string;
+    platform:string;
+    credit:number;
+  }>;
+};
 function checkIfFileAreTooBig(file?: any) {
   let valid = false;
   if (file) {
@@ -60,14 +64,14 @@ const schema = Yup.object().shape({
     ),
 });
 
-const MoocsSubmissionForm = (props: Props) => {
+const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
   const [uploadMoocs, { isSuccess, error, isLoading }] =
     useUploadMoocsMutation();
 
   const [loadUser, setLoadUser] = useState(false);
   const {} = useMyMoocsQuery(undefined, { skip: loadUser ? false : true });
 
-  const { moocsList } = useSelector((state: any) => state.moocsList);
+
 
   const formik = useFormik({
     initialValues: {
@@ -121,7 +125,7 @@ const MoocsSubmissionForm = (props: Props) => {
 
   const [selectedTitle, setSelectedTitle] = useState("");
   const [platform, setPlatform] = React.useState("");
-  const [credit, setCredit] = React.useState("");
+  const [credit, setCredit] = React.useState<number | undefined>(undefined);
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
   const inputFile = useRef<HTMLInputElement>(null);
@@ -136,22 +140,22 @@ const MoocsSubmissionForm = (props: Props) => {
 
   const handleTitleChange = (e: any) => {
     setSelectedTitle(e.target.value);
-    const moocsSelect = moocsList.find((moocs:any) => moocs.label === e.target.value);
+    const moocsSelect = moocs.find((moocs) => moocs.title === e.target.value);
     if (moocsSelect) {
-      setFieldValue("title", moocsSelect.id, true);
+      setFieldValue("title", moocsSelect._id, true);
       setPlatform(moocsSelect.platform);
       setCredit(moocsSelect.credit);
     } else {
       setFieldValue("title", "", true);
       setPlatform("");
-      setCredit("");
+      setCredit(undefined);
     }
   };
 
   const resetTitle = () => {
     setFieldValue("title", "", true);
     setPlatform("");
-    setCredit("");
+    setCredit(undefined);
     handleFileReset();
   };
 
@@ -181,9 +185,9 @@ const MoocsSubmissionForm = (props: Props) => {
                 handleTitleChange(e);
               }}
             >
-              {moocsList && moocsList.map((item:any) => (
-                <SelectItem key={item.value} value={item.value} className="">
-                  {item.label}
+              {moocs && moocs.map((item) => (
+                <SelectItem key={item.title} value={item.title} className="">
+                  {item.title}
                 </SelectItem>
               ))}
             </Select>
@@ -218,7 +222,7 @@ const MoocsSubmissionForm = (props: Props) => {
             </span>
             <input
               disabled
-              type="text"
+              type="number"
               name=""
               value={credit}
               // onChange={handleChange}

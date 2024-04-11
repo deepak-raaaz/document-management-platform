@@ -7,8 +7,8 @@ import MoocsTable from "./MoocsTable";
 import MoocsSubmissionForm from "./MoocsSubmissionForm";
 import { useMediaQuery, useTheme } from "@mui/material";
 import MobileMoocsTable from "./MobileMoocsTable";
-import { useLoadMoocsListQuery, useMyMoocsQuery } from "@/redux/features/api/moocs/moocsSlice";
 import { useSelector } from "react-redux";
+import { useLoadMoocsListQuery, useMyMoocsQuery } from "@/redux/features/api/moocs/moocsApi";
 
 type Props = {};
 
@@ -17,9 +17,10 @@ const Moocs: FC<Props> = ({}) => {
   const greaterThanMid = useMediaQuery(theme.breakpoints.up("md"));
 
   const { isLoading,error } = useMyMoocsQuery({});
-  const {} = useLoadMoocsListQuery({});
+
+  const { data} = useLoadMoocsListQuery({});
+
   const { myMoocs } = useSelector((state: any) => state.moocs);
-  console.log(myMoocs);
 
   return (
     <div className="max-w-screen-1300px mx-auto h-auto pb-10">
@@ -33,7 +34,10 @@ const Moocs: FC<Props> = ({}) => {
         <Divider className="my-2" />
         <div className="">
           {/* <InputTable /> */}
-          <MoocsSubmissionForm />
+          {
+            data && 
+          <MoocsSubmissionForm moocs={data.moocsList} />
+          }
         </div>
         <Divider className="my-2" />
         <div className="bg-white max-md:bg-slate-100 py-2">

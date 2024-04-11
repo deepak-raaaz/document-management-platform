@@ -1,7 +1,6 @@
 import React, { FC } from "react";
 import DashboardCard from "./DashboardCard";
 import TopHeader from "./TopHeader";
-
 type Props = {};
 
 const Dashboard: FC<Props> = ({}) => {
@@ -16,6 +15,7 @@ const Dashboard: FC<Props> = ({}) => {
       url: "/student/mar",
     },
   ];
+
 
   return (
     <div className="max-w-screen-1300px mx-auto h-[70vh]">
