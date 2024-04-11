@@ -21,12 +21,12 @@ interface IMoocsCourse extends Document {
 interface IMoocsDb extends Document {
   user: object;
   moocsCourse: object;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   year: number;
   document: object;
   verificationUrl:string;
-  isVerified: boolean;
+  status: string;
 }
 
 const documentsSchema = new Schema<IDocument>(
@@ -96,11 +96,11 @@ const moocsDbSchema = new Schema<IMoocsDb>(
       ref: "MooocsCourse",
     },
     startDate: {
-      type: Date,
+      type: String,
       required: true,
     },
     endDate: {
-      type: Date,
+      type: String,
       required: true,
     },
     year: {
@@ -116,9 +116,9 @@ const moocsDbSchema = new Schema<IMoocsDb>(
         type:String,
         required:true
     },
-    isVerified: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      default: "pending",
     },
   },
   { timestamps: true }

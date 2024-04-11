@@ -33,7 +33,7 @@ export const apiSlice = createApi({
                   console.log(error);
                 }
               },
-        })
+        }),
     }),
 });
 

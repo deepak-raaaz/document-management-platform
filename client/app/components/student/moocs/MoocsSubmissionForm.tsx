@@ -1,5 +1,5 @@
 import { Button, Select, SelectItem } from "@nextui-org/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { moocs, year } from "./data";
 import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
@@ -7,9 +7,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
-import { useUploadMoocsMutation } from "@/redux/features/api/moocsSlice";
+import {
+  useMyMoocsQuery,
+  useUploadMoocsMutation,
+} from "@/redux/features/api/moocs/moocsSlice";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import { useSelector } from "react-redux";
+import dayjs from "dayjs";
 
 type Props = {};
 function checkIfFileAreTooBig(file?: any) {
@@ -35,8 +39,8 @@ function checkIfFileAreCorrectType(file?: any) {
 
 const schema = Yup.object().shape({
   title: Yup.string().required("please Select Title of Course!"),
-  startDate: Yup.date().required("Please enter your Date of Joining!"),
-  endDate: Yup.date().required("Please enter your Date of Completion!"),
+  startDate: Yup.string().required("Please enter your Date of Joining!"),
+  endDate: Yup.string().required("Please enter your Date of Completion!"),
   year: Yup.string().required("select year!"),
   verificationUrl: Yup.string().required(
     "Please enter Certificate Verfication Url"
@@ -60,9 +64,9 @@ const MoocsSubmissionForm = (props: Props) => {
   const [uploadMoocs, { isSuccess, error, isLoading }] =
     useUploadMoocsMutation();
 
-    const [loadUser, setLoadUser] = useState(false);
-    const {} = useLoadUserQuery(undefined, {skip: loadUser ? false : true})
-    const { user } = useSelector((state: any) => state.auth);
+  const [loadUser, setLoadUser] = useState(false);
+  const {} = useMyMoocsQuery(undefined, { skip: loadUser ? false : true });
+
   const formik = useFormik({
     initialValues: {
       title: "",
@@ -99,6 +103,8 @@ const MoocsSubmissionForm = (props: Props) => {
       resetTitle();
       setFieldValue("year", null);
       setLoadUser(true);
+      setStartDate(null);
+      setEndDate(null);
     }
     if (error) {
       if ("data" in error) {
@@ -114,6 +120,17 @@ const MoocsSubmissionForm = (props: Props) => {
   const [selectedTitle, setSelectedTitle] = useState("");
   const [platform, setPlatform] = React.useState("");
   const [credit, setCredit] = React.useState("");
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(null);
+  const inputFile = useRef<HTMLInputElement>(null);
+
+  const handleFileReset = () => {
+    if (inputFile.current) {
+        inputFile.current.value = "";
+        inputFile.current.type = "text";
+        inputFile.current.type = "file";
+    }
+};
 
   const handleTitleChange = (e: any) => {
     setSelectedTitle(e.target.value);
@@ -133,6 +150,7 @@ const MoocsSubmissionForm = (props: Props) => {
     setFieldValue("title", "", true);
     setPlatform("");
     setCredit("");
+    handleFileReset();
   };
 
   return (
@@ -219,9 +237,11 @@ const MoocsSubmissionForm = (props: Props) => {
                   <div className="date-picker-style">
                     <MobileDatePicker
                       name="startDate"
-                      value={values.startDate}
+                      value={startDate}
                       onChange={(date: any) => {
-                        setFieldValue("startDate", date, true);
+                        setFieldValue("startDate", date ? dayjs(date).format('DD-MM-YYYY'): null, true);
+                        setStartDate(date);
+                        // alert(date ? dayjs(date).format('DD-MM-YYYY'): null);
                       }}
                     />
                   </div>
@@ -244,9 +264,10 @@ const MoocsSubmissionForm = (props: Props) => {
                   <div className="date-picker-style">
                     <MobileDatePicker
                       name="endDate"
-                      value={values.endDate}
+                      value={endDate}
                       onChange={(date: any) => {
-                        setFieldValue("endDate", date, true);
+                        setFieldValue("endDate", date ? dayjs(date).format('DD-MM-YYYY'): null, true);
+                        setEndDate(date);
                       }}
                     />
                   </div>
@@ -318,6 +339,7 @@ const MoocsSubmissionForm = (props: Props) => {
                 Certificate
               </span>
               <input
+              ref={inputFile}
                 type="file"
                 name="file"
                 id="file"

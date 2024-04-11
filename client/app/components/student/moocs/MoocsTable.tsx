@@ -14,12 +14,13 @@ import {
   DropdownItem,
 } from "@nextui-org/react";
 import { IoIosMore } from "react-icons/io";
+import { useSelector } from "react-redux";
 
 type Props = {};
 
 const MoocsTable = (props: Props) => {
-  const list = [1, 2, 3, 4];
-  const status = "verifying";
+  const { myMoocs } = useSelector((state: any) => state.moocs);
+
   return (
     <form>
       <Table
@@ -60,50 +61,50 @@ const MoocsTable = (props: Props) => {
         </TableHeader>
 
         <TableBody>
-          {list.map((item) => (
+          {myMoocs && myMoocs.map((moocs:any, index:number) => (
             <TableRow key="1" className="!bg-slate-100 ">
-              <TableCell className="!text-center !px-1">1.</TableCell>
+              <TableCell className="!text-center !px-1">{index + 1}.</TableCell>
               <TableCell className="!px-1">
                 <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 items-center flex ">
                   <span className="!mx-2 line-clamp-1">
-                    Technical English for engineers
+                    {moocs.moocsCourse.title}
                   </span>
                 </div>
               </TableCell>
               <TableCell className="!px-1">
                 <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 items-center flex ">
-                  <span className="!mx-2 line-clamp-1">Coursera</span>
+                  <span className="!mx-2 line-clamp-1">{moocs.moocsCourse.platform}</span>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 justify-center items-center flex ">
-                  <span className="!mx-2 line-clamp-1 text-center">2</span>
+                  <span className="!mx-2 line-clamp-1 text-center">{moocs.moocsCourse.credit}</span>
                 </div>
               </TableCell>
               <TableCell className="!px-1 width-style !max-w-[9rem] !w-[9rem]">
                 <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 justify-center items-center flex ">
                   <span className="!mx-2 line-clamp-1 text-center">
-                    12/04/2023
+                    {moocs.startDate}
                   </span>
                 </div>
               </TableCell>
               <TableCell className="!px-1 width-style !max-w-[9rem] !w-[9rem]">
                 <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 justify-center items-center flex ">
                   <span className="!mx-2 line-clamp-1 text-center">
-                    30/02/2024
+                  {moocs.endDate}
                   </span>
                 </div>
               </TableCell>
               <TableCell className="!px-1">
                 <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 justify-center items-center flex ">
-                  <span className="!mx-2 line-clamp-1 text-center">2nd</span>
+                  <span className="!mx-2 line-clamp-1 text-center">{moocs.year}</span>
                 </div>
               </TableCell>
               <TableCell className="!px-1">
                 <Tooltip
                   showArrow
                   placement="top"
-                  content="https://www.mycertificate.com/verification-url"
+                  content={moocs.verificationUrl}
                   classNames={{
                     base: ["before:bg-neutral-400 dark:before:bg-white"],
                     content: ["py-2 px-4 shadow-xl", "bg-slate-800 text-white"],
@@ -111,7 +112,7 @@ const MoocsTable = (props: Props) => {
                 >
                   <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 items-center flex max-w-[9rem]">
                     <span className="!mx-2 line-clamp-1 ">
-                      https://www.mycertificate.com/verification-url
+                      {moocs.verificationUrl}
                     </span>
                   </div>
                 </Tooltip>
@@ -119,16 +120,16 @@ const MoocsTable = (props: Props) => {
               <TableCell>
                 <div
                   className={`${
-                    status === "verifying"
+                    moocs.status === "pending"
                       ? "border-blue-600 text-blue-600 bg-blue-600"
-                      : status === "rejected"
+                      : moocs.status === "pending"
                       ? "border-red-600 text-red-600 bg-red-600"
-                      : status === "verified"
+                      : moocs.status === "verified"
                       ? "border-green-600 text-green-600 bg-green-600 "
                       : ""
                   } bg-opacity-15  w-full font-medium !rounded-none !min-h-unit-10 border-2 items-center justify-center flex max-w-[9rem]`}
                 >
-                  <span className="!mx-2 line-clamp-1 ">Verifying</span>
+                  <span className="!mx-2 line-clamp-1 capitalize">{moocs.status}</span>
                 </div>
               </TableCell>
               <TableCell>

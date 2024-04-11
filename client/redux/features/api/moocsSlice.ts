@@ -1,28 +1,19 @@
-import { apiSlice } from "../api/apiSlice";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
+const initialState = {
+    myMoocs: "",
+};
 
-export const moocsApi = apiSlice.injectEndpoints({
-  endpoints: (builder) => ({
-    uploadMoocs: builder.mutation({
-       query: ({ title, startDate, endDate, year, verificationUrl, file }) => {
-        const formData = new FormData();
-        formData.append("title", title);
-        formData.append("startDate", startDate);
-        formData.append("endDate", endDate);
-        formData.append("year", year);
-        formData.append("verificationUrl", verificationUrl);
-        formData.append("file", file); // Append the file to FormData
-
-        return {
-          url: "upload-moocs",
-          method: "POST",
-          body: formData,
-          credentials: "include" as const,
-        };
-      },
-    }),
-  }),
+const moocsSlice = createSlice({
+    name:"moocs",
+    initialState,
+    reducers: {
+        myMoocs: (state,action: PayloadAction<{myMoocs:string}>) => {
+            state.myMoocs = action.payload.myMoocs;
+        },
+    },
 });
 
+export const { myMoocs } = moocsSlice.actions;
 
-export const { useUploadMoocsMutation } = moocsApi;
+export default moocsSlice.reducer;
