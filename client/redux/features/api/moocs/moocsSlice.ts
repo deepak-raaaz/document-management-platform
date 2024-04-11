@@ -1,5 +1,5 @@
 import { apiSlice } from "../apiSlice";
-import { myMoocs } from "../moocsSlice";
+import { moocsList, myMoocs } from "../moocsSlice";
 
 export const moocsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -40,7 +40,26 @@ export const moocsApi = apiSlice.injectEndpoints({
           }
         },
       }),
+      loadMoocsList: builder.query({
+        query: (data) => ({
+          url: "moocs-list",
+          method: "GET",
+          credentials: "include" as const,
+        }),
+        async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+          try {
+            const result = await queryFulfilled;
+            dispatch(
+              moocsList({
+                moocsList: result.data.moocs,
+              })
+            );
+          } catch (error: any) {
+            console.log(error);
+          }
+        },
+      }),
   }),
 });
 
-export const { useUploadMoocsMutation, useMyMoocsQuery} = moocsApi;
+export const { useUploadMoocsMutation, useMyMoocsQuery, useLoadMoocsListQuery} = moocsApi;
