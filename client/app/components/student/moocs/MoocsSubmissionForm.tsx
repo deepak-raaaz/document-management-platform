@@ -125,7 +125,7 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
 
   const [selectedTitle, setSelectedTitle] = useState("");
   const [platform, setPlatform] = React.useState("");
-  const [credit, setCredit] = React.useState<number | undefined>(undefined);
+  const [credit, setCredit] = React.useState<number | string>('');
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
   const inputFile = useRef<HTMLInputElement>(null);
@@ -148,14 +148,14 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
     } else {
       setFieldValue("title", "", true);
       setPlatform("");
-      setCredit(undefined);
+      setCredit('');
     }
   };
 
   const resetTitle = () => {
     setFieldValue("title", "", true);
     setPlatform("");
-    setCredit(undefined);
+    setCredit('');
     handleFileReset();
   };
 
