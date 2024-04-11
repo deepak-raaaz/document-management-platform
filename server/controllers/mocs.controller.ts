@@ -213,7 +213,7 @@ export const getMoocsList = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-      const moocsList = await moocsCourseModel.find({ verified: true }).sort({ createdAt: -1 });
+      const moocsList = await moocsCourseModel.find({ isActive: true }).select("_id title platform credit").sort({ createdAt: -1 });
       
         res.status(201).json({
           success: true,

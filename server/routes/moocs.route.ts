@@ -20,6 +20,6 @@ moocsRouter.post(
 );
 
 moocsRouter.get("/my-moocs", isAuthenticate, getMyMoocs);
-moocsRouter.get("/get-moocs-list", isAuthenticate, getMoocsList);
+moocsRouter.get("/moocs-list", isAuthenticate, getMoocsList);
 
 export default moocsRouter;
