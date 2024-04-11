@@ -7,7 +7,7 @@ import MoocsTable from "./MoocsTable";
 import MoocsSubmissionForm from "./MoocsSubmissionForm";
 import { useMediaQuery, useTheme } from "@mui/material";
 import MobileMoocsTable from "./MobileMoocsTable";
-import { useMyMoocsQuery } from "@/redux/features/api/moocs/moocsSlice";
+import { useLoadMoocsListQuery, useMyMoocsQuery } from "@/redux/features/api/moocs/moocsSlice";
 import { useSelector } from "react-redux";
 
 type Props = {};
@@ -17,6 +17,7 @@ const Moocs: FC<Props> = ({}) => {
   const greaterThanMid = useMediaQuery(theme.breakpoints.up("md"));
 
   const { isLoading,error } = useMyMoocsQuery({});
+  const {} = useLoadMoocsListQuery({});
   const { myMoocs } = useSelector((state: any) => state.moocs);
   console.log(myMoocs);
 

@@ -1,6 +1,6 @@
 import { Button, Select, SelectItem } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
-import { moocs, year } from "./data";
+import { year } from "./data";
 import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -66,6 +66,8 @@ const MoocsSubmissionForm = (props: Props) => {
 
   const [loadUser, setLoadUser] = useState(false);
   const {} = useMyMoocsQuery(undefined, { skip: loadUser ? false : true });
+
+  const { moocsList } = useSelector((state: any) => state.moocsList);
 
   const formik = useFormik({
     initialValues: {
@@ -134,7 +136,7 @@ const MoocsSubmissionForm = (props: Props) => {
 
   const handleTitleChange = (e: any) => {
     setSelectedTitle(e.target.value);
-    const moocsSelect = moocs.find((moocs) => moocs.label === e.target.value);
+    const moocsSelect = moocsList.find((moocs:any) => moocs.label === e.target.value);
     if (moocsSelect) {
       setFieldValue("title", moocsSelect.id, true);
       setPlatform(moocsSelect.platform);
@@ -179,7 +181,7 @@ const MoocsSubmissionForm = (props: Props) => {
                 handleTitleChange(e);
               }}
             >
-              {moocs.map((item) => (
+              {moocsList && moocsList.map((item:any) => (
                 <SelectItem key={item.value} value={item.value} className="">
                   {item.label}
                 </SelectItem>
