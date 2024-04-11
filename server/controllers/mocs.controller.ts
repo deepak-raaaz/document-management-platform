@@ -141,40 +141,40 @@ export const getMyMoocs = CatchAsyncError(
 );
 
 // edit moocs
-export const editMocs = CatchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const data = req.body;
-      const document = data.document;
-      if (document) {
-        await cloudinary.v2.uploader.destroy(document.public_id);
-        const myCloud = await cloudinary.v2.uploader.upload(document, {
-          folder: "Document_Moocs",
-        });
+// export const editMocs = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const data = req.body;
+//       const document = data.document;
+//       if (document) {
+//         await cloudinary.v2.uploader.destroy(document.public_id);
+//         const myCloud = await cloudinary.v2.uploader.upload(document, {
+//           folder: "Document_Moocs",
+//         });
 
-        data.document = {
-          public_id: myCloud.public_id,
-          url: myCloud.secure_url,
-        };
-      }
+//         data.document = {
+//           public_id: myCloud.public_id,
+//           url: myCloud.secure_url,
+//         };
+//       }
 
-      const mocsId = req.params.id;
-      const mocs = await moocsModel.findByIdAndUpdate(
-        mocsId,
-        {
-          $set: data,
-        },
-        { new: true }
-      );
-      res.status(201).json({
-        success: true,
-        mocs,
-      });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
-    }
-  }
-);
+//       const mocsId = req.params.id;
+//       const mocs = await moocsModel.findByIdAndUpdate(
+//         mocsId,
+//         {
+//           $set: data,
+//         },
+//         { new: true }
+//       );
+//       res.status(201).json({
+//         success: true,
+//         mocs,
+//       });
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 400));
+//     }
+//   }
+// );
 
 //create moocs course (admin only)
 export const createMoocsCourse = CatchAsyncError(
@@ -227,14 +227,20 @@ export const getMoocsList = CatchAsyncError(
 
 // edit moocs list by user 
 
-export const editMoocsList = CatchAsyncError(
+export const editMoocs = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      
       const moocsId = req.params.id;
       const { title, startDate, endDate, year, verificationUrl } = req.body;
 
       // Find the Moocs document by its ID
       const moocs = await moocsModel.findById(moocsId);
+      
+      if(moocs?.status === 'verified' ){
+        return next(new ErrorHandler("You can change verified Document , Kindly approach to HOD", 400));
+
+      }
       if (!moocs) {
         return next(new ErrorHandler("Moocs document not found", 404));
       }
@@ -268,6 +274,43 @@ export const editMoocsList = CatchAsyncError(
         success: true,
         message: "Moocs document updated successfully",
         moocs,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// delete the uploaded moocs :
+export const deleteMoocs = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const moocsId = req.params.id;
+
+      // Find the Moocs entry by its ID
+      const moocs = await moocsModel.findById(moocsId);
+      if (!moocs) {
+        return next(new ErrorHandler("Moocs entry not found", 404));
+      }
+
+      // Check if the logged-in user is the owner of the Moocs entry
+      if (moocs.user.toString() !== req.user?._id.toString()) {
+        return next(new ErrorHandler("You are not authorized to delete this Moocs entry", 403));
+      }
+
+      // Delete the document from Cloudinary
+      const document = await documentsModel.findById(moocs.document);
+      if (document) {
+        await cloudinary.v2.uploader.destroy(document.public_id);
+        await await (document as any).remove();
+      }
+
+      // Delete the Moocs entry from the database
+      await (moocs as any).remove();
+
+      res.status(200).json({
+        success: true,
+        message: "Moocs entry and associated document deleted successfully",
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
