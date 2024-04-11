@@ -207,3 +207,22 @@ export const createMoocsCourse = CatchAsyncError(
     }
   }
 );
+
+// get all moocs list 
+export const getMoocsList = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+      const moocsList = await moocsCourseModel.find({ verified: true }).sort({ createdAt: -1 });
+      
+        res.status(201).json({
+          success: true,
+          moocsList,
+        });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+
