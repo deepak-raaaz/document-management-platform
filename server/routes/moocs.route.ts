@@ -2,6 +2,7 @@ import { isAuthenticate } from "../middleware/auth";
 import express from "express";
 import {
   editMocs,
+  getMoocsList,
   getMyMoocs,
   uploadMoocs,
 } from "../controllers/mocs.controller";
@@ -19,5 +20,6 @@ moocsRouter.post(
 );
 
 moocsRouter.get("/my-moocs", isAuthenticate, getMyMoocs);
+moocsRouter.get("/get-moocs-list", isAuthenticate, getMoocsList);
 
 export default moocsRouter;

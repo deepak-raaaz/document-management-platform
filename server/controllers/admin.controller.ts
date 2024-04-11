@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from "express";
 import cloudinary from "cloudinary";
 import { create } from 'domain';
 import { createMocsDb } from '../services/mocs.service';
-import moocsModel from '../models/moocs.model';
+import { moocsModel } from "../models/moocs.model";
 import userModel from '../models/user.model';
 
 // get all details of the student :-
