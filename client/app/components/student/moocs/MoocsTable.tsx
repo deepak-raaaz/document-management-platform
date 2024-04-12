@@ -31,13 +31,13 @@ const MoocsTable = (props: Props) => {
     ModalDialogProps["layout"] | undefined
   >(undefined);
 
-  // const { refetch } = useMyMoocsQuery({refetchOnMountOrArgChange:true});
+  const { refetch } = useMyMoocsQuery({refetchOnMountOrArgChange:true});
 
   const [deleteMyMoocs, {isSuccess,error}] = useDeleteMyMoocsMutation({});
 
   useEffect(() => {
     if(isSuccess){
-      // refetch();
+      refetch();
       toast.success("Moocs Deleted Successfully");
     }
     if(error){
@@ -183,7 +183,7 @@ const MoocsTable = (props: Props) => {
                       onAction={(key) => {handleDelete(key);}}
                     >
                       <DropdownItem key={moocs._id}>View Document</DropdownItem>
-                      <DropdownItem key={moocs._id} className={`${moocs.status === "verified" ? "hidden" : "block"}`}>Delete</DropdownItem>
+                      <DropdownItem key={moocs._id} >Delete</DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
                 </div>

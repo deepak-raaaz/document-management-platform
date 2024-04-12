@@ -295,7 +295,7 @@ export const editMoocs = CatchAsyncError(
 export const deleteMoocs = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const moocsId = req.params.id;
+      const moocsId = req.params.id as any;
 
       // Find the Moocs entry by its ID
       const moocs = await moocsModel.findById(moocsId);
