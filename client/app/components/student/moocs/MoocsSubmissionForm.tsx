@@ -10,15 +10,30 @@ import { toast } from "react-hot-toast";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
-import { useMyMoocsQuery, useUploadMoocsMutation } from "@/redux/features/api/moocs/moocsApi";
+import {
+  useMyMoocsQuery,
+  useUploadMoocsMutation,
+} from "@/redux/features/api/moocs/moocsApi";
 
+interface IEditMoocs {
+  _id: string;
+  titleId: string;
+  startDate: string;
+  endDate: string;
+  year: string;
+  verificationUrl: string;
+  fileUrl: string;
+}
 type Props = {
-  moocs:Array<{
+  //this contain moocs course list
+  moocs: Array<{
     _id: string;
-    title:string;
-    platform:string;
-    credit:number;
+    title: string;
+    platform: string;
+    credit: number;
   }>;
+  //for update or edit moocs submission
+  editMoocs?: IEditMoocs;
 };
 function checkIfFileAreTooBig(file?: any) {
   let valid = false;
@@ -64,14 +79,12 @@ const schema = Yup.object().shape({
     ),
 });
 
-const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
+const MoocsSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
   const [uploadMoocs, { isSuccess, error, isLoading }] =
     useUploadMoocsMutation();
 
   const [loadUser, setLoadUser] = useState(false);
   const {} = useMyMoocsQuery(undefined, { skip: loadUser ? false : true });
-
-
 
   const formik = useFormik({
     initialValues: {
@@ -125,22 +138,23 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
 
   const [selectedTitle, setSelectedTitle] = useState("");
   const [platform, setPlatform] = React.useState("");
-  const [credit, setCredit] = React.useState<number | string>('');
-  const [startDate, setStartDate] = React.useState<Date | null>(null);
-  const [endDate, setEndDate] = React.useState<Date | null>(null);
+  const [credit, setCredit] = React.useState<number | string>("");
+  const [startDate, setStartDate] = React.useState<dayjs.Dayjs | null>(null);
+  const [endDate, setEndDate] = React.useState<dayjs.Dayjs | null>(null);
+
   const inputFile = useRef<HTMLInputElement>(null);
 
   const handleFileReset = () => {
     if (inputFile.current) {
-        inputFile.current.value = "";
-        inputFile.current.type = "text";
-        inputFile.current.type = "file";
+      inputFile.current.value = "";
+      inputFile.current.type = "text";
+      inputFile.current.type = "file";
     }
-};
+  };
 
   const handleTitleChange = (e: any) => {
     setSelectedTitle(e.target.value);
-    const moocsSelect = moocs.find((moocs) => moocs.title === e.target.value);
+    const moocsSelect = moocs.find((moocs) => moocs._id === e.target.value);
     if (moocsSelect) {
       setFieldValue("title", moocsSelect._id, true);
       setPlatform(moocsSelect.platform);
@@ -148,21 +162,42 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
     } else {
       setFieldValue("title", "", true);
       setPlatform("");
-      setCredit('');
+      setCredit("");
     }
   };
 
   const resetTitle = () => {
     setFieldValue("title", "", true);
     setPlatform("");
-    setCredit('');
+    setCredit("");
     handleFileReset();
   };
+
+  useEffect(() => {
+    const moocsSelect = moocs.find((moocs) => moocs._id === editMoocs?.titleId);
+    if (moocsSelect) {
+      setFieldValue("title", moocsSelect._id, true);
+      setPlatform(moocsSelect.platform);
+      setCredit(moocsSelect.credit);
+    }
+    if (editMoocs) {
+      const sdate = dayjs(editMoocs.startDate, "DD-MM-YYYY");
+      const edate = dayjs(editMoocs.endDate, "DD-MM-YYYY");
+      setStartDate(sdate);
+      setEndDate(edate);
+      setFieldValue("year", editMoocs.year);
+      setFieldValue("verificationUrl", editMoocs.verificationUrl);
+      setFieldValue("startDate", editMoocs.startDate);
+      setFieldValue("endDate", editMoocs.endDate);
+    }
+  }, [editMoocs]);
 
   return (
     <div>
       <div className="gradient-bg flex py-2 justify-center items-center rounded-lg">
-        <span className="font-semibold text-white">Moocs Submission</span>
+        <span className="font-semibold text-white">
+          Moocs {editMoocs ? "Edit" : "Submission"}
+        </span>
       </div>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-12 gap-2 bg-slate-100 py-3 px-2 my-2 overflow-hidden">
@@ -184,12 +219,14 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
               onChange={(e: any) => {
                 handleTitleChange(e);
               }}
+              defaultSelectedKeys={editMoocs ? [editMoocs.titleId] : ""}
             >
-              {moocs && moocs.map((item) => (
-                <SelectItem key={item.title} value={item.title} className="">
-                  {item.title}
-                </SelectItem>
-              ))}
+              {moocs &&
+                moocs.map((item) => (
+                  <SelectItem key={item._id} value={item.title} className="">
+                    {item.title}
+                  </SelectItem>
+                ))}
             </Select>
             {errors.title && touched.title && (
               <span className="text-red-500 pt-2 block text-tiny mx-1">
@@ -245,7 +282,11 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
                       name="startDate"
                       value={startDate}
                       onChange={(date: any) => {
-                        setFieldValue("startDate", date ? dayjs(date).format('DD-MM-YYYY'): null, true);
+                        setFieldValue(
+                          "startDate",
+                          date ? dayjs(date).format("DD-MM-YYYY") : null,
+                          true
+                        );
                         setStartDate(date);
                         // alert(date ? dayjs(date).format('DD-MM-YYYY'): null);
                       }}
@@ -272,7 +313,11 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
                       name="endDate"
                       value={endDate}
                       onChange={(date: any) => {
-                        setFieldValue("endDate", date ? dayjs(date).format('DD-MM-YYYY'): null, true);
+                        setFieldValue(
+                          "endDate",
+                          date ? dayjs(date).format("DD-MM-YYYY") : null,
+                          true
+                        );
                         setEndDate(date);
                       }}
                     />
@@ -299,6 +344,7 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
               id="year"
               name="year"
               value={values.year}
+              defaultSelectedKeys={editMoocs ? [editMoocs.year] : ""}
               onChange={(e: any) => {
                 handleChange("year")(e.target.value);
               }}
@@ -338,14 +384,27 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
             )}
           </div>
 
-          <div className="col-span-12 grid grid-cols-12">
+          <div className="col-span-12 grid grid-cols-12 gap-2">
+            {editMoocs && (
+              <div className="col-span-2 max-1000px:col-span-3 flex flex-col">
+                <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
+                  Certificate
+                </span>
+                <Button
+                  color="primary"
+                  className="!rounded-md my-0"
+                >
+                  View File
+                </Button>
+              </div>
+            )}
             {/* Upload button  */}
             <div className="flex flex-col col-span-4 max-800px:col-span-6 max-sm:col-span-12">
               <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
-                Certificate
+                {editMoocs ? "New Certificate" : "Certificate"}
               </span>
               <input
-              ref={inputFile}
+                ref={inputFile}
                 type="file"
                 name="file"
                 id="file"
@@ -362,7 +421,7 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
               )}
             </div>
           </div>
-          <div className="col-span-12 grid grid-cols-12">
+          <div className="col-span-12 grid gap-2 grid-cols-12">
             <Button
               color="primary"
               className="!rounded-md gradient-bg my-4 col-span-2 max-md:col-span-3 max-sm:col-span-12 "
@@ -370,7 +429,7 @@ const MoocsSubmissionForm:FC<Props> = ({moocs}) => {
               disabled={isLoading}
               isLoading={isLoading}
             >
-              {isLoading ? "Submitting" : "Submit"}
+              {isLoading ? "Submitting" : editMoocs ? "Save" : "Submit"}
             </Button>
           </div>
         </div>

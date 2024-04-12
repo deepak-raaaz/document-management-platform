@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -15,13 +15,22 @@ import {
 } from "@nextui-org/react";
 import { IoIosMore } from "react-icons/io";
 import { useSelector } from "react-redux";
+import { ModalDialogProps } from "@mui/joy";
+import PopUpModal from "@/app/utils/PopUpModal";
+import UpdateForm from "./UpdateForm";
+
 
 type Props = {};
 
 const MoocsTable = (props: Props) => {
   const { myMoocs } = useSelector((state: any) => state.moocs);
+  const [route, setRoute] = useState("");
+  const [layout, setLayout] = React.useState<
+    ModalDialogProps["layout"] | undefined
+  >(undefined);
 
   return (
+    <>
     <form>
       <Table
         aria-label="Example static collection table"
@@ -148,10 +157,10 @@ const MoocsTable = (props: Props) => {
                     </DropdownTrigger>
                     <DropdownMenu
                       aria-label="Action event example"
-                      onAction={(key) => alert(key)}
+                      onAction={(key) => {alert(key)}}
                     >
-                      <DropdownItem key="Copy link">Edit</DropdownItem>
-                      <DropdownItem key="Report">Delete</DropdownItem>
+                      <DropdownItem key={moocs._id}>View Document</DropdownItem>
+                      <DropdownItem key={moocs._id} className={`${moocs.status === "verified" ? "hidden" : "block"}`}>Delete</DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
                 </div>
@@ -161,6 +170,20 @@ const MoocsTable = (props: Props) => {
         </TableBody>
       </Table>
     </form>
+    {route === "edit" && (
+        <>
+          {layout && (
+            <PopUpModal
+              layout={layout}
+              setLayout={setLayout}
+              setRoute={setRoute}
+              component={UpdateForm}
+              route="viewPdf"
+            />
+          )}
+        </>
+      )}
+    </>
   );
 };
 
