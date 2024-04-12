@@ -292,7 +292,6 @@ export const editMoocs = CatchAsyncError(
   }
 );
 
-// delete the uploaded moocs :
 export const deleteMoocs = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -313,11 +312,22 @@ export const deleteMoocs = CatchAsyncError(
       const document = await documentsModel.findById(moocs.document);
       if (document) {
         await cloudinary.v2.uploader.destroy(document.public_id);
-        await await (document as any).remove();
+        await document.deleteOne();
       }
 
       // Delete the Moocs entry from the database
-      await (moocs as any).remove();
+      await moocs.deleteOne();
+
+      // Remove the Moocs entry ID from the user's moocs array
+      const user = await userModel.findById(req.user?._id);
+      if (user) {
+        const index = user.moocs.indexOf(moocsId);
+        if (index !== -1) {
+          user.moocs.splice(index, 1);
+          await user.save();
+          await redis.set(req.user?._id, JSON.stringify(user));
+        }
+      }
 
       res.status(200).json({
         success: true,
@@ -328,6 +338,8 @@ export const deleteMoocs = CatchAsyncError(
     }
   }
 );
+
+
 
 
 
