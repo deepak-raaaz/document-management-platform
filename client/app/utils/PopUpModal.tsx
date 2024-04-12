@@ -10,6 +10,8 @@ type Props = {
   component: any;
   route?:string;
   setRoute?: (route: string) => void;
+  pdfUrl?:string;
+  verificationUrl?:string;
 };
 
 const PopUpModel: FC<Props> = ({
@@ -18,6 +20,8 @@ const PopUpModel: FC<Props> = ({
   setRoute,
   route,
   component: Component,
+  pdfUrl,
+  verificationUrl
 }) => {
   const theme = useTheme();
   const greaterThanMid = useMediaQuery(theme.breakpoints.up("md"));
@@ -38,7 +42,7 @@ const PopUpModel: FC<Props> = ({
           {/* <DialogTitle>Filters</DialogTitle> */}
           <div className={`m-auto  ${route === "viewPdf"? "w-[60vw]" :"800px:w-[450px]"} `}>
 
-          <Component setRoute={setRoute}  />
+          <Component setRoute={setRoute} pdfUrl={pdfUrl} verificationUrl={verificationUrl} />
         </div>
         </ModalDialog>
       </Modal>
