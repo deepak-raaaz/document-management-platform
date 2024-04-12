@@ -120,4 +120,39 @@ interface IMARUpload {
   );
 
   
+  export const deleteMAR = CatchAsyncError(
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const marId = req.params.id;
+  
+        // Find the MAR entry by its ID
+        const mar = await marModel.findById(marId);
+        if (!mar) {
+          return next(new ErrorHandler("MAR entry not found", 404));
+        }
+  
+        // Check if the logged-in user is the owner of the MAR entry
+        if (mar.user.toString() !== req.user?._id.toString()) {
+          return next(new ErrorHandler("You are not authorized to delete this MAR entry", 403));
+        }
+  
+        // Delete the document from Cloudinary
+        const document = await documentsModel.findById(mar.document);
+        if (document) {
+          await cloudinary.v2.uploader.destroy(document.public_id);
+          await (document as any).remove();
+        }
+  
+        // Delete the MAR entry from the database
+        await (mar as any).remove();
+  
+        res.status(200).json({
+          success: true,
+          message: "MAR entry and associated document deleted successfully",
+        });
+      } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    }
+  );
   
