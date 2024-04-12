@@ -84,7 +84,7 @@ const MoocsSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
     useUploadMoocsMutation();
 
   const [loadUser, setLoadUser] = useState(false);
-  const {} = useMyMoocsQuery(undefined, { skip: loadUser ? false : true });
+  const {refetch} = useMyMoocsQuery({},{refetchOnMountOrArgChange:true});
 
   const formik = useFormik({
     initialValues: {
@@ -121,7 +121,8 @@ const MoocsSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
       formik.resetForm();
       resetTitle();
       setFieldValue("year", null);
-      setLoadUser(true);
+      // setLoadUser(true);
+      refetch();
       setStartDate(null);
       setEndDate(null);
     }
