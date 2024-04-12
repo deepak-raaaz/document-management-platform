@@ -303,6 +303,11 @@ export const deleteMoocs = CatchAsyncError(
         return next(new ErrorHandler("Moocs entry not found", 404));
       }
 
+      if(moocs?.status === 'verified' ){
+        return next(new ErrorHandler("You can change verified Document , Kindly approach to HOD", 400));
+
+      }
+
       // Check if the logged-in user is the owner of the Moocs entry
       if (moocs.user.toString() !== req.user?._id.toString()) {
         return next(new ErrorHandler("You are not authorized to delete this Moocs entry", 403));
