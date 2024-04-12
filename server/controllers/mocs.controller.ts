@@ -139,10 +139,19 @@ export const getMyMoocs = CatchAsyncError(
         return next(new ErrorHandler("User not found", 400));
       }
 
-      const moocs = user.moocs;
+      const moocs = user.moocs as any;
 
-      res.status(201).json({
+      // Calculate total credit points of verified Moocs entries
+      let totalCreditPoints = 0;
+      moocs.forEach((mooc : any) => {
+        if (mooc.status === "verified") { // Ensure mooc is properly typed as MoocsDocument
+          totalCreditPoints += mooc.moocsCourse.credit;
+        }
+      });
+
+      res.status(200).json({
         success: true,
+        totalCreditPoints,
         moocs,
       });
     } catch (error: any) {
