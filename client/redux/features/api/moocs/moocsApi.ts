@@ -47,7 +47,14 @@ export const moocsApi = apiSlice.injectEndpoints({
           credentials: "include" as const,
         }),
       }),
+      deleteMyMoocs: builder.mutation({
+        query: (id) => ({
+          url: `delete-moocs/${id}`,
+          method: "DELETE",
+          credentials: "include" as const,
+        }),
+      }),
   }),
 });
 
-export const { useUploadMoocsMutation, useMyMoocsQuery, useLoadMoocsListQuery} = moocsApi;
+export const { useUploadMoocsMutation, useMyMoocsQuery, useLoadMoocsListQuery, useDeleteMyMoocsMutation} = moocsApi;
