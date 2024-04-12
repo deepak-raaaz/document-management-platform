@@ -47,6 +47,16 @@ export const uploadMoocs = CatchAsyncError(
             return next(new ErrorHandler("User not found", 400));
           }
 
+          // Check if the user has already uploaded the MOOCs
+          const existingMoocs = await moocsModel.findOne({
+            user: user._id,
+            moocsCourse: course._id,
+          });
+
+          if (existingMoocs) {
+            return next(new ErrorHandler("You have already uploaded this MOOCs", 400));
+          }
+
           const file = req.file; // Access the uploaded file
           if (!file) {
             return next(new ErrorHandler("No file uploaded", 400));
@@ -67,7 +77,7 @@ export const uploadMoocs = CatchAsyncError(
           fs.unlinkSync(tempFilePath);
 
           const documentData = {
-            user: user?._id,
+            user: user._id,
             public_id: myCloud.public_id,
             url: myCloud.secure_url,
             pageCount: myCloud.pages,
@@ -77,19 +87,19 @@ export const uploadMoocs = CatchAsyncError(
 
           const moocsDocument = await documentsModel.create(documentData);
           const data = {
-            user: user?._id,
-            moocsCourse: course?._id,
+            user: user._id,
+            moocsCourse: course._id,
             startDate: startDate,
             endDate: endDate,
             year: year,
-            document: moocsDocument?._id,
+            document: moocsDocument._id,
             verificationUrl: verificationUrl,
           };
 
           const moocs = await moocsModel.create(data);
 
-          user?.moocs.push(moocs?._id);
-          await user?.save();
+          user.moocs.push(moocs._id);
+          await user.save();
           await redis.set(req.user?._id, JSON.stringify(user));
 
           res.status(201).json({
@@ -105,6 +115,7 @@ export const uploadMoocs = CatchAsyncError(
     }
   }
 );
+
 
 // get my moocs list
 export const getMyMoocs = CatchAsyncError(
