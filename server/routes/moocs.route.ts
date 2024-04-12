@@ -25,6 +25,6 @@ moocsRouter.post("/upload-moocs", isAuthenticate, uploadMoocs);
 moocsRouter.get("/my-moocs", isAuthenticate, getMyMoocs);
 moocsRouter.get("/moocs-list", isAuthenticate, getMoocsList);
 moocsRouter.put("/edit-moocs/:id", isAuthenticate, editMoocs);
-moocsRouter.delete("/delete-moocs", isAuthenticate, deleteMoocs);
+moocsRouter.delete("/delete-moocs/:id", isAuthenticate, deleteMoocs);
 
 export default moocsRouter;

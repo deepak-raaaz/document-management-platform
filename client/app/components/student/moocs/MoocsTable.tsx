@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -18,6 +18,8 @@ import { useSelector } from "react-redux";
 import { ModalDialogProps } from "@mui/joy";
 import PopUpModal from "@/app/utils/PopUpModal";
 import UpdateForm from "./UpdateForm";
+import { useDeleteMyMoocsMutation, useMyMoocsQuery } from "@/redux/features/api/moocs/moocsApi";
+import { toast } from "react-hot-toast";
 
 
 type Props = {};
@@ -28,6 +30,27 @@ const MoocsTable = (props: Props) => {
   const [layout, setLayout] = React.useState<
     ModalDialogProps["layout"] | undefined
   >(undefined);
+
+  // const { refetch } = useMyMoocsQuery({refetchOnMountOrArgChange:true});
+
+  const [deleteMyMoocs, {isSuccess,error}] = useDeleteMyMoocsMutation({});
+
+  useEffect(() => {
+    if(isSuccess){
+      // refetch();
+      toast.success("Moocs Deleted Successfully");
+    }
+    if(error){
+      if("data" in error){
+        const errorMessage = error as any;
+        toast.error(errorMessage.data.message);
+      }
+    }
+  }, [isSuccess,error])
+  
+  const handleDelete = async (id:any) => {
+    await deleteMyMoocs(id);
+  }
 
   return (
     <>
@@ -157,7 +180,7 @@ const MoocsTable = (props: Props) => {
                     </DropdownTrigger>
                     <DropdownMenu
                       aria-label="Action event example"
-                      onAction={(key) => {alert(key)}}
+                      onAction={(key) => {handleDelete(key);}}
                     >
                       <DropdownItem key={moocs._id}>View Document</DropdownItem>
                       <DropdownItem key={moocs._id} className={`${moocs.status === "verified" ? "hidden" : "block"}`}>Delete</DropdownItem>
