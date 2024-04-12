@@ -295,12 +295,17 @@ export const editMoocs = CatchAsyncError(
 export const deleteMoocs = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const moocsId = req.params.id;
+      const moocsId = req.params.id as any;
 
       // Find the Moocs entry by its ID
       const moocs = await moocsModel.findById(moocsId);
       if (!moocs) {
         return next(new ErrorHandler("Moocs entry not found", 404));
+      }
+
+      if(moocs?.status === 'verified' ){
+        return next(new ErrorHandler("You can change verified Document , Kindly approach to HOD", 400));
+
       }
 
       // Check if the logged-in user is the owner of the Moocs entry
