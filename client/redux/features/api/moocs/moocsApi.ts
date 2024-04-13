@@ -1,5 +1,5 @@
 import { apiSlice } from "../apiSlice";
-import {  myMoocs } from "../moocsSlice";
+import {  myMoocs } from "./moocsSlice";
 
 export const moocsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

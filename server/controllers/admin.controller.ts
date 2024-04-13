@@ -3,19 +3,32 @@ import ErrorHandler from "../utlis/ErrorHandler";
 import { CatchAsyncError } from "../middleware/CatchAsyncError";
 import { NextFunction, Request, Response } from "express";
 import cloudinary from "cloudinary";
-import { create } from 'domain';
+import { create } from "domain";
 
 import { moocsModel } from "../models/moocs.model";
-import userModel from '../models/user.model';
+import userModel from "../models/user.model";
 
 // get all details of the student :-
 export const allStudentDetails = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const allStudentDetails = await userModel.find().sort({ createdAt: -1 });
+
+      // Convert Mongoose documents to plain JavaScript objects
+      const plainStudentDetails = allStudentDetails.map(student => student.toObject());
+
+      // Modify isVerified property to 'active' or 'inactive' and rename to 'status'
+      const modifiedDetails = plainStudentDetails.map(student => ({
+        ...student,
+        status: student.isVerfied ? 'active' : 'inactive'
+      }));
+
+      // Remove the isVerified property from the modified details
+      const detailsWithoutIsVerified = modifiedDetails.map(({ isVerfied, ...rest }) => rest);
+
       res.status(201).json({
         success: true,
-        allStudentDetails,
+        allStudentDetails: detailsWithoutIsVerified,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -29,7 +42,7 @@ export const singleStudentDetail = CatchAsyncError(
     try {
       const universityRoll = req.params.universityRoll;
       const singleStudent = await userModel.findById(universityRoll);
-      if(!universityRoll){
+      if (!universityRoll) {
         return next(new ErrorHandler("Not record found!", 400));
       }
       res.status(201).json({
@@ -51,7 +64,7 @@ export const verifyStudent = CatchAsyncError(
       if (!student) {
         return next(new Error("User not found"));
       }
-      if(student.isVerfied){
+      if (student.isVerfied) {
         return next(new Error("Already verified!"));
       }
       if (!student.isVerfied) {
@@ -60,13 +73,10 @@ export const verifyStudent = CatchAsyncError(
       await student.save();
       res.status(201).json({
         success: true,
-        message:"verfied Done"
+        message: "verfied Done",
       });
-
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
-
-

@@ -1,9 +1,9 @@
 const columns = [
-  { name: "UNIVERSITY ROLL NO.", uid: "universityRollNo", sortable: true },
+  { name: "UNIVERSITY ROLL NO.", uid: "universityroll", sortable: true },
   { name: "NAME", uid: "name", sortable: true },
-  { name: "CLASS ROLL NO", uid: "classRollNo", sortable: true },
+  { name: "CLASS ROLL NO", uid: "classroll", sortable: true },
   { name: "EMAIL", uid: "email" },
-  { name: "BATCH", uid: "batch", sortable: true },
+  { name: "BATCH", uid: "year", sortable: true },
   { name: "ACCOUNT STATUS", uid: "status", sortable: true },
   { name: "ACTIONS", uid: "actions" },
 ];

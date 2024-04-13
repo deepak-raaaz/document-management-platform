@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,FC } from "react";
 import {
   Table,
   TableHeader,
@@ -31,8 +31,7 @@ import { ModalDialogProps } from "@mui/joy";
 import Verify from "./Verify";
 import Reject from "./Reject";
 import { MdOutlineCancel } from "react-icons/md";
-import { FaRegEye } from "react-icons/fa";
-
+import { useAllUsersQuery } from "@/redux/features/api/admin/allUserApi";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -40,17 +39,22 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "universityRollNo",
+  "universityroll",
   "name",
-  "classRollNo",
-  "batch",
+  "classroll",
+  "year",
   "status",
   "actions",
 ];
 
-type User = (typeof users)[0];
+type Props = {
+  users: any;
+};
 
-export default function NewRegistrationList() {
+const NewRegistrationList:FC<Props> = ({users}) => {
+  type User = (typeof users)[0];
+ 
+
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
@@ -62,7 +66,7 @@ export default function NewRegistrationList() {
   const [batchFilter, setBatchFilter] = React.useState<string>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
-    column: "classRollNo",
+    column: "classroll",
     direction: "ascending",
   });
 
@@ -97,7 +101,7 @@ export default function NewRegistrationList() {
     if (batchFilter !== "all") {
       // Update: Apply batch filter if it's not "all"
       filteredUsers = filteredUsers.filter(
-        (user) => user.batch === batchFilter
+        (user) => user.year === batchFilter
       );
     }
 
@@ -151,7 +155,7 @@ export default function NewRegistrationList() {
             {user.email}
           </User>
         );
-      case "batch":
+      case "year":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
@@ -180,13 +184,15 @@ export default function NewRegistrationList() {
             <Tooltip content="Activate" color="success" className="text-white">
               <span className="text-lg text-success cursor-pointer active:opacity-50">
                 <IoShieldCheckmarkOutline
-                  onClick={() => handleVerify(user.universityRollNo)}
+                  onClick={() => handleVerify(user.universityroll)}
                 />
               </span>
             </Tooltip>
             <Tooltip color="danger" content="Deactivate">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <MdOutlineCancel onClick={() => handleReject(user.universityRollNo)} />
+                <MdOutlineCancel
+                  onClick={() => handleReject(user.universityroll)}
+                />
               </span>
             </Tooltip>
           </div>
@@ -259,9 +265,9 @@ export default function NewRegistrationList() {
                   setBatchFilter(selectedValue[0]); // Safely extract the first element
                 }}
               >
-                {batchOptions.map((batch) => (
-                  <DropdownItem key={batch.uid} className="capitalize">
-                    {batch.name}
+                {batchOptions.map((year) => (
+                  <DropdownItem key={year.uid} className="capitalize">
+                    {year.name}
                   </DropdownItem>
                 ))}
               </DropdownMenu>
@@ -390,7 +396,6 @@ export default function NewRegistrationList() {
   >(undefined);
   const [activeItem, setActiveItem] = useState(0);
 
-
   return (
     <>
       <Table
@@ -420,7 +425,7 @@ export default function NewRegistrationList() {
         </TableHeader>
         <TableBody emptyContent={"No users found"} items={sortedItems}>
           {(item) => (
-            <TableRow key={item.universityRollNo}>
+            <TableRow key={item.universityroll}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
@@ -455,3 +460,6 @@ export default function NewRegistrationList() {
     </>
   );
 }
+
+
+export default NewRegistrationList;
