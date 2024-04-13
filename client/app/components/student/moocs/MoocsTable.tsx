@@ -105,7 +105,7 @@ const MoocsTable = (props: Props) => {
           <TableBody>
             {myMoocs &&
               myMoocs.map((moocs: any, index: number) => (
-                <TableRow key="1" className="!bg-slate-100 ">
+                <TableRow key={`moocs${index}`} className="!bg-slate-100 ">
                   <TableCell className="!text-center !px-1">
                     {index + 1}.
                   </TableCell>
@@ -190,26 +190,6 @@ const MoocsTable = (props: Props) => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2 justify-center">
-                      {/* <Dropdown
-                    placement="bottom-end"
-                    className="dark:bg-slate-900"
-                  >
-                    <DropdownTrigger>
-                      <Button
-                        isIconOnly
-                        className="bg-transparent rounded-full"
-                      >
-                        <IoIosMore size={25} className="dark:text-slate-200" />
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                      aria-label="Action event example"
-                      // onAction={}
-                    >
-                      <DropdownItem key={moocs._id}>View Document</DropdownItem>
-                      <DropdownItem key={moocs._id} onClick={(key) => {handleDelete(key);}}>Delete</DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown> */}
                       <Tooltip content="View pdf">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                           <FaRegEye
@@ -237,7 +217,7 @@ const MoocsTable = (props: Props) => {
       {route === "viewpdf" && (
         <>
           {layout && (
-            <PopUpModal
+            <PopUpModal 
               layout={layout}
               setLayout={setLayout}
               setRoute={setRoute}

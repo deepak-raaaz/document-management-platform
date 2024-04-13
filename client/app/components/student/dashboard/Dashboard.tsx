@@ -1,6 +1,7 @@
 import React, { FC } from "react";
 import DashboardCard from "./DashboardCard";
 import TopHeader from "./TopHeader";
+import { BreadcrumbItem } from "@nextui-org/react";
 type Props = {};
 
 const Dashboard: FC<Props> = ({}) => {
@@ -19,7 +20,9 @@ const Dashboard: FC<Props> = ({}) => {
 
   return (
     <div className="max-w-screen-1300px mx-auto h-[70vh]">
-      <TopHeader title="Student Dashboard"/>
+      <TopHeader>
+        <BreadcrumbItem href="/student/dashboard">Dashboard</BreadcrumbItem>
+      </TopHeader>
 
       <div className="bg-white border-1 border-slate-300 p-8 rounded-lg h-full mx-4">
         <div className="flex flex-wrap  gap-8 max-sm:justify-center">

@@ -1,15 +1,16 @@
 import { useLogOutQuery } from "@/redux/features/auth/authApi";
-import { Tooltip } from "@nextui-org/react";
+import { BreadcrumbItem, Breadcrumbs, Tooltip } from "@nextui-org/react";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
 
 type Props = {
-  title: string;
+  children: React.ReactNode
 };
 
-const TopHeader: FC<Props> = ({ title }) => {
+const TopHeader: FC<Props> = ({ children}) => {
   const { user } = useSelector((state: any) => state.auth);
   const [logout, setLogout] = useState(false);
   const {} = useLogOutQuery(undefined, {
@@ -22,7 +23,10 @@ const TopHeader: FC<Props> = ({ title }) => {
 
   return (
     <div className="flex justify-between flex-wrap my-3 px-3 mx-3">
-      <h1 className="font-medium text-slate-600">{title}</h1>
+      {/* <h1 className="font-medium text-slate-600"><Link href="/Dashboard">Dashboard</Link>{title}</h1>*/}
+      <Breadcrumbs size="lg">
+        {children}
+      </Breadcrumbs>
       <div className="flex space-x-3 ">
         <span className="font-medium">
           Welcome : <span className="uppercase">{user.name}</span>

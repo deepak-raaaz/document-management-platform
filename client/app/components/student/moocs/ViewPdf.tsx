@@ -11,9 +11,9 @@ type Props = {
 const ViewPdf: FC<Props> = ({ setRoute, pdfUrl,verificationUrl}) => {
  
   return (
-    <div className="h-full]">
+    <div className="h-full w-full">
       <h3 className="font-semibold text-lg text-slate-800">Certificate</h3>
-      <div className="h-[58vh] mt-4">
+      <div className="h-[58vh]  mt-4">
         <iframe src={pdfUrl} width="100%" height="100%" />
       </div>
       <div className="flex flex-col my-2 ">

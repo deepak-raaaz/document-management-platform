@@ -40,8 +40,7 @@ const PopUpModel: FC<Props> = ({
         <ModalDialog layout={layout}>
           <ModalClose />
           {/* <DialogTitle>Filters</DialogTitle> */}
-          <div className={`m-auto  ${route === "viewPdf"? "w-[60vw]" :"800px:w-[450px]"} `}>
-
+          <div className={`m-auto  ${route === "viewPdf"? "w-[60vw] max-md:w-full" :"800px:w-[450px]"} `}>
           <Component setRoute={setRoute} pdfUrl={pdfUrl} verificationUrl={verificationUrl} />
         </div>
         </ModalDialog>

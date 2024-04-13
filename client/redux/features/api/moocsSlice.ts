@@ -2,6 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     myMoocs: "",
+    totalCreditPoints: 0,
     moocsCourseList: [],
 };
 
@@ -9,12 +10,10 @@ const moocsSlice = createSlice({
     name:"moocs",
     initialState,
     reducers: {
-        myMoocs: (state,action: PayloadAction<{myMoocs:string}>) => {
+        myMoocs: (state,action: PayloadAction<{myMoocs:string,totalCreditPoints:number}>) => {
             state.myMoocs = action.payload.myMoocs;
+            state.totalCreditPoints = action.payload.totalCreditPoints;
         },
-        // moocsList: (state,action: PayloadAction<{moocsCourseList:Array<string>}>) => {
-        //     state.moocsCourseList = action.payload.moocsCourseList;
-        // },
     },
 });
 

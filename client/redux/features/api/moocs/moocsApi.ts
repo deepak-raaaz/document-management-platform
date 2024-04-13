@@ -33,6 +33,7 @@ export const moocsApi = apiSlice.injectEndpoints({
             dispatch(
               myMoocs({
                 myMoocs: result.data.moocs,
+                totalCreditPoints: result.data.totalCreditPoints
               })
             );
           } catch (error: any) {

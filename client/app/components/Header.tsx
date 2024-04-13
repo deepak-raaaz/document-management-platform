@@ -21,7 +21,7 @@ type Props = {
   activeItem: number;
   route: string;
   setRoute: (route: string) => void;
-  loginType: string;
+  loginType?: string;
 };
 
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute,loginType }) => {
