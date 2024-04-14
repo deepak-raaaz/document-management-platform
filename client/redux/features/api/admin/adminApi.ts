@@ -1,7 +1,7 @@
 import { apiSlice } from "../apiSlice";
 import { allUsers } from "./adminSlice";
 
-export const moocsApi = apiSlice.injectEndpoints({
+export const adminApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
       allUsers: builder.query({
         query: (data) => ({
@@ -22,7 +22,27 @@ export const moocsApi = apiSlice.injectEndpoints({
           }
         },
       }),
+      activateAccount: builder.mutation({
+        query: ({id,email}) => ({
+          url: `account-verify/${id}`,
+          method: "PUT",
+          body:{
+            email
+          },
+          credentials: "include" as const,
+        }),
+      }),
+      deactivateAccount: builder.mutation({
+        query: ({id,email}) => ({
+          url: `account-verify/${id}`,
+          method: "PUT",
+          body:{
+            email
+          },
+          credentials: "include" as const,
+        }),
+      })
   }),
 });
 
-export const { useAllUsersQuery } = moocsApi;
+export const { useAllUsersQuery, useActivateAccountMutation, useDeactivateAccountMutation } = adminApi;

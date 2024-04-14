@@ -5,19 +5,14 @@ import { toast } from "react-hot-toast";
 
 type Props = {
   setRoute: (route: string) => void;
+  email:string;
+  id:string;
 };
 
-const Reject: FC<Props> = ({ setRoute }) => {
+const Reject: FC<Props> = ({ setRoute,id,email }) => {
   const [isSelected, setIsSelected] = React.useState(false);
 
-  const user = {
-    name: "Junior Garcia",
-    avatar: "https://avatars.githubusercontent.com/u/30373425?v=4",
-    username: "jrgarciadev",
-    url: "https://twitter.com/jrgarciadev",
-    role: "Software Developer",
-    status: "Active",
-  };
+  
   return (
     <div>
       <h3 className="font-semibold text-lg text-slate-800">
@@ -52,7 +47,7 @@ const Reject: FC<Props> = ({ setRoute }) => {
           >
             <div className="w-full flex flex-col ms-2">
               <span className=" text-slate-800 text-base">Send deactivation mail to </span>
-              <span className="text-tiny text-slate-500">deepakjamui26@gmail.com</span>
+              <span className="text-tiny text-slate-500">{email}</span>
             </div>
           </Checkbox>
         </div>

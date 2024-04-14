@@ -31,7 +31,7 @@ import { ModalDialogProps } from "@mui/joy";
 import Verify from "./Verify";
 import Reject from "./Reject";
 import { MdOutlineCancel } from "react-icons/md";
-import { useAllUsersQuery } from "@/redux/features/api/admin/allUserApi";
+import { useAllUsersQuery } from "@/redux/features/api/admin/adminApi";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -69,6 +69,9 @@ const NewRegistrationList:FC<Props> = ({users}) => {
     column: "classroll",
     direction: "ascending",
   });
+
+  const [selectedId, setSelectedId] = React.useState(""); 
+  const [selectedEmail, setSelectedEmail] = React.useState(""); 
 
   const [page, setPage] = React.useState(1);
 
@@ -132,14 +135,17 @@ const NewRegistrationList:FC<Props> = ({users}) => {
     setLayout("center");
   };
 
-  const handleVerify = (roll: string) => {
+  const handleVerify = (id: string) => {
     setRoute("verify");
     setLayout("center");
+    setSelectedId(id);
   };
 
-  const handleReject = (roll: string) => {
+  const handleReject = (id: string,email:string) => {
     setRoute("reject");
     setLayout("center");
+    setSelectedId(id);
+    setSelectedEmail(email);
   };
   const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
     const cellValue = user[columnKey as keyof User];
@@ -184,14 +190,14 @@ const NewRegistrationList:FC<Props> = ({users}) => {
             <Tooltip content="Activate" color="success" className="text-white">
               <span className="text-lg text-success cursor-pointer active:opacity-50">
                 <IoShieldCheckmarkOutline
-                  onClick={() => handleVerify(user.universityroll)}
+                  onClick={() => handleVerify(user._id)}
                 />
               </span>
             </Tooltip>
             <Tooltip color="danger" content="Deactivate">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
                 <MdOutlineCancel
-                  onClick={() => handleReject(user.universityroll)}
+                  onClick={() => handleReject(user._id,user.email)}
                 />
               </span>
             </Tooltip>
@@ -441,6 +447,7 @@ const NewRegistrationList:FC<Props> = ({users}) => {
               setLayout={setLayout}
               setRoute={setRoute}
               component={Verify}
+              id={selectedId}
             />
           )}
         </>
@@ -453,6 +460,8 @@ const NewRegistrationList:FC<Props> = ({users}) => {
               setLayout={setLayout}
               setRoute={setRoute}
               component={Reject}
+              id={selectedId}
+              email={selectedEmail}
             />
           )}
         </>
