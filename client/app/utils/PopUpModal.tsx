@@ -12,6 +12,8 @@ type Props = {
   setRoute?: (route: string) => void;
   pdfUrl?:string;
   verificationUrl?:string;
+  id?:string;
+  email?:string;
 };
 
 const PopUpModel: FC<Props> = ({
@@ -21,7 +23,9 @@ const PopUpModel: FC<Props> = ({
   route,
   component: Component,
   pdfUrl,
-  verificationUrl
+  verificationUrl,
+  id,
+  email
 }) => {
   const theme = useTheme();
   const greaterThanMid = useMediaQuery(theme.breakpoints.up("md"));
@@ -41,7 +45,7 @@ const PopUpModel: FC<Props> = ({
           <ModalClose />
           {/* <DialogTitle>Filters</DialogTitle> */}
           <div className={`m-auto  ${route === "viewPdf"? "w-[60vw] max-md:w-full" :"800px:w-[450px]"} `}>
-          <Component setRoute={setRoute} pdfUrl={pdfUrl} verificationUrl={verificationUrl} />
+          <Component setRoute={setRoute} pdfUrl={pdfUrl} verificationUrl={verificationUrl} id={id} email={email}/>
         </div>
         </ModalDialog>
       </Modal>

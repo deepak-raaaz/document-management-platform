@@ -1,6 +1,6 @@
 import React from "react";
 import NewRegistrationList from "./newRegistrationList/NewRegistrationList";
-import { useAllUsersQuery } from "@/redux/features/api/admin/allUserApi";
+import { useAllUsersQuery } from "@/redux/features/api/admin/adminApi";
 import { useSelector } from "react-redux";
 
 type Props = {};

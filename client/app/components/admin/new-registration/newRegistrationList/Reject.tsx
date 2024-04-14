@@ -1,37 +1,63 @@
+import {
+  useAllUsersQuery,
+  useDeactivateAccountMutation,
+} from "@/redux/features/api/admin/adminApi";
 import { Button, Checkbox, Chip, Textarea, User, cn } from "@nextui-org/react";
 import Link from "next/link";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 type Props = {
   setRoute: (route: string) => void;
+  email: string;
+  id: string;
 };
 
-const Reject: FC<Props> = ({ setRoute }) => {
+const Reject: FC<Props> = ({ setRoute, id, email }) => {
   const [isSelected, setIsSelected] = React.useState(false);
+  const [reason, setReason] = React.useState("");
+  const [deactivateAccount, { isSuccess, error, isLoading, data }] =
+    useDeactivateAccountMutation();
 
-  const user = {
-    name: "Junior Garcia",
-    avatar: "https://avatars.githubusercontent.com/u/30373425?v=4",
-    username: "jrgarciadev",
-    url: "https://twitter.com/jrgarciadev",
-    role: "Software Developer",
-    status: "Active",
+  const { refetch } = useAllUsersQuery({}, { refetchOnMountOrArgChange: true });
+
+  useEffect(() => {
+    if (isSuccess) {
+      if (data) {
+        toast.success(data.message);
+      }
+      refetch();
+      setRoute("a");
+    }
+    if (error) {
+      if ("data" in error) {
+        const errorData = error as any;
+        toast.error(errorData.data.message);
+      }
+      setRoute("a");
+    }
+  }, [isSuccess, error]);
+
+  const handleDeativate = async () => {
+    await deactivateAccount({
+      email: isSelected,
+      id,
+      reason,
+    });
   };
+
   return (
     <div>
       <h3 className="font-semibold text-lg text-slate-800">
         Account Deactivation!
       </h3>
-      <span>
-        Please provide a reason for deactivating the account.
-      </span>
+      <span>Please provide a reason for deactivating the account.</span>
       <div className="flex flex-col mt-4">
         <div>
           <Textarea
             id="reject"
             //   value={values.verificationUrl}
-            //   onChange={handleChange}
+            onChange={(e) => setReason(e.target.value)}
             variant="faded"
             labelPlacement="outside"
             placeholder="Enter reason for rejection"
@@ -51,13 +77,15 @@ const Reject: FC<Props> = ({ setRoute }) => {
             onValueChange={setIsSelected}
           >
             <div className="w-full flex flex-col ms-2">
-              <span className=" text-slate-800 text-base">Send deactivation mail to </span>
-              <span className="text-tiny text-slate-500">deepakjamui26@gmail.com</span>
+              <span className=" text-slate-800 text-base">
+                Send deactivation mail to{" "}
+              </span>
+              <span className="text-tiny text-slate-500">{email}</span>
             </div>
           </Checkbox>
         </div>
-        </div>
-        <div className='flex justify-end mt-4'>
+      </div>
+      <div className="flex justify-end mt-4">
         <div className="flex w-full justify-end mt-4 space-x-3">
           <Button
             size="md"
@@ -74,13 +102,13 @@ const Reject: FC<Props> = ({ setRoute }) => {
             size="md"
             variant="solid"
             className="bg-danger font-semibold text-white"
-            // onPress={setRoute("")}
             onClick={() => {
-              setRoute("a");
-              toast.success("Reject Successfully!");
+              handleDeativate();
             }}
+            disabled={isLoading}
+            isLoading={isLoading}
           >
-            Reject
+            {isLoading ? "Loading..." : "Reject"}
           </Button>
         </div>
       </div>
