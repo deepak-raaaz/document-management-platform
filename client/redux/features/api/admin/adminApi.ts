@@ -33,11 +33,12 @@ export const adminApi = apiSlice.injectEndpoints({
         }),
       }),
       deactivateAccount: builder.mutation({
-        query: ({id,email}) => ({
-          url: `account-verify/${id}`,
+        query: ({id,email,reason}) => ({
+          url: `account-reject/${id}`,
           method: "PUT",
           body:{
-            email
+            email,
+            reason
           },
           credentials: "include" as const,
         }),
