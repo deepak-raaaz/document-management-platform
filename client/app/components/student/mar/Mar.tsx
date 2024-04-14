@@ -9,6 +9,7 @@ import {
 } from "@/redux/features/api/moocs/moocsApi";
 import StudentData from "../moocs/StudentData";
 import MarSubmissionForm from "./MarSubmissionForm";
+import MarTable from "./MarTable";
 
 type Props = {};
 
@@ -43,9 +44,10 @@ const Mar: FC<Props> = ({}) => {
         <Divider className="my-2" />
         <div className="bg-white max-md:bg-slate-100 py-2">
           <h4 className="ms-3 my-2 font-semibold">Mar Details -</h4>
+          <MarTable/>
           {/* {greaterThanMid ? <MoocsTable /> : <MobileMoocsTable />} */}
           <div className="text-slate-700 flex justify-end my-2 mx-2">
-            {data && <span>Total Credit Earned : {totalCreditPoints}</span>}
+            {data && <span>Total Mar Points Earned : {totalCreditPoints}</span>}
           </div>
         </div>
       </div>
