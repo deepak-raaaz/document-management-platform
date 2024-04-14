@@ -15,25 +15,14 @@ import {
   useUploadMoocsMutation,
 } from "@/redux/features/api/moocs/moocsApi";
 
-interface IEditMoocs {
-  _id: string;
-  titleId: string;
-  startDate: string;
-  endDate: string;
-  year: string;
-  verificationUrl: string;
-  fileUrl: string;
-}
 type Props = {
   //this contain moocs course list
   moocs: Array<{
     _id: string;
     title: string;
-    platform: string;
+    category: string;
     credit: number;
   }>;
-  //for update or edit moocs submission
-  editMoocs?: IEditMoocs;
 };
 function checkIfFileAreTooBig(file?: any) {
   let valid = false;
@@ -57,13 +46,10 @@ function checkIfFileAreCorrectType(file?: any) {
 }
 
 const schema = Yup.object().shape({
-  title: Yup.string().required("please Select Title of Course!"),
-  startDate: Yup.string().required("Please enter your Date of Joining!"),
-  endDate: Yup.string().required("Please enter your Date of Completion!"),
+  title: Yup.string().required("please Enter Title of Certificate!"),
+  certificateDate: Yup.string().required("Please select certificate date!"),
+  category: Yup.string().required("Please select mar category!"),
   year: Yup.string().required("select year!"),
-  verificationUrl: Yup.string().required(
-    "Please enter Certificate Verfication Url"
-  ),
   file: Yup.mixed()
     .nullable()
     .required("Select file")
@@ -79,37 +65,29 @@ const schema = Yup.object().shape({
     ),
 });
 
-const MarSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
+const MarSubmissionForm: FC<Props> = ({ moocs }) => {
   const [uploadMoocs, { isSuccess, error, isLoading }] =
     useUploadMoocsMutation();
 
   const [loadUser, setLoadUser] = useState(false);
-  const {refetch} = useMyMoocsQuery({},{refetchOnMountOrArgChange:true});
+
+  const { refetch } = useMyMoocsQuery({}, { refetchOnMountOrArgChange: true });
 
   const formik = useFormik({
     initialValues: {
       title: "",
-      startDate: null,
-      endDate: null,
+      certificateDate: "",
+      category: "",
       year: "",
-      verificationUrl: "",
       file: null,
     },
     validationSchema: schema,
-    onSubmit: async ({
-      title,
-      startDate,
-      endDate,
-      year,
-      verificationUrl,
-      file,
-    }) => {
+    onSubmit: async ({ title, category, year, file, certificateDate }) => {
       await uploadMoocs({
         title,
-        startDate,
-        endDate,
+        certificateDate,
+        category,
         year,
-        verificationUrl,
         file,
       });
     },
@@ -119,12 +97,10 @@ const MarSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
     if (isSuccess) {
       toast.success("Successfully Submitted!");
       formik.resetForm();
-      resetTitle();
+      // resetTitle();
       setFieldValue("year", null);
       // setLoadUser(true);
       refetch();
-      setStartDate(null);
-      setEndDate(null);
     }
     if (error) {
       if ("data" in error) {
@@ -137,11 +113,11 @@ const MarSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
   const { errors, touched, values, handleChange, handleSubmit, setFieldValue } =
     formik;
 
-  const [selectedTitle, setSelectedTitle] = useState("");
-  const [platform, setPlatform] = React.useState("");
-  const [credit, setCredit] = React.useState<number | string>("");
-  const [startDate, setStartDate] = React.useState<dayjs.Dayjs | null>(null);
-  const [endDate, setEndDate] = React.useState<dayjs.Dayjs | null>(null);
+  const [title, setTitle] = React.useState("");
+  const [category, setCategory] = React.useState("");
+  const [selectedCategoy, setSelectedCategory] = useState("");
+  const [marPoint, setMarPoint] = React.useState<number | string>("");
+  const [Date, setDate] = React.useState<dayjs.Dayjs | null>(null);
 
   const inputFile = useRef<HTMLInputElement>(null);
 
@@ -153,52 +129,34 @@ const MarSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
     }
   };
 
-  const handleTitleChange = (e: any) => {
-    setSelectedTitle(e.target.value);
-    const moocsSelect = moocs.find((moocs) => moocs._id === e.target.value);
-    if (moocsSelect) {
-      setFieldValue("title", moocsSelect._id, true);
-      setPlatform(moocsSelect.platform);
-      setCredit(moocsSelect.credit);
+  const handleCategoryChange = (e: any) => {
+    setSelectedCategory(e.target.value);
+    const categorySelect = moocs.find(
+      (category) => category._id === e.target.value
+    );
+    if (categorySelect) {
+      setFieldValue("category", categorySelect._id, true);
+      setCategory(categorySelect.category);
+      setMarPoint(categorySelect.credit);
     } else {
-      setFieldValue("title", "", true);
-      setPlatform("");
-      setCredit("");
+      setFieldValue("category", "", true);
+      setCategory("");
+      setMarPoint("");
+      // setCredit("");
     }
   };
 
-  const resetTitle = () => {
-    setFieldValue("title", "", true);
-    setPlatform("");
-    setCredit("");
-    handleFileReset();
-  };
-
-  useEffect(() => {
-    const moocsSelect = moocs.find((moocs) => moocs._id === editMoocs?.titleId);
-    if (moocsSelect) {
-      setFieldValue("title", moocsSelect._id, true);
-      setPlatform(moocsSelect.platform);
-      setCredit(moocsSelect.credit);
-    }
-    if (editMoocs) {
-      const sdate = dayjs(editMoocs.startDate, "DD-MM-YYYY");
-      const edate = dayjs(editMoocs.endDate, "DD-MM-YYYY");
-      setStartDate(sdate);
-      setEndDate(edate);
-      setFieldValue("year", editMoocs.year);
-      setFieldValue("verificationUrl", editMoocs.verificationUrl);
-      setFieldValue("startDate", editMoocs.startDate);
-      setFieldValue("endDate", editMoocs.endDate);
-    }
-  }, [editMoocs]);
+  // const resetTitle = () => {
+  //   setFieldValue("title", "", true);
+  //   setCategory("");
+  //   setCredit("");
+  //   handleFileReset();
+  // };
 
   return (
     <div>
       <div className="gradient-bg flex py-2 justify-center items-center rounded-lg">
-        <span className="font-semibold text-white">
-          Mar {editMoocs ? "Edit" : "Submission"}
-        </span>
+        <span className="font-semibold text-white">Mar Submission</span>
       </div>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-12 gap-2 bg-slate-100 py-3 px-2 my-2 overflow-hidden">
@@ -208,19 +166,40 @@ const MarSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
           {/* Title Selector  */}
           <div className="flex flex-col col-span-4 max-800px:col-span-5 max-sm:col-span-12">
             <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
-              Course Title
+              Event Name
+            </span>
+            <input
+              type="text"
+              name="title"
+              value={values.title}
+              onChange={handleChange}
+              id="title"
+              placeholder="Enter Event Name"
+              className={`
+              input !mt-0 !bg-white text-[.88rem] `}
+            />
+            {errors.title && touched.title && (
+              <span className="text-red-500 pt-2 block text-tiny mx-1">
+                {errors.title}
+              </span>
+            )}
+          </div>
+
+          {/* Category selector  */}
+          <div className="flex flex-col col-span-2 max-800px:col-span-3 max-sm:col-span-7">
+            <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
+              Category
             </span>
             <Select
               label=""
               className="w-full selector-white"
-              placeholder="Select Title"
+              placeholder="Select Category"
               id="title"
               name="title"
               value={values.title}
               onChange={(e: any) => {
-                handleTitleChange(e);
+                handleCategoryChange(e);
               }}
-              defaultSelectedKeys={editMoocs ? [editMoocs.titleId] : ""}
             >
               {moocs &&
                 moocs.map((item) => (
@@ -229,43 +208,26 @@ const MarSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
                   </SelectItem>
                 ))}
             </Select>
-            {errors.title && touched.title && (
+            {errors.category && touched.category && (
               <span className="text-red-500 pt-2 block text-tiny mx-1">
-                {errors.title}
+                {errors.category}
               </span>
             )}
-          </div>
-
-          {/* Platform selector  */}
-          <div className="flex flex-col col-span-2 max-800px:col-span-3 max-sm:col-span-7">
-            <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
-              Course Platform
-            </span>
-            <input
-              disabled
-              type="text"
-              name=""
-              value={platform}
-              // onChange={handleChange}
-              id="course_platform"
-              placeholder="Course Platform"
-              className={` input !mt-0 !bg-white text-[.88rem]`}
-            />
           </div>
 
           {/* Credit selector  */}
           <div className="flex flex-col col-span-2 max-800px:col-span-3 max-sm:col-span-5">
             <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
-              Credit Earned
+              Mar Points
             </span>
             <input
               disabled
               type="number"
               name=""
-              value={credit}
+              value={marPoint}
               // onChange={handleChange}
-              id="credit_earned"
-              placeholder="Credit Earned"
+              id="mar_point"
+              placeholder="Mar Point"
               className={` input !mt-0 !bg-white text-[.88rem]`}
             />
           </div>
@@ -274,135 +236,69 @@ const MarSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
             {/* Start Date selector  */}
             <div className="flex flex-col col-span-2 max-800px:col-span-3 max-sm:col-span-6">
               <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
-                Starting Date
+                Certificate Date
               </span>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={["MobileDatePicker"]}>
                   <div className="date-picker-style">
                     <MobileDatePicker
                       name="startDate"
-                      value={startDate}
+                      value={Date}
                       onChange={(date: any) => {
                         setFieldValue(
-                          "startDate",
+                          "certificateDate",
                           date ? dayjs(date).format("DD-MM-YYYY") : null,
                           true
                         );
-                        setStartDate(date);
+                        setDate(date);
                         // alert(date ? dayjs(date).format('DD-MM-YYYY'): null);
                       }}
                     />
                   </div>
                 </DemoContainer>
               </LocalizationProvider>
-              {errors.startDate && touched.startDate && (
+              {errors.certificateDate && touched.certificateDate && (
                 <span className="text-red-500 pt-2 block text-tiny mx-1">
-                  {errors.startDate}
+                  {errors.certificateDate}
                 </span>
               )}
             </div>
 
-            {/* Start Date selector  */}
-            <div className="flex flex-col col-span-2 max-800px:col-span-3 max-sm:col-span-6">
-              <span className="text-slate-800 text-[.75rem] mx-1 my-1  after:ml-0.5 after:text-red-500 after:content-['*']">
-                Completion Date
+            {/* Year selector  */}
+            <div className="flex flex-col col-span-2 max-800px:col-span-3 max-sm:col-span-4">
+              <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*'] ">
+                Year
               </span>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={["MobileDatePicker"]}>
-                  <div className="date-picker-style">
-                    <MobileDatePicker
-                      name="endDate"
-                      value={endDate}
-                      onChange={(date: any) => {
-                        setFieldValue(
-                          "endDate",
-                          date ? dayjs(date).format("DD-MM-YYYY") : null,
-                          true
-                        );
-                        setEndDate(date);
-                      }}
-                    />
-                  </div>
-                </DemoContainer>
-              </LocalizationProvider>
-              {errors.endDate && touched.endDate && (
+              <Select
+                label=""
+                className="w-full  selector-white"
+                placeholder="Select Year"
+                id="year"
+                name="year"
+                value={values.year}
+                onChange={(e: any) => {
+                  handleChange("year")(e.target.value);
+                }}
+              >
+                {year.map((year) => (
+                  <SelectItem key={year.value} value={year.value} className="">
+                    {year.label}
+                  </SelectItem>
+                ))}
+              </Select>
+              {errors.year && touched.year && (
                 <span className="text-red-500 pt-2 block text-tiny mx-1">
-                  {errors.endDate}
+                  {errors.year}
                 </span>
               )}
             </div>
-          </div>
-
-          {/* Year selector  */}
-          <div className="flex flex-col col-span-2 max-800px:col-span-3 max-sm:col-span-4">
-            <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*'] ">
-              Year
-            </span>
-            <Select
-              label=""
-              className="w-full  selector-white"
-              placeholder="Select Title"
-              id="year"
-              name="year"
-              value={values.year}
-              defaultSelectedKeys={editMoocs ? [editMoocs.year] : ""}
-              onChange={(e: any) => {
-                handleChange("year")(e.target.value);
-              }}
-            >
-              {year.map((year) => (
-                <SelectItem key={year.value} value={year.value} className="">
-                  {year.label}
-                </SelectItem>
-              ))}
-            </Select>
-            {errors.year && touched.year && (
-              <span className="text-red-500 pt-2 block text-tiny mx-1">
-                {errors.year}
-              </span>
-            )}
-          </div>
-
-          {/* Verification url input  */}
-          <div className="flex flex-col col-span-3 max-800px:col-span-4 max-sm:col-span-8">
-            <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*'] ">
-              Verification Url
-            </span>
-            <input
-              type="text"
-              name=""
-              value={values.verificationUrl}
-              onChange={handleChange}
-              id="verificationUrl"
-              placeholder="Verification url"
-              className={`
-              input !mt-0 !bg-white text-[.88rem] `}
-            />
-            {errors.verificationUrl && touched.verificationUrl && (
-              <span className="text-red-500 pt-2 block text-tiny mx-1">
-                {errors.verificationUrl}
-              </span>
-            )}
           </div>
 
           <div className="col-span-12 grid grid-cols-12 gap-2">
-            {editMoocs && (
-              <div className="col-span-2 max-1000px:col-span-3 flex flex-col">
-                <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
-                  Certificate
-                </span>
-                <Button
-                  color="primary"
-                  className="!rounded-md my-0"
-                >
-                  View File
-                </Button>
-              </div>
-            )}
             {/* Upload button  */}
             <div className="flex flex-col col-span-4 max-800px:col-span-6 max-sm:col-span-12">
               <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
-                {editMoocs ? "New Certificate" : "Certificate"}
+                Certificate
               </span>
               <input
                 ref={inputFile}
@@ -430,7 +326,7 @@ const MarSubmissionForm: FC<Props> = ({ moocs, editMoocs }) => {
               disabled={isLoading}
               isLoading={isLoading}
             >
-              {isLoading ? "Submitting" : editMoocs ? "Save" : "Submit"}
+              {isLoading ? "Submitting" : "Submit"}
             </Button>
           </div>
         </div>
