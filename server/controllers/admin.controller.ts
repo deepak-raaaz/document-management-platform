@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from "express";
 import cloudinary from "cloudinary";
 import { create } from "domain";
 
-import { moocsModel } from "../models/moocs.model";
+import { moocsCourseModel, moocsModel } from "../models/moocs.model";
 import userModel from "../models/user.model";
 import nodemailer from 'nodemailer';
 import ejs from "ejs";
@@ -101,6 +101,12 @@ export const verifyStudent = CatchAsyncError(
           return next(new ErrorHandler(error.message, 400));
         }
       }
+
+      res.status(201).json({
+        success: true,
+        message: `Account verified !`,
+        
+      });
         
      
     } catch (error: any) {
@@ -110,4 +116,84 @@ export const verifyStudent = CatchAsyncError(
 );
 
 
-// verify student by admin and send mail (optional)
+// Reject  student by admin and send mail (optional)
+export const rejectStudent = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const student = await userModel.findById(req.params.id);
+      if (!student) {
+        return next(new Error("User not found"));
+      }
+      if (!student.isVerfied) {
+        return next(new Error("Already not verified!"));
+      }
+      if (student.isVerfied) {
+        student.isVerfied = false;
+      }
+      await student.save();
+      const {email,reason} = req.body;
+      if(email){
+        const data = { user: { name: student.name },reason };
+
+        const html = await ejs.renderFile(
+          path.join(__dirname, "../mails/account-rejection-mail.ejs"),
+          data
+        );
+  
+        try {
+          await sendMail({
+            email: student.email,
+            subject: "Account Rejection mail",
+            template: "account-rejection-mail.ejs",
+            data,
+          });
+  
+          res.status(201).json({
+            success: true,
+            message: `An email notification has been sent to the registered email : ${student.email}`,
+            
+          });
+        } catch (error: any) {
+          return next(new ErrorHandler(error.message, 400));
+        }
+      }
+        
+     
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// edit moocs course add or remove moocs list and credit
+
+export const createMoocsCourse = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { title, platform, credit } = req.body;
+      if (!title) {
+        return next(new ErrorHandler("Enter Course Title", 400));
+      }
+      if (!platform) {
+        return next(new ErrorHandler("Enter Course Platform", 400));
+      }
+      if (!credit) {
+        return next(new ErrorHandler("Enter Course Credit", 400));
+      }
+
+      const data = {
+        title: title,
+        platform: platform,
+        credit: credit,
+      };
+
+      const moocsCourse = await moocsCourseModel.create(data);
+      res.status(201).json({
+        success: true,
+        moocsCourse,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);

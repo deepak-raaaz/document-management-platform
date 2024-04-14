@@ -155,4 +155,48 @@ interface IMARUpload {
       }
     }
   );
+
+
+// get all mar point list 
+export const getMyMar = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await userModel.findById(req.user?._id).populate({
+        path: "mar",
+        populate: [
+          {
+            path: "marCourse",
+            model: "MarCourse",
+          },
+          {
+            path: "document",
+            model: "MarDocuments",
+          },
+        ],
+      });
+
+      if (!user) {
+        return next(new ErrorHandler("User not found", 400));
+      }
+
+      const moocs = user.moocs as any;
+
+      // Calculate total credit points of verified Moocs entries
+      let totalMarPoints = 0;
+      moocs.forEach((mar : any) => {
+        if (mar.status === "verified") { // Ensure mooc is properly typed as MoocsDocument
+          totalMarPoints += mar.marCourse.marPoint;
+        }
+      });
+
+      res.status(200).json({
+        success: true,
+        totalMarPoints,
+        moocs,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
   
