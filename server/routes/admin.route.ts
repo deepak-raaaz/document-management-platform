@@ -1,7 +1,7 @@
 import { isAuthenticate } from './../middleware/auth';
 import express from 'express';
 import { authorizeRoles } from './../middleware/auth';
-import { allStudentDetails, singleStudentDetail } from '../controllers/admin.controller';
+import { allStudentDetails, singleStudentDetail, verifyStudent } from '../controllers/admin.controller';
 import { createMoocsCourse } from '../controllers/mocs.controller';
 
 const adminRouter = express.Router();
@@ -12,6 +12,10 @@ adminRouter.get("/single-student-details",isAuthenticate,authorizeRoles("admin")
 
 //create moocs course list
 adminRouter.post("/create-moocs-course", isAuthenticate,authorizeRoles("admin"), createMoocsCourse);
+
+adminRouter.put("/account-verify/:id", isAuthenticate,authorizeRoles("admin"), verifyStudent);
+
+
 
 
 

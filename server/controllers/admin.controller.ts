@@ -7,6 +7,10 @@ import { create } from "domain";
 
 import { moocsModel } from "../models/moocs.model";
 import userModel from "../models/user.model";
+import nodemailer from 'nodemailer';
+import ejs from "ejs";
+import path from "path";
+import sendMail from "../utlis/sendMail";
 
 // get all details of the student :-
 export const allStudentDetails = CatchAsyncError(
@@ -71,12 +75,39 @@ export const verifyStudent = CatchAsyncError(
         student.isVerfied = true;
       }
       await student.save();
-      res.status(201).json({
-        success: true,
-        message: "verfied Done",
-      });
+      const {email} = req.body;
+      if(email){
+        const data = { user: { name: student.name } };
+
+        const html = await ejs.renderFile(
+          path.join(__dirname, "../mails/account-verification-mail.ejs"),
+          data
+        );
+  
+        try {
+          await sendMail({
+            email: student.email,
+            subject: "Account verification mail",
+            template: "account-verification-mail.ejs",
+            data,
+          });
+  
+          res.status(201).json({
+            success: true,
+            message: `An email notification has been sent to the registered email : ${student.email}`,
+            
+          });
+        } catch (error: any) {
+          return next(new ErrorHandler(error.message, 400));
+        }
+      }
+        
+     
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
+
+
+// verify student by admin and send mail (optional)
