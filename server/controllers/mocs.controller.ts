@@ -197,36 +197,7 @@ export const getMyMoocs = CatchAsyncError(
 // );
 
 //create moocs course (admin only)
-export const createMoocsCourse = CatchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { title, platform, credit } = req.body;
-      if (!title) {
-        return next(new ErrorHandler("Enter Course Title", 400));
-      }
-      if (!platform) {
-        return next(new ErrorHandler("Enter Course Platform", 400));
-      }
-      if (!credit) {
-        return next(new ErrorHandler("Enter Course Credit", 400));
-      }
 
-      const data = {
-        title: title,
-        platform: platform,
-        credit: credit,
-      };
-
-      const moocsCourse = await moocsCourseModel.create(data);
-      res.status(201).json({
-        success: true,
-        moocsCourse,
-      });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
-    }
-  }
-);
 
 // get all moocs list 
 export const getMoocsList = CatchAsyncError(

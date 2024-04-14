@@ -2,7 +2,7 @@ import { isAuthenticate } from './../middleware/auth';
 import express from 'express';
 import { authorizeRoles } from './../middleware/auth';
 import { allStudentDetails, rejectStudent, singleStudentDetail, verifyStudent } from '../controllers/admin.controller';
-import { createMoocsCourse } from '../controllers/mocs.controller';
+import { createMoocsCourse } from '../controllers/admin.controller';
 
 const adminRouter = express.Router();
 
