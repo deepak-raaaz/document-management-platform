@@ -341,6 +341,47 @@ export const deactivateMAR = CatchAsyncError(
   }
 );
 
+// Add MarCategory by admin
+export const addMarCategory = CatchAsyncError(async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { category, perMarPoints, maximumMarPoints } = req.body;
+
+    // Validate input fields
+    if (!category) {
+      return next(new ErrorHandler("Enter Category Name", 400));
+    }
+    if (!perMarPoints) {
+      return next(new ErrorHandler("Enter Per Mar Points", 400));
+    }
+    if (!maximumMarPoints) {
+      return next(new ErrorHandler("Enter Maximum Mar Points", 400));
+    }
+
+    // Create a new MarCategory
+    const newMarCategory = await categoryModel.create({
+      category,
+      perMarPoints,
+      maximumMarPoints,
+    });
+
+    // Return success response
+    res.status(201).json({
+      success: true,
+      message: "MarCategory added successfully",
+      newMarCategory,
+    });
+  } catch (error: any) {
+    // Handle errors
+    return next(new ErrorHandler(error.message, 400));
+  }
+}
+);
+
+
 // eedit marcategory list :-
 
 export const editMarCategory= CatchAsyncError(async (
