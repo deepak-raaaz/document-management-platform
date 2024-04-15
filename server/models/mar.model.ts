@@ -1,6 +1,5 @@
 require("dotenv").config();
-import mongoose, { Document, Schema } from "mongoose";
-import { Model } from "mongoose";
+import mongoose, { Document, Schema, Model } from "mongoose";
 
 interface IDocument extends Document {
   user: object;
@@ -21,11 +20,18 @@ interface IMarCourse extends Document {
 interface IMarDb extends Document {
   user: object;
   marCourse: object;
-  
+
   year: number;
   document: object;
-  
+
   isVerified: boolean;
+}
+
+interface ICategory extends Document {
+  category: string;
+  perMarPoints: number;
+  maximumMarPoints: number;
+  isActive: boolean;
 }
 
 const documentsSchema = new Schema<IDocument>(
@@ -94,7 +100,6 @@ const marDbSchema = new Schema<IMarDb>(
       required: true,
       ref: "MarCourse",
     },
-    
     year: {
       type: Number,
       required: true,
@@ -104,10 +109,32 @@ const marDbSchema = new Schema<IMarDb>(
       required: true,
       ref: "MarDocuments",
     },
-    
     isVerified: {
       type: Boolean,
       default: false,
+    },
+  },
+  { timestamps: true }
+);
+
+const categorySchema = new Schema<ICategory>(
+  {
+    category: {
+      type: String,
+      required: true,
+    },
+    perMarPoints: {
+      type: Number,
+      required: true,
+    },
+    maximumMarPoints: {
+      type: Number,
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      required: true,
     },
   },
   { timestamps: true }
@@ -122,6 +149,9 @@ const marCourseModel: Model<IMarCourse> = mongoose.model(
   "MarCourse",
   marCourseSchema
 );
+
 const marModel: Model<IMarDb> = mongoose.model("Mar", marDbSchema);
 
-export { marModel, documentsModel, marCourseModel };
+const categoryModel: Model<ICategory> = mongoose.model("MarCategory", categorySchema);
+
+export { marModel, documentsModel, marCourseModel, categoryModel };
