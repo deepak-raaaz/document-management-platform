@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -17,7 +17,8 @@ import {
   Pagination,
   Selection,
   ChipProps,
-  SortDescriptor
+  SortDescriptor,
+  Tooltip,
 } from "@nextui-org/react";
 import { PlusIcon } from "./PlusIcon";
 import { VerticalDotsIcon } from "./VerticalDotsIcon";
@@ -25,6 +26,13 @@ import { ChevronDownIcon } from "./ChevronDownIcon";
 import { SearchIcon } from "./SearchIcon";
 import { columns, users, statusOptions, batchOptions } from "./data";
 import { capitalize } from "./utils";
+import { IoShieldCheckmarkOutline } from "react-icons/io5";
+import { MdAccountCircle, MdOutlineCancel } from "react-icons/md";
+import { FaRegEye } from "react-icons/fa";
+import { ModalDialogProps } from "@mui/joy";
+import StudentProfile from "./studentProfile/StudentProfile";
+import PopUpModal from "@/app/utils/PopUpModal";
+
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   verified: "success",
@@ -32,14 +40,25 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
   submitted: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["universityRollNo", "name", "classRollNo","moocsStatus", "actions"];
+const INITIAL_VISIBLE_COLUMNS = [
+  "universityRollNo",
+  "name",
+  "classRollNo",
+  "marPoints",
+  "moocsCredits",
+  "actions",
+];
 
-type User = typeof users[0];
+type User = (typeof users)[0];
 
 export default function StudentsList() {
   const [filterValue, setFilterValue] = React.useState("");
-  const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
-  const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
+  const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
+    new Set([])
+  );
+  const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
+    new Set(INITIAL_VISIBLE_COLUMNS)
+  );
   const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
   const [batchFilter, setBatchFilter] = React.useState<string>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -55,7 +74,9 @@ export default function StudentsList() {
   const headerColumns = React.useMemo(() => {
     if (visibleColumns === "all") return columns;
 
-    return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
+    return columns.filter((column) =>
+      Array.from(visibleColumns).includes(column.uid)
+    );
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
@@ -63,16 +84,22 @@ export default function StudentsList() {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase()),
+        user.name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
-    if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
+    if (
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusOptions.length
+    ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.moocsStatus),
+        Array.from(statusFilter).includes(user.moocsStatus)
       );
     }
-    if (batchFilter !== "all") { // Update: Apply batch filter if it's not "all"
-      filteredUsers = filteredUsers.filter((user) => user.batch === batchFilter);
+    if (batchFilter !== "all") {
+      // Update: Apply batch filter if it's not "all"
+      filteredUsers = filteredUsers.filter(
+        (user) => user.batch === batchFilter
+      );
     }
 
     return filteredUsers;
@@ -100,11 +127,19 @@ export default function StudentsList() {
   const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
     const cellValue = user[columnKey as keyof User];
 
+
+
+    const handleProfileView = (id: string) => {
+      setRoute("studentProfile");
+      setLayout("center");
+      setSelectedId(id);
+    };
+
     switch (columnKey) {
       case "name":
         return (
           <User
-          // avatarProps={undefined}
+            // avatarProps={undefined}
             description={user.email}
             name={cellValue}
           >
@@ -120,25 +155,40 @@ export default function StudentsList() {
         );
       case "moocsStatus":
         return (
-          <Chip className="capitalize" color={statusColorMap[user.moocsStatus]} size="sm" variant="flat">
+          <Chip
+            className="capitalize"
+            color={statusColorMap[user.moocsStatus]}
+            size="sm"
+            variant="flat"
+          >
             {cellValue}
           </Chip>
         );
       case "actions":
         return (
-          <div className="relative flex justify-end items-center gap-2">
-            <Dropdown>
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-300" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
-                <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="View Profile">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                <MdAccountCircle
+                  size={25}
+                   onClick={() => handleProfileView(user._id)}
+                />
+              </span>
+            </Tooltip>
+            {/* <Tooltip content="Verify" color="success" className="text-white">
+              <span className="text-lg text-success cursor-pointer active:opacity-50">
+                <IoShieldCheckmarkOutline
+                  // onClick={() => handleVerify(user.universityRollNo)}
+                />
+              </span>
+            </Tooltip>
+            <Tooltip color="danger" content="Reject">
+              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                <MdOutlineCancel 
+                // onClick={() => handleReject(user.universityRollNo)} 
+                />
+              </span>
+            </Tooltip> */}
           </div>
         );
       default:
@@ -158,10 +208,13 @@ export default function StudentsList() {
     }
   }, [page]);
 
-  const onRowsPerPageChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setRowsPerPage(Number(e.target.value));
-    setPage(1);
-  }, []);
+  const onRowsPerPageChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setRowsPerPage(Number(e.target.value));
+      setPage(1);
+    },
+    []
+  );
 
   const onSearchChange = React.useCallback((value?: string) => {
     if (value) {
@@ -188,7 +241,10 @@ export default function StudentsList() {
           <div className="flex gap-3">
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
-                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
                   Batch
                 </Button>
               </DropdownTrigger>
@@ -212,7 +268,10 @@ export default function StudentsList() {
             </Dropdown>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
-                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
                   Status
                 </Button>
               </DropdownTrigger>
@@ -233,7 +292,10 @@ export default function StudentsList() {
             </Dropdown>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
-                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
                   Columns
                 </Button>
               </DropdownTrigger>
@@ -255,7 +317,9 @@ export default function StudentsList() {
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {users.length} students</span>
+          <span className="text-default-400 text-small">
+            Total {users.length} students
+          </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -284,9 +348,7 @@ export default function StudentsList() {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {
-            `${filteredItems.length} students`
-          }
+          {`${filteredItems.length} students`}
           {/* {selectedKeys === "all"
             ? "All items selected"
             : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
@@ -301,10 +363,20 @@ export default function StudentsList() {
           onChange={setPage}
         />
         <div className="hidden sm:flex w-[30%] justify-end gap-2">
-          <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onPreviousPage}
+          >
             Previous
           </Button>
-          <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onNextPage}
+          >
             Next
           </Button>
         </div>
@@ -312,39 +384,65 @@ export default function StudentsList() {
     );
   }, [selectedKeys, items.length, page, pages]);
 
+
+  const [route, setRoute] = useState("");
+  const [layout, setLayout] = React.useState<
+    ModalDialogProps["layout"] | undefined
+  >(undefined);
+  const [selectedId, setSelectedId] = React.useState(""); 
+
+
   return (
-    <Table
-      aria-label="Example table with custom cells, pagination and sorting"
-      isHeaderSticky
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: "max-h-[382px]",
-      }}
-      sortDescriptor={sortDescriptor}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-      onSortChange={setSortDescriptor}
-    >
-      <TableHeader columns={headerColumns}>
-        {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={"No users found"} items={sortedItems}>
-        {(item) => (
-          <TableRow key={item.universityRollNo}>
-            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <Table
+        aria-label="Example table with custom cells, pagination and sorting"
+        isHeaderSticky
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        classNames={{
+          wrapper: "max-h-[382px]",
+        }}
+        sortDescriptor={sortDescriptor}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSelectionChange={setSelectedKeys}
+        onSortChange={setSortDescriptor}
+      >
+        <TableHeader columns={headerColumns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === "actions" ? "center" : "start"}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody emptyContent={"No users found"} items={sortedItems}>
+          {(item) => (
+            <TableRow key={item.universityRollNo}>
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      {route === "studentProfile" && (
+        <>
+          {layout && (
+            <PopUpModal 
+              layout={layout}
+              setLayout={setLayout}
+              setRoute={setRoute}
+              component={StudentProfile}
+              route="viewPdf"
+              id={selectedId}
+            />
+          )}
+        </>
+      )}
+    </>
   );
 }

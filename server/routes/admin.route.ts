@@ -8,7 +8,7 @@ const adminRouter = express.Router();
 
 adminRouter.get("/all-student-details",isAuthenticate,authorizeRoles("admin"),allStudentDetails);
 
-adminRouter.get("/single-student-details",isAuthenticate,authorizeRoles("admin"),singleStudentDetail);
+adminRouter.get("/single-student-details/:id",isAuthenticate,authorizeRoles("admin"),singleStudentDetail);
 
 //create moocs course list
 adminRouter.post("/create-moocs-course", isAuthenticate,authorizeRoles("admin"), createMoocsCourse);

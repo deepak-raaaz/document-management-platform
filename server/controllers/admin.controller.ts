@@ -44,9 +44,24 @@ export const allStudentDetails = CatchAsyncError(
 export const singleStudentDetail = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const universityRoll = req.params.universityRoll;
-      const singleStudent = await userModel.findById(universityRoll);
-      if (!universityRoll) {
+      const id = req.params.id;
+      const singleStudent = await userModel.findById(id).populate({
+        path: "moocs",
+        populate: [
+          {
+            path: "moocsCourse",
+            model: "MoocsCourse",
+          },
+          {
+            path: "document",
+            model: "MoocsDocuments",
+          },
+        ],
+      });;
+
+
+      
+      if (!singleStudent) {
         return next(new ErrorHandler("Not record found!", 400));
       }
       res.status(201).json({
