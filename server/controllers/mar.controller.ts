@@ -18,13 +18,15 @@ import { redis } from "../utlis/redis";
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage }).single("file");
 
+// Define IMARUpload interface
 interface IMARUpload {
   title: string;
   year: number;
-  category: string;
+  category: string; // Assuming category is an ObjectId
   date: string;
 }
-// Uplaod Mar points :-
+
+// Uplaod Mar points
 export const uploadMAR = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -84,15 +86,20 @@ export const uploadMAR = CatchAsyncError(
             format: myCloud.format,
           };
 
+          // Retrieve category data
           const categoryData = await categoryModel.findById(category);
-          const points = categoryData?.perMarPoints;
+          if (!categoryData) {
+            return next(new ErrorHandler("Category not found", 404));
+          }
+
+          const points = categoryData.perMarPoints;
           const marDocument = await documentsModel.create(documentData);
 
           // Calculate current MAR points within the category
           const currentCategoryPoints = await marModel.aggregate([
             {
               $match: {
-                category: category,
+                marCategory: category,
                 user: user._id,
               },
             },
@@ -105,9 +112,7 @@ export const uploadMAR = CatchAsyncError(
           ]);
 
           // Get maximum MAR points allowed for the category from the database
-          const maxCategoryPoints = await categoryModel.findOne({
-            category: category,
-          });
+          const maxCategoryPoints = categoryData.maximumMarPoints;
 
           // Calculate overall MAR points collected across all categories
           const overallPoints = await marModel.aggregate([
@@ -127,7 +132,7 @@ export const uploadMAR = CatchAsyncError(
           // Check if adding new points exceeds the maximum allowed
           if (
             currentCategoryPoints[0]?.totalPoints + points >
-            (maxCategoryPoints?.maximumMarPoints ?? Number.MAX_VALUE)
+            (maxCategoryPoints ?? Number.MAX_VALUE)
           ) {
             return next(
               new ErrorHandler(
@@ -141,9 +146,10 @@ export const uploadMAR = CatchAsyncError(
             user: user._id,
             title: title,
             year: year,
-            marCategory: categoryData?._id,
+            marCategory: category,
             certificateDate: date,
             document: marDocument._id,
+            points: points, // Add points to the data
           };
 
           const mar = await marModel.create(data);
