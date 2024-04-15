@@ -138,6 +138,7 @@ export default function MoocsSubmissionList() {
     setRoute("reject");
     setLayout("center");
   };
+  
   const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
     const cellValue = user[columnKey as keyof User];
 

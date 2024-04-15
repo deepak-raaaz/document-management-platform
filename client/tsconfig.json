@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/components/admin/moocs/moocsSubmissionList/EditIcon.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/components/admin/moocs/moocsSubmissionList/EditIcon.jsx", "app/components/admin/students/studentList/studentProfile/data.js"],
   "exclude": ["node_modules"]
 }

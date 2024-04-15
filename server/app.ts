@@ -7,7 +7,7 @@ import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
 import mocsRouter from "./routes/moocs.route";
 import adminRouter from "./routes/admin.route";
-import marRouter from "./routes/mar.routes";
+import marRouter from "./routes/mar.route";
 
 app.use(express.json({limit:"50mb"}));
 

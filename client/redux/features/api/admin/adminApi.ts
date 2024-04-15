@@ -42,8 +42,15 @@ export const adminApi = apiSlice.injectEndpoints({
           },
           credentials: "include" as const,
         }),
+      }),
+      studentDetails: builder.query({
+        query: ({id}) => ({
+          url: `single-student-details/${id}`,
+          method: "GET",
+          credentials: "include" as const,
+        }),
       })
   }),
 });
 
-export const { useAllUsersQuery, useActivateAccountMutation, useDeactivateAccountMutation } = adminApi;
+export const { useAllUsersQuery, useActivateAccountMutation, useDeactivateAccountMutation,useStudentDetailsQuery } = adminApi;
