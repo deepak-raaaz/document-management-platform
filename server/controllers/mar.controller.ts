@@ -5,6 +5,7 @@ import { NextFunction, Request, Response } from "express";
 import cloudinary from "cloudinary";
 
 import {
+  categoryModel,
     documentsModel,
     marCourseModel,
     marModel,
@@ -32,7 +33,7 @@ interface IMARUpload {
     category: string;
     points: number;
   }
-  
+  // Uplaod Mar points :-
   export const uploadMAR = CatchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -41,8 +42,7 @@ interface IMARUpload {
             return next(new ErrorHandler("File upload failed", 400));
           }
           try {
-            const { title, year, category, points } =
-              req.body as IMARUpload;
+            const { title, year, category, points } = req.body as IMARUpload;
   
             // Check if the user exists
             const user = await userModel.findById(req.user?._id);
@@ -89,6 +89,54 @@ interface IMARUpload {
             };
   
             const marDocument = await documentsModel.create(documentData);
+  
+            // Calculate current MAR points within the category
+            const currentCategoryPoints = await marModel.aggregate([
+              {
+                $match: {
+                  category: category,
+                  user: user._id,
+                },
+              },
+              {
+                $group: {
+                  _id: null,
+                  totalPoints: { $sum: "$points" },
+                },
+              },
+            ]);
+  
+            // Get maximum MAR points allowed for the category from the database
+            const maxCategoryPoints = await categoryModel.findOne({ category: category });
+  
+            // Calculate overall MAR points collected across all categories
+            const overallPoints = await marModel.aggregate([
+              {
+                $match: {
+                  user: user._id,
+                },
+              },
+              {
+                $group: {
+                  _id: null,
+                  totalPoints: { $sum: "$points" },
+                },
+              },
+            ]);
+  
+            // Check if adding new points exceeds the maximum allowed
+            if (
+              currentCategoryPoints[0]?.totalPoints + points >
+              (maxCategoryPoints?.maximumMarPoints ?? Number.MAX_VALUE)
+            ) {
+              return next(
+                new ErrorHandler(
+                  `Adding ${points} MAR points exceeds the maximum allowed for category ${category}`,
+                  400
+                )
+              );
+            }
+  
             const data = {
               user: user._id,
               title: title,
@@ -99,15 +147,16 @@ interface IMARUpload {
             };
   
             const mar = await marModel.create(data);
-
-          // Push the newly created MAR document ID to the user's mar array
-          user.mar.push(mar._id);
-          await user.save();
-          await redis.set(req.user?._id, JSON.stringify(user));
+  
+            // Push the newly created MAR document ID to the user's mar array
+            user.mar.push(mar._id);
+            await user.save();
+            await redis.set(req.user?._id, JSON.stringify(user));
   
             res.status(201).json({
               success: true,
               mar,
+              overallPoints: overallPoints[0]?.totalPoints ?? 0, // Return overall MAR points collected
             });
           } catch (error: any) {
             return next(new ErrorHandler(error.message, 400));
@@ -118,6 +167,94 @@ interface IMARUpload {
       }
     }
   );
+  
+
+  
+  // export const uploadMAR = CatchAsyncError(
+  //   async (req: Request, res: Response, next: NextFunction) => {
+  //     try {
+  //       upload(req, res, async (err: any) => {
+  //         if (err) {
+  //           return next(new ErrorHandler("File upload failed", 400));
+  //         }
+  //         try {
+  //           const { title, year, category, points } =
+  //             req.body as IMARUpload;
+  
+  //           // Check if the user exists
+  //           const user = await userModel.findById(req.user?._id);
+  //           if (!user) {
+  //             return next(new ErrorHandler("User not found", 400));
+  //           }
+  
+  //           // Check if the user has already uploaded MAR with the same title
+  //           const existingMAR = await marModel.findOne({
+  //             user: user._id,
+  //             title: title,
+  //           });
+  
+  //           if (existingMAR) {
+  //             return next(new ErrorHandler("You have already uploaded MAR with this title", 400));
+  //           }
+  
+  //           const file = req.file; // Access the uploaded file
+  //           if (!file) {
+  //             return next(new ErrorHandler("No file uploaded", 400));
+  //           }
+  
+  //           // Create a temporary file path
+  //           const tempFilePath = `temp_${Date.now()}_${file.originalname}`;
+  
+  //           // Write the buffer to the temporary file
+  //           fs.writeFileSync(tempFilePath, file.buffer);
+  
+  //           // Upload temporary file to Cloudinary
+  //           const myCloud = await cloudinary.v2.uploader.upload(tempFilePath, {
+  //             folder: "Document_MAR",
+  //           });
+  
+  //           // Delete the temporary file
+  //           fs.unlinkSync(tempFilePath);
+  
+  //           const documentData = {
+  //             user: user._id,
+  //             public_id: myCloud.public_id,
+  //             url: myCloud.secure_url,
+  //             pageCount: myCloud.pages,
+  //             size: myCloud.bytes,
+  //             format: myCloud.format,
+  //           };
+  
+  //           const marDocument = await documentsModel.create(documentData);
+  //           const data = {
+  //             user: user._id,
+  //             title: title,
+  //             year: year,
+  //             category: category,
+  //             points: points,
+  //             document: marDocument._id,
+  //           };
+  
+  //           const mar = await marModel.create(data);
+
+  //         // Push the newly created MAR document ID to the user's mar array
+  //         user.mar.push(mar._id);
+  //         await user.save();
+  //         await redis.set(req.user?._id, JSON.stringify(user));
+  
+  //           res.status(201).json({
+  //             success: true,
+  //             mar,
+  //           });
+  //         } catch (error: any) {
+  //           return next(new ErrorHandler(error.message, 400));
+  //         }
+  //       });
+  //     } catch (error: any) {
+  //       return next(new ErrorHandler(error.message, 400));
+  //     }
+  //   }
+  // );
 
   
   export const deleteMAR = CatchAsyncError(

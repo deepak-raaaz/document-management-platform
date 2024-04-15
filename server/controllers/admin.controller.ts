@@ -6,6 +6,10 @@ import cloudinary from "cloudinary";
 import { create } from "domain";
 
 import { moocsCourseModel, moocsModel } from "../models/moocs.model";
+import {
+  categoryModel,
+    
+  } from "../models/mar.model";
 import userModel from "../models/user.model";
 import nodemailer from 'nodemailer';
 import ejs from "ejs";
@@ -321,3 +325,91 @@ export const deactivateMAR = CatchAsyncError(
     }
   }
 );
+
+// eedit marcategory list :-
+
+export const editMarCategory= CatchAsyncError(async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const categoryId = req.params.id;
+    const { category, perMarPoints, maximumMarPoints } = req.body;
+      
+    // Validate input fields
+    if (!category) {
+      return next(new ErrorHandler("Enter Category Name", 400));
+    }
+    if (!perMarPoints) {
+      return next(new ErrorHandler("Enter Per Mar Points", 400));
+    }
+    if (!maximumMarPoints) {
+      return next(new ErrorHandler("Enter Maximum Mar Points", 400));
+    }
+
+    // Find and update MarCategory
+    const updatedCategory = await categoryModel.findByIdAndUpdate(categoryId, {
+      category: category,
+      perMarPoints: perMarPoints,
+      maximumMarPoints: maximumMarPoints,
+    }, { new: true });
+
+    // Check if the category exists
+    if (!updatedCategory) {
+      return next(new Error("Category not found"));
+    }
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      updatedCategory,
+    });
+  } catch (error: any) {
+    // Handle errors
+    return next(new ErrorHandler(error.message, 400));
+  }
+}
+);
+
+// delkete marcategory
+// Soft delete MarCategory by admin
+export const deleteMarCategory = CatchAsyncError(async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const categoryId = req.params.id;
+
+    // Check if categoryId is provided
+    if (!categoryId) {
+      return next(new ErrorHandler("Category ID is required", 400));
+    }
+
+    // Update isActive field to false
+    const updatedCategory = await categoryModel.findByIdAndUpdate(
+      categoryId,
+      { isActive: false },
+      { new: true }
+    );
+
+    // If the category doesn't exist, return an error
+    if (!updatedCategory) {
+      return next(new ErrorHandler("Category not found", 404));
+    }
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: "MarCategory soft deleted successfully",
+      updatedCategory,
+    });
+  } catch (error: any) {
+    // Handle errors
+    return next(new ErrorHandler(error.message, 400));
+  }
+}
+);
+
+
