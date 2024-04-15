@@ -19,8 +19,9 @@ interface IMarCourse extends Document {
 
 interface IMarDb extends Document {
   user: object;
-  marCourse: object;
-
+  title: string;
+  marCategory: object;
+  certificateDate: string;
   year: number;
   document: object;
 
@@ -95,10 +96,14 @@ const marDbSchema = new Schema<IMarDb>(
       required: true,
       ref: "User",
     },
-    marCourse: {
+    title: {
+      type:String,
+      required:true
+    },
+    marCategory: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "MarCourse",
+      ref: "MarCategory",
     },
     year: {
       type: Number,
@@ -108,6 +113,10 @@ const marDbSchema = new Schema<IMarDb>(
       type: Schema.Types.ObjectId,
       required: true,
       ref: "MarDocuments",
+    },
+    certificateDate: {
+      type: String,
+      required: true,
     },
     isVerified: {
       type: Boolean,
