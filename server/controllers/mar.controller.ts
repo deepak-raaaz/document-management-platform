@@ -275,24 +275,19 @@ export const getMyMar = CatchAsyncError(
 );
 
 //  get category list :-
-export const getCategoryList = CatchAsyncError(
+export const getMarCategories = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Fetch category list from the database
+      // Fetch MAR categories from the database
       const categories = await categoryModel.find({ isActive: true });
-
-      // Extract category names and perMarPoints
-      const categoryList = categories.map(category => ({
-        category: category.category,
-        perMarPoints: category.perMarPoints
-      }));
 
       res.status(200).json({
         success: true,
-        categories: categoryList
+        categories
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
+
