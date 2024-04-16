@@ -32,6 +32,7 @@ interface ICategory extends Document {
   category: string;
   perMarPoints: number;
   maximumMarPoints: number;
+  maxFile: number;
   isActive: boolean;
 }
 
@@ -139,6 +140,10 @@ const categorySchema = new Schema<ICategory>(
     maximumMarPoints: {
       type: Number,
       required: true,
+    },
+    maxFile:{
+      type:Number,
+      required:true
     },
     isActive: {
       type: Boolean,

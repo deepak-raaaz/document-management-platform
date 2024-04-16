@@ -92,6 +92,21 @@ export const uploadMAR = CatchAsyncError(
             return next(new ErrorHandler("Category not found", 404));
           }
 
+          // Check if the student has already crossed the maxFile limit in the selected category
+          const existingMARsInCategory = await marModel.countDocuments({
+            user: user._id,
+            marCategory: category,
+          });
+
+          if (existingMARsInCategory >= categoryData.maxFile) {
+            return next(
+              new ErrorHandler(
+                `You have already uploaded the maximum number of files in this category`,
+                400
+              )
+            );
+          }
+
           const points = categoryData.perMarPoints;
           const marDocument = await documentsModel.create(documentData);
 
