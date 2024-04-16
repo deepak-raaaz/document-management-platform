@@ -363,12 +363,13 @@ export const addMarCategory = CatchAsyncError(async (
     if (!maximumMarPoints) {
       return next(new ErrorHandler("Enter Maximum Mar Points", 400));
     }
-
+    const maxFile = maximumMarPoints/perMarPoints;
     // Create a new MarCategory
     const newMarCategory = await categoryModel.create({
       category,
       perMarPoints,
       maximumMarPoints,
+      maxFile
     });
 
     // Return success response
