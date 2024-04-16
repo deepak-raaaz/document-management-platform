@@ -189,92 +189,6 @@ export const uploadMAR = CatchAsyncError(
   }
 );
 
-// export const uploadMAR = CatchAsyncError(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       upload(req, res, async (err: any) => {
-//         if (err) {
-//           return next(new ErrorHandler("File upload failed", 400));
-//         }
-//         try {
-//           const { title, year, category, points } =
-//             req.body as IMARUpload;
-
-//           // Check if the user exists
-//           const user = await userModel.findById(req.user?._id);
-//           if (!user) {
-//             return next(new ErrorHandler("User not found", 400));
-//           }
-
-//           // Check if the user has already uploaded MAR with the same title
-//           const existingMAR = await marModel.findOne({
-//             user: user._id,
-//             title: title,
-//           });
-
-//           if (existingMAR) {
-//             return next(new ErrorHandler("You have already uploaded MAR with this title", 400));
-//           }
-
-//           const file = req.file; // Access the uploaded file
-//           if (!file) {
-//             return next(new ErrorHandler("No file uploaded", 400));
-//           }
-
-//           // Create a temporary file path
-//           const tempFilePath = `temp_${Date.now()}_${file.originalname}`;
-
-//           // Write the buffer to the temporary file
-//           fs.writeFileSync(tempFilePath, file.buffer);
-
-//           // Upload temporary file to Cloudinary
-//           const myCloud = await cloudinary.v2.uploader.upload(tempFilePath, {
-//             folder: "Document_MAR",
-//           });
-
-//           // Delete the temporary file
-//           fs.unlinkSync(tempFilePath);
-
-//           const documentData = {
-//             user: user._id,
-//             public_id: myCloud.public_id,
-//             url: myCloud.secure_url,
-//             pageCount: myCloud.pages,
-//             size: myCloud.bytes,
-//             format: myCloud.format,
-//           };
-
-//           const marDocument = await documentsModel.create(documentData);
-//           const data = {
-//             user: user._id,
-//             title: title,
-//             year: year,
-//             category: category,
-//             points: points,
-//             document: marDocument._id,
-//           };
-
-//           const mar = await marModel.create(data);
-
-//         // Push the newly created MAR document ID to the user's mar array
-//         user.mar.push(mar._id);
-//         await user.save();
-//         await redis.set(req.user?._id, JSON.stringify(user));
-
-//           res.status(201).json({
-//             success: true,
-//             mar,
-//           });
-//         } catch (error: any) {
-//           return next(new ErrorHandler(error.message, 400));
-//         }
-//       });
-//     } catch (error: any) {
-//       return next(new ErrorHandler(error.message, 400));
-//     }
-//   }
-// );
-
 export const deleteMAR = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -353,6 +267,29 @@ export const getMyMar = CatchAsyncError(
         success: true,
         totalMarPoints,
         moocs,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+//  get category list :-
+export const getCategoryList = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Fetch category list from the database
+      const categories = await categoryModel.find({ isActive: true });
+
+      // Extract category names and perMarPoints
+      const categoryList = categories.map(category => ({
+        category: category.category,
+        perMarPoints: category.perMarPoints
+      }));
+
+      res.status(200).json({
+        success: true,
+        categories: categoryList
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));

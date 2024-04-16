@@ -472,4 +472,121 @@ export const deleteMarCategory = CatchAsyncError(async (
 }
 );
 
+// verify mar list uplaoded by student:-
+export const verifyMarDocument = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Find the MAR document by ID
+      const marDoc = await marModel.findById(req.params.id);
+      if (!marDoc) {
+        return next(new Error("MAR document not found"));
+      }
+      
+      // Check if the MAR document is already verified
+      if (marDoc.isVerified) {
+        return next(new Error("MAR document is already verified!"));
+      }
+
+      // If not verified, update the isVerified field to true
+      marDoc.isVerified = true;
+      await marDoc.save();
+
+      // Send notification email if requested
+      const { email } = req.body;
+      if (email) {
+        const data = { marTitle: marDoc.title };
+
+        const html = await ejs.renderFile(
+          path.join(__dirname, "../mails/mar-verification-mail.ejs"),
+          data
+        );
+
+        try {
+          await sendMail({
+            email,
+            subject: "MAR Document Verification",
+            template: "mar-verification-mail.ejs",
+            data,
+          });
+
+          return res.status(200).json({
+            success: true,
+            message: `MAR document "${marDoc.title}" has been successfully verified. An email notification has been sent.`,
+          });
+        } catch (error: any) {
+          return next(new ErrorHandler(error.message, 400));
+        }
+      }
+
+      // Respond with success message
+      res.status(200).json({
+        success: true,
+        message: `MAR document "${marDoc.title}" has been successfully verified.`,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+
+// verify moocs document :-
+export const verifyMoocsDocument = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Find the MOOCs document by ID
+      const moocsDoc = await moocsModel.findById(req.params.id).populate("moocsCourse") as any;
+      if (!moocsDoc) {
+        return next(new Error("MOOCs document not found"));
+      }
+      
+      // Check if the MOOCs document is already verified
+      if (moocsDoc.status==="verified") {
+        return next(new Error("MOOCs document is already verified!"));
+      }
+
+      // If not verified, update the isVerified field to true
+      moocsDoc.status = "verified";
+      await moocsDoc.save();
+
+      // Send notification email if requested
+      const { email } = req.body;
+      if (email) {
+        const data = { moocsTitle: moocsDoc.moocsCourse.title};
+
+        const html = await ejs.renderFile(
+          path.join(__dirname, "../mails/moocs-verification-mail.ejs"),
+          data
+        );
+
+        try {
+          await sendMail({
+            email,
+            subject: "MOOCs Document Verification",
+            template: "moocs-verification-mail.ejs",
+            data,
+          });
+
+          return res.status(200).json({
+            success: true,
+            message: `MOOCs document "${moocsDoc.title}" has been successfully verified. An email notification has been sent.`,
+          });
+        } catch (error: any) {
+          return next(new ErrorHandler(error.message, 400));
+        }
+      }
+
+      // Respond with success message
+      res.status(200).json({
+        success: true,
+        message: `MOOCs document "${moocsDoc.title}" has been successfully verified.`,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+
+
 
