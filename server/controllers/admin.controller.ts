@@ -167,7 +167,6 @@ export const rejectStudent = CatchAsyncError(
             template: "account-rejection-mail.ejs",
             data,
           });
-  
           res.status(201).json({
             success: true,
             message: `An email notification has been sent to the registered email : ${student.email}`,
@@ -177,7 +176,11 @@ export const rejectStudent = CatchAsyncError(
           return next(new ErrorHandler(error.message, 400));
         }
       }
+      res.status(201).json({
+        success: true,
+        message: `Account Deativated!`,
         
+      });
      
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
