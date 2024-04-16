@@ -275,10 +275,10 @@ export const getMyMar = CatchAsyncError(
 );
 
 //  get category list :-
-export const getMarCategories = CatchAsyncError(
+export const getVerifiedMarCategories = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Fetch MAR categories from the database
+      // Fetch verified MAR categories from the database
       const categories = await categoryModel.find({ isActive: true });
 
       res.status(200).json({
