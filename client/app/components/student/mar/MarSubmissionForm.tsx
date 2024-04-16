@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import {
   useMyMoocsQuery,
+  useUploadMarMutation,
   useUploadMoocsMutation,
 } from "@/redux/features/api/moocs/moocsApi";
 
@@ -66,8 +67,8 @@ const schema = Yup.object().shape({
 });
 
 const MarSubmissionForm: FC<Props> = ({ moocs }) => {
-  const [uploadMoocs, { isSuccess, error, isLoading }] =
-    useUploadMoocsMutation();
+  const [uploadMar, { isSuccess, error, isLoading }] =
+    useUploadMarMutation();
 
   const [loadUser, setLoadUser] = useState(false);
 
@@ -83,7 +84,7 @@ const MarSubmissionForm: FC<Props> = ({ moocs }) => {
     },
     validationSchema: schema,
     onSubmit: async ({ title, category, year, file, certificateDate }) => {
-      await uploadMoocs({
+      await uploadMar({
         title,
         certificateDate,
         category,

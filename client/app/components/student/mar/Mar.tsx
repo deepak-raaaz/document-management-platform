@@ -5,6 +5,7 @@ import { useMediaQuery, useTheme } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
   useLoadMoocsListQuery,
+  useMarCategoryListQuery,
   useMyMoocsQuery,
 } from "@/redux/features/api/moocs/moocsApi";
 import StudentData from "../moocs/StudentData";
@@ -19,7 +20,7 @@ const Mar: FC<Props> = ({}) => {
 
   const { isLoading, error } = useMyMoocsQuery({});
 
-  const { data } = useLoadMoocsListQuery({});
+  const { data } = useMarCategoryListQuery({});
   const { myMoocs, totalCreditPoints } = useSelector(
     (state: any) => state.moocs
   );
