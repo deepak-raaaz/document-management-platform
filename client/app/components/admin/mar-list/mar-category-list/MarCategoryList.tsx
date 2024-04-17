@@ -39,19 +39,20 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "title",
-  "platform",
-  "credit",
+  "category",
+  "perMarPoints",
+  "maximumMarPoints",
+  "maxFile",
   "status",
   "actions",
 ];
 
 type Props = {
-  moocsCourse: any;
+    marCategoryList: any;
 };
 
-const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
-  type MoocsCourse = (typeof moocsCourse)[0];
+const MarCategoryList:FC<Props> = ({marCategoryList}) => {
+  type MarCategoryList = (typeof marCategoryList)[0];
  
 
   const [filterValue, setFilterValue] = React.useState("");
@@ -85,25 +86,25 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...moocsCourse];
+    let filteredUsers = [...marCategoryList];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((moocsCourse) =>
-      moocsCourse.title.toLowerCase().includes(filterValue.toLowerCase())
+      filteredUsers = filteredUsers.filter((marCategoryList) =>
+      marCategoryList.category.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredUsers = filteredUsers.filter((moocsCourse) =>
-        Array.from(statusFilter).includes(moocsCourse.status)
+      filteredUsers = filteredUsers.filter((marCategoryList) =>
+        Array.from(statusFilter).includes(marCategoryList.status)
       );
     }
     
 
     return filteredUsers;
-  }, [moocsCourse, filterValue, statusFilter, batchFilter]);
+  }, [marCategoryList, filterValue, statusFilter, batchFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -115,9 +116,9 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
   }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: MoocsCourse, b: MoocsCourse) => {
-      const first = a[sortDescriptor.column as keyof MoocsCourse] as number;
-      const second = b[sortDescriptor.column as keyof MoocsCourse] as number;
+    return [...items].sort((a: MarCategoryList, b: MarCategoryList) => {
+      const first = a[sortDescriptor.column as keyof MarCategoryList] as number;
+      const second = b[sortDescriptor.column as keyof MarCategoryList] as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
@@ -141,8 +142,8 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
     setSelectedId(id);
     setSelectedEmail(email);
   };
-  const renderCell = React.useCallback((user: MoocsCourse, columnKey: React.Key) => {
-    const cellValue = user[columnKey as keyof MoocsCourse];
+  const renderCell = React.useCallback((user: MarCategoryList, columnKey: React.Key) => {
+    const cellValue = user[columnKey as keyof MarCategoryList];
 
     switch (columnKey) {
       case "status":
@@ -221,7 +222,7 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by title..."
+            placeholder="Search by category..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => setFilterValue("")} // Update: Clear filter directly
@@ -281,7 +282,7 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {moocsCourse.length} Moocs Course
+            Total {marCategoryList.length} Mar Categories
           </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
@@ -304,14 +305,14 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    moocsCourse.length,
+    marCategoryList.length,
   ]);
 
   const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
         <span className="w-[30%] text-small text-default-400">
-          {`${filteredItems.length} Moocs Course`}
+          {`${filteredItems.length} Mar Categories`}
           {/* {selectedKeys === "all"
             ? "All items selected"
             : `${selectedKeys.size} of ${filteredItems.length} selected`} */}
@@ -422,4 +423,4 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
 }
 
 
-export default MoocsCourseList;
+export default MarCategoryList;

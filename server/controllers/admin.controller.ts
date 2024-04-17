@@ -6,13 +6,9 @@ import cloudinary from "cloudinary";
 import { create } from "domain";
 
 import { moocsCourseModel, moocsModel } from "../models/moocs.model";
-import {
-  categoryModel,
-  marCourseModel,
-    
-  } from "../models/mar.model";
+import { categoryModel } from "../models/mar.model";
 import userModel from "../models/user.model";
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utlis/sendMail";
@@ -25,16 +21,20 @@ export const allStudentDetails = CatchAsyncError(
       const allStudentDetails = await userModel.find().sort({ createdAt: -1 });
 
       // Convert Mongoose documents to plain JavaScript objects
-      const plainStudentDetails = allStudentDetails.map(student => student.toObject());
+      const plainStudentDetails = allStudentDetails.map((student) =>
+        student.toObject()
+      );
 
       // Modify isVerified property to 'active' or 'inactive' and rename to 'status'
-      const modifiedDetails = plainStudentDetails.map(student => ({
+      const modifiedDetails = plainStudentDetails.map((student) => ({
         ...student,
-        status: student.isVerfied ? 'active' : 'inactive'
+        status: student.isVerfied ? "active" : "inactive",
       }));
 
       // Remove the isVerified property from the modified details
-      const detailsWithoutIsVerified = modifiedDetails.map(({ isVerfied, ...rest }) => rest);
+      const detailsWithoutIsVerified = modifiedDetails.map(
+        ({ isVerfied, ...rest }) => rest
+      );
 
       res.status(201).json({
         success: true,
@@ -63,10 +63,8 @@ export const singleStudentDetail = CatchAsyncError(
             model: "MoocsDocuments",
           },
         ],
-      });;
+      });
 
-
-      
       if (!singleStudent) {
         return next(new ErrorHandler("Not record found!", 400));
       }
@@ -96,15 +94,15 @@ export const verifyStudent = CatchAsyncError(
         student.isVerfied = true;
       }
       await student.save();
-      const {email} = req.body;
-      if(email){
+      const { email } = req.body;
+      if (email) {
         const data = { user: { name: student.name } };
 
         const html = await ejs.renderFile(
           path.join(__dirname, "../mails/account-verification-mail.ejs"),
           data
         );
-  
+
         try {
           await sendMail({
             email: student.email,
@@ -112,11 +110,10 @@ export const verifyStudent = CatchAsyncError(
             template: "account-verification-mail.ejs",
             data,
           });
-  
+
           res.status(201).json({
             success: true,
             message: `An email notification has been sent to the registered email : ${student.email}`,
-            
           });
         } catch (error: any) {
           return next(new ErrorHandler(error.message, 400));
@@ -126,16 +123,12 @@ export const verifyStudent = CatchAsyncError(
       res.status(201).json({
         success: true,
         message: `Account verified !`,
-        
       });
-        
-     
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
-
 
 // Reject  student by admin and send mail (optional)
 export const rejectStudent = CatchAsyncError(
@@ -152,15 +145,15 @@ export const rejectStudent = CatchAsyncError(
         student.isVerfied = false;
       }
       await student.save();
-      const {email,reason} = req.body;
-      if(email){
-        const data = { user: { name: student.name },reason };
+      const { email, reason } = req.body;
+      if (email) {
+        const data = { user: { name: student.name }, reason };
 
         const html = await ejs.renderFile(
           path.join(__dirname, "../mails/account-rejection-mail.ejs"),
           data
         );
-  
+
         try {
           await sendMail({
             email: student.email,
@@ -171,7 +164,6 @@ export const rejectStudent = CatchAsyncError(
           res.status(201).json({
             success: true,
             message: `An email notification has been sent to the registered email : ${student.email}`,
-            
           });
         } catch (error: any) {
           return next(new ErrorHandler(error.message, 400));
@@ -180,9 +172,7 @@ export const rejectStudent = CatchAsyncError(
       res.status(201).json({
         success: true,
         message: `Account Deativated!`,
-        
       });
-     
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -228,7 +218,7 @@ export const editMoocsCourse = CatchAsyncError(
     try {
       const courseId = req.params.id;
       const { title, platform, credit } = req.body;
-      
+
       if (!title) {
         return next(new ErrorHandler("Enter Course Title", 400));
       }
@@ -239,11 +229,15 @@ export const editMoocsCourse = CatchAsyncError(
         return next(new ErrorHandler("Enter Course Credit", 400));
       }
 
-      const updatedCourse = await moocsCourseModel.findByIdAndUpdate(courseId, {
-        title: title,
-        platform: platform,
-        credit: credit,
-      }, { new: true });
+      const updatedCourse = await moocsCourseModel.findByIdAndUpdate(
+        courseId,
+        {
+          title: title,
+          platform: platform,
+          credit: credit,
+        },
+        { new: true }
+      );
 
       if (!updatedCourse) {
         return next(new Error("Course not found"));
@@ -265,7 +259,7 @@ export const editMAR = CatchAsyncError(
     try {
       const marId = req.params.id;
       const { title, year, category, points } = req.body;
-      
+
       if (!title) {
         return next(new ErrorHandler("Enter MAR Title", 400));
       }
@@ -279,12 +273,16 @@ export const editMAR = CatchAsyncError(
         return next(new ErrorHandler("Enter MAR Points", 400));
       }
 
-      const updatedMAR = await marModel.findByIdAndUpdate(marId, {
-        title: title,
-        year: year,
-        category: category,
-        points: points,
-      }, { new: true });
+      const updatedMAR = await marModel.findByIdAndUpdate(
+        marId,
+        {
+          title: title,
+          year: year,
+          category: category,
+          points: points,
+        },
+        { new: true }
+      );
 
       if (!updatedMAR) {
         return next(new Error("MAR not found"));
@@ -300,15 +298,17 @@ export const editMAR = CatchAsyncError(
   }
 );
 
-
-
 //  delete moocs list :-
 
 export const deleteMoocsCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const courseId = req.params.id;
-      const updatedCourse = await moocsCourseModel.findByIdAndUpdate(courseId, { isActive: false }, { new: true });
+      const updatedCourse = await moocsCourseModel.findByIdAndUpdate(
+        courseId,
+        { isActive: false },
+        { new: true }
+      );
 
       if (!updatedCourse) {
         return next(new Error("Course not found"));
@@ -329,7 +329,11 @@ export const deactivateMAR = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const marId = req.params.id;
-      const updatedMAR = await marModel.findByIdAndUpdate(marId, { isActive: false }, { new: true });
+      const updatedMAR = await marModel.findByIdAndUpdate(
+        marId,
+        { isActive: false },
+        { new: true }
+      );
 
       if (!updatedMAR) {
         return next(new Error("MAR not found"));
@@ -346,131 +350,125 @@ export const deactivateMAR = CatchAsyncError(
 );
 
 // Add MarCategory by admin
-export const addMarCategory = CatchAsyncError(async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { category, perMarPoints, maximumMarPoints } = req.body;
+export const addMarCategory = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { category, perMarPoints, maximumMarPoints } = req.body;
 
-    // Validate input fields
-    if (!category) {
-      return next(new ErrorHandler("Enter Category Name", 400));
-    }
-    if (!perMarPoints) {
-      return next(new ErrorHandler("Enter Per Mar Points", 400));
-    }
-    if (!maximumMarPoints) {
-      return next(new ErrorHandler("Enter Maximum Mar Points", 400));
-    }
-    const maxFile = maximumMarPoints/perMarPoints;
-    // Create a new MarCategory
-    const newMarCategory = await categoryModel.create({
-      category,
-      perMarPoints,
-      maximumMarPoints,
-      maxFile
-    });
+      // Validate input fields
+      if (!category) {
+        return next(new ErrorHandler("Enter Category Name", 400));
+      }
+      if (!perMarPoints) {
+        return next(new ErrorHandler("Enter Per Mar Points", 400));
+      }
+      if (!maximumMarPoints) {
+        return next(new ErrorHandler("Enter Maximum Mar Points", 400));
+      }
+      const maxFile = maximumMarPoints / perMarPoints;
+      // Create a new MarCategory
+      const newMarCategory = await categoryModel.create({
+        category,
+        perMarPoints,
+        maximumMarPoints,
+        maxFile,
+      });
 
-    // Return success response
-    res.status(201).json({
-      success: true,
-      message: "MarCategory added successfully",
-      newMarCategory,
-    });
-  } catch (error: any) {
-    // Handle errors
-    return next(new ErrorHandler(error.message, 400));
+      // Return success response
+      res.status(201).json({
+        success: true,
+        message: "MarCategory added successfully",
+        newMarCategory,
+      });
+    } catch (error: any) {
+      // Handle errors
+      return next(new ErrorHandler(error.message, 400));
+    }
   }
-}
 );
-
 
 // eedit marcategory list :-
 
-export const editMarCategory= CatchAsyncError(async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const categoryId = req.params.id;
-    const { category, perMarPoints, maximumMarPoints } = req.body;
-      
-    // Validate input fields
-    if (!category) {
-      return next(new ErrorHandler("Enter Category Name", 400));
-    }
-    if (!perMarPoints) {
-      return next(new ErrorHandler("Enter Per Mar Points", 400));
-    }
-    if (!maximumMarPoints) {
-      return next(new ErrorHandler("Enter Maximum Mar Points", 400));
-    }
+export const editMarCategory = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const categoryId = req.params.id;
+      const { category, perMarPoints, maximumMarPoints } = req.body;
 
-    // Find and update MarCategory
-    const updatedCategory = await categoryModel.findByIdAndUpdate(categoryId, {
-      category: category,
-      perMarPoints: perMarPoints,
-      maximumMarPoints: maximumMarPoints,
-    }, { new: true });
+      // Validate input fields
+      if (!category) {
+        return next(new ErrorHandler("Enter Category Name", 400));
+      }
+      if (!perMarPoints) {
+        return next(new ErrorHandler("Enter Per Mar Points", 400));
+      }
+      if (!maximumMarPoints) {
+        return next(new ErrorHandler("Enter Maximum Mar Points", 400));
+      }
 
-    // Check if the category exists
-    if (!updatedCategory) {
-      return next(new Error("Category not found"));
+      // Find and update MarCategory
+      const updatedCategory = await categoryModel.findByIdAndUpdate(
+        categoryId,
+        {
+          category: category,
+          perMarPoints: perMarPoints,
+          maximumMarPoints: maximumMarPoints,
+        },
+        { new: true }
+      );
+
+      // Check if the category exists
+      if (!updatedCategory) {
+        return next(new Error("Category not found"));
+      }
+
+      // Return success response
+      res.status(200).json({
+        success: true,
+        updatedCategory,
+      });
+    } catch (error: any) {
+      // Handle errors
+      return next(new ErrorHandler(error.message, 400));
     }
-
-    // Return success response
-    res.status(200).json({
-      success: true,
-      updatedCategory,
-    });
-  } catch (error: any) {
-    // Handle errors
-    return next(new ErrorHandler(error.message, 400));
   }
-}
 );
 
 // delkete marcategory
 // Soft delete MarCategory by admin
-export const deleteMarCategory = CatchAsyncError(async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const categoryId = req.params.id;
+export const deleteMarCategory = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const categoryId = req.params.id;
 
-    // Check if categoryId is provided
-    if (!categoryId) {
-      return next(new ErrorHandler("Category ID is required", 400));
+      // Check if categoryId is provided
+      if (!categoryId) {
+        return next(new ErrorHandler("Category ID is required", 400));
+      }
+
+      // Update isActive field to false
+      const updatedCategory = await categoryModel.findByIdAndUpdate(
+        categoryId,
+        { isActive: false },
+        { new: true }
+      );
+
+      // If the category doesn't exist, return an error
+      if (!updatedCategory) {
+        return next(new ErrorHandler("Category not found", 404));
+      }
+
+      // Return success response
+      res.status(200).json({
+        success: true,
+        message: "MarCategory soft deleted successfully",
+        updatedCategory,
+      });
+    } catch (error: any) {
+      // Handle errors
+      return next(new ErrorHandler(error.message, 400));
     }
-
-    // Update isActive field to false
-    const updatedCategory = await categoryModel.findByIdAndUpdate(
-      categoryId,
-      { isActive: false },
-      { new: true }
-    );
-
-    // If the category doesn't exist, return an error
-    if (!updatedCategory) {
-      return next(new ErrorHandler("Category not found", 404));
-    }
-
-    // Return success response
-    res.status(200).json({
-      success: true,
-      message: "MarCategory soft deleted successfully",
-      updatedCategory,
-    });
-  } catch (error: any) {
-    // Handle errors
-    return next(new ErrorHandler(error.message, 400));
   }
-}
 );
 
 // verify mar list uplaoded by student:-
@@ -482,7 +480,7 @@ export const verifyMarDocument = CatchAsyncError(
       if (!marDoc) {
         return next(new Error("MAR document not found"));
       }
-      
+
       // Check if the MAR document is already verified
       if (marDoc.status === "verified") {
         return next(new Error("MAR document is already verified!"));
@@ -530,19 +528,20 @@ export const verifyMarDocument = CatchAsyncError(
   }
 );
 
-
 // verify moocs document :-
 export const verifyMoocsDocument = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Find the MOOCs document by ID
-      const moocsDoc = await moocsModel.findById(req.params.id).populate("moocsCourse") as any;
+      const moocsDoc = (await moocsModel
+        .findById(req.params.id)
+        .populate("moocsCourse")) as any;
       if (!moocsDoc) {
         return next(new Error("MOOCs document not found"));
       }
-      
+
       // Check if the MOOCs document is already verified
-      if (moocsDoc.status==="verified") {
+      if (moocsDoc.status === "verified") {
         return next(new Error("MOOCs document is already verified!"));
       }
 
@@ -553,7 +552,7 @@ export const verifyMoocsDocument = CatchAsyncError(
       // Send notification email if requested
       const { email } = req.body;
       if (email) {
-        const data = { moocsTitle: moocsDoc.moocsCourse.title};
+        const data = { moocsTitle: moocsDoc.moocsCourse.title };
 
         const html = await ejs.renderFile(
           path.join(__dirname, "../mails/moocs-verification-mail.ejs"),
@@ -588,39 +587,62 @@ export const verifyMoocsDocument = CatchAsyncError(
   }
 );
 
-// get all moocs course list :- by admin 
+// get all moocs course list :- by admin
 export const getMoocsListAdmin = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const moocsList = await moocsCourseModel.find().sort({ createdAt: -1 });
 
-      const  moocsList =  await moocsCourseModel.find().sort({ createdAt: -1 });
-     
-        res.status(201).json({
-          success: true,
-          moocsList,
-        });
+      // Convert Mongoose documents to plain JavaScript objects
+      const plainMoocsListDetails = moocsList.map((moocs) => moocs.toObject());
+
+      // Modify isVerified property to 'active' or 'inactive' and rename to 'status'
+      const modifiedDetails = plainMoocsListDetails.map((moocs) => ({
+        ...moocs,
+        status: moocs.isActive ? "active" : "inactive",
+      }));
+
+      // Remove the isVerified property from the modified details
+      const FinalMoocsList = modifiedDetails.map(
+        ({ isActive, ...rest }) => rest
+      );
+
+      res.status(201).json({
+        success: true,
+        moocsList: FinalMoocsList,
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
-
 
 //  get all mar list by admin :
 export const getMarListAdmin = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const marList = await categoryModel.find().sort({ createdAt: -1 });
 
-      const  marList =  await marCourseModel.find().sort({ createdAt: -1 });
-     
-        res.status(201).json({
-          success: true,
-          marList,
-        });
+      // Convert Mongoose documents to plain JavaScript objects
+      const plainMarListDetails = marList.map((mar) => mar.toObject());
+
+      // Modify isVerified property to 'active' or 'inactive' and rename to 'status'
+      const modifiedDetails = plainMarListDetails.map((mar) => ({
+        ...mar,
+        status: mar.isActive ? "active" : "inactive",
+      }));
+
+      // Remove the isVerified property from the modified details
+      const FinalMarList = modifiedDetails.map(
+        ({ isActive, ...rest }) => rest
+      );
+
+      res.status(201).json({
+        success: true,
+        marList:FinalMarList,
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
-
-

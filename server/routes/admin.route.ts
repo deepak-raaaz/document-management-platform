@@ -16,7 +16,7 @@ adminRouter.post("/create-moocs-course", isAuthenticate,authorizeRoles("admin"),
 
 adminRouter.get("/moocs-course-list", isAuthenticate,authorizeRoles("admin"), getMoocsListAdmin);
 
-adminRouter.get("/mar-course-list", isAuthenticate,authorizeRoles("admin"), getMarListAdmin);
+adminRouter.get("/mar-category", isAuthenticate,authorizeRoles("admin"), getMarListAdmin);
 
 adminRouter.put("/account-verify/:id", isAuthenticate,authorizeRoles("admin"), verifyStudent);
 

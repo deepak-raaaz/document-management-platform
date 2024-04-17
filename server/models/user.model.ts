@@ -86,7 +86,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
         default: 0,
     },
     totalMoocs:{
-        ype:Number,
+        type:Number,
         default: 0,
     },
     isVerfied:{
