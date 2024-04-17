@@ -483,12 +483,12 @@ export const verifyMarDocument = CatchAsyncError(
       }
       
       // Check if the MAR document is already verified
-      if (marDoc.isVerified) {
+      if (marDoc.status === "verified") {
         return next(new Error("MAR document is already verified!"));
       }
 
       // If not verified, update the isVerified field to true
-      marDoc.isVerified = true;
+      marDoc.status = "verified";
       await marDoc.save();
 
       // Send notification email if requested

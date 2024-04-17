@@ -14,7 +14,7 @@ type Props = {
 
 const LandingPage: FC<Props> =({setOpen,route,setRoute, setLoginType}) => {
   return (
-    <div className="max-w-screen-1300px mx-auto h-[70vh] max-1300px:mx-4">
+    <div className="max-w-screen-1300px mx-auto h-full max-1300px:mx-4">
       <div className="grid grid-cols-12 gap-6 my-10">
         <div
          className="bg-amber-500 rounded-xl overflow-hidden col-span-4 max-1000px:col-span-6 max-md:col-span-12 pe-2 flex items-center space-x-4 cursor-pointer"
