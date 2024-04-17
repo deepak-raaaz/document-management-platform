@@ -38,5 +38,4 @@ adminRouter.put("/moocs-verify/:id", isAuthenticate,authorizeRoles("admin"),veri
 
 
 
-
 export default adminRouter;
