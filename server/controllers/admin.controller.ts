@@ -587,7 +587,7 @@ export const verifyMarDocument = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Find the MAR document by ID
-      const marDoc = await marModel.findById(req.params.id);
+      const marDoc = await marModel.findById(req.params.id).populate('user') as any;
       if (!marDoc) {
         return next(new Error("MAR document not found"));
       }
@@ -613,7 +613,7 @@ export const verifyMarDocument = CatchAsyncError(
 
         try {
           await sendMail({
-            email,
+            email:marDoc.user.email,
             subject: "MAR Document Verification",
             template: "mar-verification-mail.ejs",
             data,
@@ -780,7 +780,7 @@ export const getAllMoocsData = CatchAsyncError(
 export const getAllMarData = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const marData = await marModel.find().populate('user').populate('MarCategory').populate('document');
+      const marData = await marModel.find().populate('user').populate('marCategory').populate('document');
 
       res.status(200).json({
         success: true,
@@ -857,7 +857,7 @@ export const rejectMarDocument = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Find the MOOCs document by ID
-      const marDoc = await marModel.findById(req.params.id).populate("marCategory") as any;
+      const marDoc = await marModel.findById(req.params.id).populate("marCategory").populate("user") as any;
       if (!marDoc) {
         return next(new Error("MAR document not found"));
       }
@@ -874,7 +874,7 @@ export const rejectMarDocument = CatchAsyncError(
       // Send notification email if requested
       const { email ,reason } = req.body;
       if (email) {
-        const data = { moocsTitle: marDoc.marCategory.category ,reason:reason};
+        const data = { marTitle: marDoc.marCategory.category ,reason:reason};
 
         const html = await ejs.renderFile(
           path.join(__dirname, "../mails/mar-rejection-mail.ejs"),
@@ -883,7 +883,7 @@ export const rejectMarDocument = CatchAsyncError(
 
         try {
           await sendMail({
-            email,
+            email:marDoc.user.email,
             subject: "Mar Document rejected",
             template: "mar-rejection-mail.ejs",
             data,

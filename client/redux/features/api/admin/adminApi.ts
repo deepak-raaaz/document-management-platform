@@ -145,6 +145,35 @@ export const adminApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+
+    adminMarData: builder.query({
+      query: ({}) => ({
+        url: "all-mar-list",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    verifyMar: builder.mutation({
+      query: ({ id,email}) => ({
+        url: `mar-verify/${id}`,
+        method: "PUT",
+        body: {
+          email,
+        },
+        credentials: "include" as const,
+      }),
+    }),
+    rejectMar: builder.mutation({
+      query: ({ id,email,reason}) => ({
+        url: `mar-reject/${id}`,
+        method: "PUT",
+        body: {
+          email,
+          reason
+        },
+        credentials: "include" as const,
+      }),
+    }),
   }),
 });
 
@@ -163,5 +192,8 @@ export const {
   useActivateMoocsCourseMutation,
   useAdminMoocsDataQuery,
   useVerifyMoocsMutation,
-  useRejectMoocsMutation
+  useRejectMoocsMutation,
+  useAdminMarDataQuery,
+  useVerifyMarMutation,
+  useRejectMarMutation
 } = adminApi;
