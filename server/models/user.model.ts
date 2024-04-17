@@ -17,6 +17,8 @@ export interface IUser extends Document{
     role: string;
     moocs:  Array<{ moocsId:ObjectId}>;
     mar:  Array<{ marId:ObjectId}>;
+    totalMar:number,
+    totalMoocs:number,
     isVerfied: boolean;
     
     comparePassword: (password: string) => Promise<boolean>;
@@ -79,6 +81,14 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
             ref: "Mar",
         }
     ],
+    totalMar:{
+        type:Number,
+        default: 0,
+    },
+    totalMoocs:{
+        ype:Number,
+        default: 0,
+    },
     isVerfied:{
         type:Boolean,
         default: false,
