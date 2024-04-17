@@ -21,7 +21,7 @@ const Mar: FC<Props> = ({}) => {
   const { isLoading, error } = useMyMoocsQuery({});
 
   const { data } = useMarCategoryListQuery({});
-  const { myMoocs, totalCreditPoints } = useSelector(
+  const { myMar, totalMarPoints } = useSelector(
     (state: any) => state.moocs
   );
 
@@ -40,7 +40,7 @@ const Mar: FC<Props> = ({}) => {
         <Divider className="my-2" />
         <div className="">
           {/* <InputTable /> */}
-          {data && <MarSubmissionForm moocs={data.moocsList} />}
+          {data && <MarSubmissionForm marList={data.categories} />}
         </div>
         <Divider className="my-2" />
         <div className="bg-white max-md:bg-slate-100 py-2">
@@ -48,7 +48,7 @@ const Mar: FC<Props> = ({}) => {
           <MarTable/>
           {/* {greaterThanMid ? <MoocsTable /> : <MobileMoocsTable />} */}
           <div className="text-slate-700 flex justify-end my-2 mx-2">
-            {data && <span>Total Mar Points Earned : {totalCreditPoints}</span>}
+            {data && <span>Total Mar Points Earned : {totalMarPoints}</span>}
           </div>
         </div>
       </div>

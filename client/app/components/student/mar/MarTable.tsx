@@ -7,30 +7,23 @@ import {
   TableRow,
   TableCell,
   Tooltip,
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
 } from "@nextui-org/react";
-import { IoIosMore } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { ModalDialogProps } from "@mui/joy";
 import PopUpModal from "@/app/utils/PopUpModal";
 import {
-  useDeleteMyMoocsMutation,
-  useMyMoocsQuery,
+  useDeleteMyMarMutation,
+  useMyMarQuery,
 } from "@/redux/features/api/moocs/moocsApi";
 import { toast } from "react-hot-toast";
 import { FaRegEye } from "react-icons/fa";
-import { IoShieldCheckmarkOutline } from "react-icons/io5";
-import { MdOutlineCancel, MdOutlineDeleteOutline } from "react-icons/md";
+import {MdOutlineDeleteOutline } from "react-icons/md";
 import ViewPdf from "../moocs/ViewPdf"; 
 
 type Props = {};
 
 const MarTable = (props: Props) => {
-  const { myMoocs } = useSelector((state: any) => state.moocs);
+  const { myMar } = useSelector((state: any) => state.moocs);
   const [route, setRoute] = useState("");
   const [layout, setLayout] = React.useState<
     ModalDialogProps["layout"] | undefined
@@ -40,14 +33,14 @@ const MarTable = (props: Props) => {
   const [pdfUrl, setPdfUrl] = useState("");
   const [verificationUrl, setVerificationUrl] = useState("");
 
-  const { refetch } = useMyMoocsQuery({ refetchOnMountOrArgChange: true });
+  const { refetch } = useMyMarQuery({ refetchOnMountOrArgChange: true });
 
-  const [deleteMyMoocs, { isSuccess, error }] = useDeleteMyMoocsMutation({});
+  const [deleteMyMar, { isSuccess, error }] = useDeleteMyMarMutation({});
 
   useEffect(() => {
     if (isSuccess) {
       refetch();
-      toast.success("Moocs Deleted Successfully");
+      toast.success("Mar Deleted Successfully");
     }
     if (error) {
       if ("data" in error) {
@@ -58,7 +51,8 @@ const MarTable = (props: Props) => {
   }, [isSuccess, error]);
 
   const handleDelete = async (id: any) => {
-    await deleteMyMoocs(id);
+    // alert(id);
+    await deleteMyMar(id);
   };
 
   return (
@@ -75,23 +69,17 @@ const MarTable = (props: Props) => {
             <TableColumn className="!bg-transparent !text-white !min-w-[20rem] text-center">
               Title
             </TableColumn>
-            <TableColumn className="!bg-transparent !text-white !max-w-[5rem] text-center">
-              Platform
+            <TableColumn className="!bg-transparent !text-white !max-w-[12rem] !w-[12rem] text-center">
+              Category
             </TableColumn>
             <TableColumn className="!bg-transparent !text-white !max-w-[9rem] !min-w-0 text-wrap text-center">
-              Credit Earned
+              Mar Points
             </TableColumn>
             <TableColumn className="!bg-transparent !text-white !max-w-[9rem] !min-w-0 text-wrap text-center">
-              Date of Joining
-            </TableColumn>
-            <TableColumn className="!bg-transparent !text-white text-center">
-              Date of Completion
+              Certificate Date
             </TableColumn>
             <TableColumn className="!bg-transparent !text-white text-center !w-[8rem] !max-w-[8rem]">
               Year
-            </TableColumn>
-            <TableColumn className="!bg-transparent !text-white text-center">
-              Verification Url
             </TableColumn>
             <TableColumn className="!bg-transparent !text-white text-center">
               Status
@@ -102,8 +90,8 @@ const MarTable = (props: Props) => {
           </TableHeader>
 
           <TableBody>
-            {myMoocs &&
-              myMoocs.map((moocs: any, index: number) => (
+            {myMar &&
+              myMar.map((mar: any, index: number) => (
                 <TableRow key={`moocs${index}`} className="!bg-slate-100 ">
                   <TableCell className="!text-center !px-1">
                     {index + 1}.
@@ -111,79 +99,52 @@ const MarTable = (props: Props) => {
                   <TableCell className="!px-1">
                     <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 items-center flex ">
                       <span className="!mx-2 line-clamp-1">
-                        {moocs.moocsCourse.title}
+                        {mar.title}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="!px-1">
-                    <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 items-center flex ">
+                    <div className=" !bg-white !rounded-none !min-h-unit-10 border-1 items-center flex ">
                       <span className="!mx-2 line-clamp-1">
-                        {moocs.moocsCourse.platform}
+                        {mar.marCategory.category}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 justify-center items-center flex ">
                       <span className="!mx-2 line-clamp-1 text-center">
-                        {moocs.moocsCourse.credit}
+                        {mar.marCategory.perMarPoints}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="!px-1 width-style !max-w-[9rem] !w-[9rem]">
                     <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 justify-center items-center flex ">
                       <span className="!mx-2 line-clamp-1 text-center">
-                        {moocs.startDate}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="!px-1 width-style !max-w-[9rem] !w-[9rem]">
-                    <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 justify-center items-center flex ">
-                      <span className="!mx-2 line-clamp-1 text-center">
-                        {moocs.endDate}
+                        {mar.certificateDate}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="!px-1">
                     <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 justify-center items-center flex ">
                       <span className="!mx-2 line-clamp-1 text-center">
-                        {moocs.year}
+                        {mar.year}
                       </span>
                     </div>
-                  </TableCell>
-                  <TableCell className="!px-1">
-                    <Tooltip
-                      showArrow
-                      placement="top"
-                      content={moocs.verificationUrl}
-                      classNames={{
-                        base: ["before:bg-neutral-400 dark:before:bg-white"],
-                        content: [
-                          "py-2 px-4 shadow-xl",
-                          "bg-slate-800 text-white",
-                        ],
-                      }}
-                    >
-                      <div className="w-full !bg-white !rounded-none !min-h-unit-10 border-1 items-center flex max-w-[9rem]">
-                        <span className="!mx-2 line-clamp-1 ">
-                          {moocs.verificationUrl}
-                        </span>
-                      </div>
-                    </Tooltip>
                   </TableCell>
                   <TableCell>
                     <div
                       className={`${
-                        moocs.status === "pending"
+                        mar.status === "pending"
                           ? "border-blue-600 text-blue-600 bg-blue-600"
-                          : moocs.status === "rejected"
+                          : mar.status === "rejected"
                           ? "border-red-600 text-red-600 bg-red-600"
-                          : moocs.status === "verified"
+                          : mar.status === "verified"
                           ? "border-green-600 text-green-600 bg-green-600 "
                           : ""
                       } bg-opacity-15  w-full font-medium !rounded-none !min-h-unit-10 border-2 items-center justify-center flex max-w-[9rem]`}
                     >
                       <span className="!mx-2 line-clamp-1 capitalize">
-                        {moocs.status}
+                        {mar.status}
                       </span>
                     </div>
                   </TableCell>
@@ -192,16 +153,16 @@ const MarTable = (props: Props) => {
                       <Tooltip content="View pdf">
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                           <FaRegEye
-                            onClick={() => {setLayout("center");setRoute("viewpdf"); setPdfUrl(moocs.document.url); setVerificationUrl(moocs.verificationUrl);}}
+                            onClick={() => {setLayout("center");setRoute("viewpdf"); setPdfUrl(mar.document.url);}}
                           />
                         </span>
                       </Tooltip>
                       {
-                        moocs.status !== "verified" &&
+                        mar.status !== "verified" &&
                       <Tooltip color="danger" content="Delete">
                         <span className="text-lg text-danger cursor-pointer active:opacity-50">
                           <MdOutlineDeleteOutline
-                            onClick={() => {handleDelete(moocs._id);}}
+                            onClick={() => {handleDelete(mar._id);}}
                           />
                         </span>
                       </Tooltip>

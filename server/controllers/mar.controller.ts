@@ -192,7 +192,7 @@ export const uploadMAR = CatchAsyncError(
 export const deleteMAR = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const marId = req.params.id;
+      const marId = req.params.id as any;
 
       // Find the MAR entry by its ID
       const mar = await marModel.findById(marId);
@@ -210,15 +210,30 @@ export const deleteMAR = CatchAsyncError(
         );
       }
 
+      // Check if the Moocs entry status is "verified"
+      if (mar.status === "verified") {
+        return next(new ErrorHandler("Cannot delete a verified Mar entry", 403));
+      }
+
       // Delete the document from Cloudinary
       const document = await documentsModel.findById(mar.document);
       if (document) {
         await cloudinary.v2.uploader.destroy(document.public_id);
-        await (document as any).remove();
+        await document.deleteOne();
       }
 
       // Delete the MAR entry from the database
-      await (mar as any).remove();
+      await mar.deleteOne();
+
+      const user = await userModel.findById(req.user?._id);
+      if (user) {
+        const index = user.mar.indexOf(marId);
+        if (index !== -1) {
+          user.mar.splice(index, 1);
+          await user.save();
+          await redis.set(req.user?._id, JSON.stringify(user));
+        }
+      }
 
       res.status(200).json({
         success: true,
@@ -238,8 +253,8 @@ export const getMyMar = CatchAsyncError(
         path: "mar",
         populate: [
           {
-            path: "marCourse",
-            model: "MarCourse",
+            path: "marCategory",
+            model: "MarCategory",
           },
           {
             path: "document",
@@ -252,21 +267,21 @@ export const getMyMar = CatchAsyncError(
         return next(new ErrorHandler("User not found", 400));
       }
 
-      const moocs = user.moocs as any;
+      const mar = user.mar as any;
 
       // Calculate total credit points of verified Moocs entries
       let totalMarPoints = 0;
-      moocs.forEach((mar: any) => {
+      mar.forEach((mar: any) => {
         if (mar.status === "verified") {
           // Ensure mooc is properly typed as MoocsDocument
-          totalMarPoints += mar.marCourse.marPoint;
+          totalMarPoints += mar.marCategory.marPoint;
         }
       });
 
       res.status(200).json({
         success: true,
         totalMarPoints,
-        moocs,
+        mar,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));

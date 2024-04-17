@@ -7,22 +7,20 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
-import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
-import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import {
-  useMyMoocsQuery,
+  useMyMarQuery,
   useUploadMarMutation,
-  useUploadMoocsMutation,
 } from "@/redux/features/api/moocs/moocsApi";
 
 type Props = {
   //this contain moocs course list
-  moocs: Array<{
+  marList: Array<{
     _id: string;
-    title: string;
     category: string;
-    credit: number;
+    perMarPoints: number;
+    maximumMarPoints: number;
+    maxFile: number;
   }>;
 };
 function checkIfFileAreTooBig(file?: any) {
@@ -48,7 +46,7 @@ function checkIfFileAreCorrectType(file?: any) {
 
 const schema = Yup.object().shape({
   title: Yup.string().required("please Enter Title of Certificate!"),
-  certificateDate: Yup.string().required("Please select certificate date!"),
+  date: Yup.string().required("Please select certificate date!"),
   category: Yup.string().required("Please select mar category!"),
   year: Yup.string().required("select year!"),
   file: Yup.mixed()
@@ -66,27 +64,25 @@ const schema = Yup.object().shape({
     ),
 });
 
-const MarSubmissionForm: FC<Props> = ({ moocs }) => {
+const MarSubmissionForm: FC<Props> = ({ marList }) => {
   const [uploadMar, { isSuccess, error, isLoading }] =
     useUploadMarMutation();
 
-  const [loadUser, setLoadUser] = useState(false);
-
-  const { refetch } = useMyMoocsQuery({}, { refetchOnMountOrArgChange: true });
+  const { refetch } = useMyMarQuery({}, { refetchOnMountOrArgChange: true });
 
   const formik = useFormik({
     initialValues: {
       title: "",
-      certificateDate: "",
+      date: "",
       category: "",
       year: "",
       file: null,
     },
     validationSchema: schema,
-    onSubmit: async ({ title, category, year, file, certificateDate }) => {
+    onSubmit: async ({ title, category, year, file, date }) => {
       await uploadMar({
         title,
-        certificateDate,
+        date,
         category,
         year,
         file,
@@ -98,7 +94,9 @@ const MarSubmissionForm: FC<Props> = ({ moocs }) => {
     if (isSuccess) {
       toast.success("Successfully Submitted!");
       formik.resetForm();
-      // resetTitle();
+      resetTitle();
+      setDate(null);
+
       setFieldValue("year", null);
       // setLoadUser(true);
       refetch();
@@ -114,7 +112,6 @@ const MarSubmissionForm: FC<Props> = ({ moocs }) => {
   const { errors, touched, values, handleChange, handleSubmit, setFieldValue } =
     formik;
 
-  const [title, setTitle] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [selectedCategoy, setSelectedCategory] = useState("");
   const [marPoint, setMarPoint] = React.useState<number | string>("");
@@ -132,27 +129,26 @@ const MarSubmissionForm: FC<Props> = ({ moocs }) => {
 
   const handleCategoryChange = (e: any) => {
     setSelectedCategory(e.target.value);
-    const categorySelect = moocs.find(
+    const categorySelect = marList.find(
       (category) => category._id === e.target.value
-    );
+      );
     if (categorySelect) {
       setFieldValue("category", categorySelect._id, true);
       setCategory(categorySelect.category);
-      setMarPoint(categorySelect.credit);
+      setMarPoint(categorySelect.perMarPoints);
     } else {
       setFieldValue("category", "", true);
       setCategory("");
       setMarPoint("");
-      // setCredit("");
     }
   };
 
-  // const resetTitle = () => {
-  //   setFieldValue("title", "", true);
-  //   setCategory("");
-  //   setCredit("");
-  //   handleFileReset();
-  // };
+  const resetTitle = () => {
+    setFieldValue("title", "", true);
+    setCategory("");
+    setMarPoint("");
+    handleFileReset();
+  };
 
   return (
     <div>
@@ -187,7 +183,7 @@ const MarSubmissionForm: FC<Props> = ({ moocs }) => {
           </div>
 
           {/* Category selector  */}
-          <div className="flex flex-col col-span-2 max-800px:col-span-3 max-sm:col-span-7">
+          <div className="flex flex-col col-span-3 max-800px:col-span-3 max-sm:col-span-7">
             <span className="text-slate-800 text-[.75rem] mx-1 my-1 after:ml-0.5 after:text-red-500 after:content-['*']">
               Category
             </span>
@@ -197,15 +193,19 @@ const MarSubmissionForm: FC<Props> = ({ moocs }) => {
               placeholder="Select Category"
               id="title"
               name="title"
-              value={values.title}
+              value={values.category}
               onChange={(e: any) => {
                 handleCategoryChange(e);
               }}
             >
-              {moocs &&
-                moocs.map((item) => (
-                  <SelectItem key={item._id} value={item.title} className="">
-                    {item.title}
+              {marList &&
+                marList.map((item) => (
+                  <SelectItem key={item._id} value={item.category} className="" textValue={item.category}>
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-slate-800">{item.category}</span>
+                      <span className="text-tiny text-slate-600">Max : {item.maxFile}</span>
+                    </div>
+                    
                   </SelectItem>
                 ))}
             </Select>
@@ -247,7 +247,7 @@ const MarSubmissionForm: FC<Props> = ({ moocs }) => {
                       value={Date}
                       onChange={(date: any) => {
                         setFieldValue(
-                          "certificateDate",
+                          "date",
                           date ? dayjs(date).format("DD-MM-YYYY") : null,
                           true
                         );
@@ -258,9 +258,9 @@ const MarSubmissionForm: FC<Props> = ({ moocs }) => {
                   </div>
                 </DemoContainer>
               </LocalizationProvider>
-              {errors.certificateDate && touched.certificateDate && (
+              {errors.date && touched.date && (
                 <span className="text-red-500 pt-2 block text-tiny mx-1">
-                  {errors.certificateDate}
+                  {errors.date}
                 </span>
               )}
             </div>

@@ -25,7 +25,7 @@ interface IMarDb extends Document {
   year: number;
   document: object;
 
-  isVerified: boolean;
+  status: string;
 }
 
 interface ICategory extends Document {
@@ -119,9 +119,9 @@ const marDbSchema = new Schema<IMarDb>(
       type: String,
       required: true,
     },
-    isVerified: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      default: "pending",
     },
   },
   { timestamps: true }

@@ -94,8 +94,15 @@ export const moocsApi = apiSlice.injectEndpoints({
     }),
     marCategoryList: builder.query({
       query: (data) => ({
-        url: "mar-list",
+        url: "mar-category-list",
         method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    deleteMyMar: builder.mutation({
+      query: (id) => ({
+        url: `delete-mar/${id}`,
+        method: "DELETE",
         credentials: "include" as const,
       }),
     }),
@@ -108,5 +115,7 @@ export const {
   useLoadMoocsListQuery,
   useDeleteMyMoocsMutation,
   useUploadMarMutation,
-  useMarCategoryListQuery
+  useMarCategoryListQuery,
+  useMyMarQuery,
+  useDeleteMyMarMutation
 } = moocsApi;
