@@ -93,7 +93,7 @@ const moocsDbSchema = new Schema<IMoocsDb>(
     moocsCourse: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "MooocsCourse",
+      ref: "MoocsCourse",
     },
     startDate: {
       type: String,

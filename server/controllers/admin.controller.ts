@@ -471,6 +471,42 @@ export const deleteMarCategory = CatchAsyncError(
   }
 );
 
+// activate mar-category:-
+export const activateMarCategory = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const categoryId = req.params.id;
+
+      // Check if categoryId is provided
+      if (!categoryId) {
+        return next(new ErrorHandler("Category ID is required", 400));
+      }
+
+      // Update isActive field to false
+      const updatedCategory = await categoryModel.findByIdAndUpdate(
+        categoryId,
+        { isActive: true },
+        { new: true }
+      );
+
+      // If the category doesn't exist, return an error
+      if (!updatedCategory) {
+        return next(new ErrorHandler("Category not found", 404));
+      }
+
+      // Return success response
+      res.status(200).json({
+        success: true,
+        message: "MarCategory soft activated successfully",
+        updatedCategory,
+      });
+    } catch (error: any) {
+      // Handle errors
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 // verify mar list uplaoded by student:-
 export const verifyMarDocument = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -664,21 +700,139 @@ export const getAllMoocsData = CatchAsyncError(
   }
 );
 
-
+// get all mar data uploaded by student by admin
 export const getAllMarData = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const moocsData = await marModel.find().populate('user').populate('MarCategory').populate('document');
+      const marData = await marModel.find().populate('user').populate('MarCategory').populate('document');
 
       res.status(200).json({
         success: true,
-        moocsData,
+        marData,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
+
+// reject moocs uploaded by student by admin 
+export const rejectMoocsDocument = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Find the MOOCs document by ID
+      const moocsDoc = (await moocsModel
+        .findById(req.params.id)
+        .populate("moocsCourse")) as any;
+      if (!moocsDoc) {
+        return next(new Error("MOOCs document not found"));
+      }
+
+      // Check if the MOOCs document is already verified
+      if (moocsDoc.status !== "verified") {
+        return next(new Error("MOOCs document is already rejected!"));
+      }
+
+      // If not verified, update the isVerified field to true
+      moocsDoc.status = "rejected";
+      await moocsDoc.save();
+
+      // Send notification email if requested
+      const { email ,reason } = req.body;
+      if (email) {
+        const data = { moocsTitle: moocsDoc.moocsCourse.title ,reason:reason};
+
+        const html = await ejs.renderFile(
+          path.join(__dirname, "../mails/moocs-rejection-mail.ejs"),
+          data
+        );
+
+        try {
+          await sendMail({
+            email,
+            subject: "MOOCs Document rejected",
+            template: "moocs-rejection-mail.ejs",
+            data,
+          });
+
+          return res.status(200).json({
+            success: true,
+            message: `MOOCs document "${moocsDoc.title}" has been successfully rejected. An email notification has been sent.`,
+          });
+        } catch (error: any) {
+          return next(new ErrorHandler(error.message, 400));
+        }
+      }
+
+      // Respond with success message
+      res.status(200).json({
+        success: true,
+        message: `MOOCs document "${moocsDoc.title}" has been successfully rejected.`,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// rejecting mar document 
+export const rejectMarDocument = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Find the MOOCs document by ID
+      const marDoc = await marModel.findById(req.params.id).populate("marCategory") as any;
+      if (!marDoc) {
+        return next(new Error("MAR document not found"));
+      }
+
+      // Check if the MAR document is already rejected
+      if (marDoc.status === "rejected") {
+        return next(new Error("MAR document is already rejected!"));
+      }
+
+      // If not verified, update the isVerified field to true
+      marDoc.status = "rejected";
+      await marDoc.save();
+
+      // Send notification email if requested
+      const { email ,reason } = req.body;
+      if (email) {
+        const data = { moocsTitle: marDoc.marCategory.category ,reason:reason};
+
+        const html = await ejs.renderFile(
+          path.join(__dirname, "../mails/mar-rejection-mail.ejs"),
+          data
+        );
+
+        try {
+          await sendMail({
+            email,
+            subject: "Mar Document rejected",
+            template: "mar-rejection-mail.ejs",
+            data,
+          });
+
+          return res.status(200).json({
+            success: true,
+            message: `MOOCs document "${marDoc.title}" has been successfully rejected. An email notification has been sent.`,
+          });
+        } catch (error: any) {
+          return next(new ErrorHandler(error.message, 400));
+        }
+      }
+
+      // Respond with success message
+      res.status(200).json({
+        success: true,
+        message: `MOOCs document "${marDoc.title}" has been successfully rejected.`,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+
 
 
 
