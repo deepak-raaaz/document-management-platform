@@ -88,6 +88,34 @@ export const adminApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+    deactivteMarCategory: builder.mutation({
+      query: ({ id }) => ({
+        url: `deactivate-mar-category/${id}`,
+        method: "PUT",
+        credentials: "include" as const,
+      }),
+    }),
+    activateMarCategory: builder.mutation({
+      query: ({ id }) => ({
+        url: `activate-mar-category/${id}`,
+        method: "PUT",
+        credentials: "include" as const,
+      }),
+    }),
+    deactivteMoocsCourse: builder.mutation({
+      query: ({ id }) => ({
+        url: `deactivate-mar-category/${id}`,
+        method: "PUT",
+        credentials: "include" as const,
+      }),
+    }),
+    activateMoocsCourse: builder.mutation({
+      query: ({ id }) => ({
+        url: `deactivate-mar-category/${id}`,
+        method: "PUT",
+        credentials: "include" as const,
+      }),
+    }),
   }),
 });
 
