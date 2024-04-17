@@ -148,6 +148,11 @@ export const getMyMoocs = CatchAsyncError(
           totalCreditPoints += mooc.moocsCourse.credit;
         }
       });
+      if(user.totalMoocs!==totalCreditPoints){
+        user.totalMoocs=totalCreditPoints;
+        await user.save();
+        await redis.set(req.user?._id, JSON.stringify(user));
+      }
 
       res.status(200).json({
         success: true,

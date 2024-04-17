@@ -278,6 +278,12 @@ export const getMyMar = CatchAsyncError(
         }
       });
 
+      if(user.totalMar!==totalMarPoints){
+        user.totalMar=totalMarPoints;
+        await user.save();
+        await redis.set(req.user?._id, JSON.stringify(user));
+      }
+
       res.status(200).json({
         success: true,
         totalMarPoints,

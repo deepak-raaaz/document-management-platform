@@ -8,6 +8,7 @@ import { create } from "domain";
 import { moocsCourseModel, moocsModel } from "../models/moocs.model";
 import {
   categoryModel,
+  marCourseModel,
     
   } from "../models/mar.model";
 import userModel from "../models/user.model";
@@ -587,6 +588,39 @@ export const verifyMoocsDocument = CatchAsyncError(
   }
 );
 
+// get all moocs course list :- by admin 
+export const getMoocsList = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
 
+      const  moocsList =  await moocsCourseModel.find().sort({ createdAt: -1 });
+     
+        res.status(201).json({
+          success: true,
+          moocsList,
+        });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+
+//  get all mar list by admin :
+export const getMarList = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+      const  marList =  await marCourseModel.find().sort({ createdAt: -1 });
+     
+        res.status(201).json({
+          success: true,
+          marList,
+        });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
 
 
