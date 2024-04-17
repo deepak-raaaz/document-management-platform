@@ -7,7 +7,7 @@ import cloudinary from "cloudinary";
 import {
   categoryModel,
   documentsModel,
-  marCourseModel,
+  
   marModel,
 } from "../models/mar.model";
 import userModel from "../models/user.model";

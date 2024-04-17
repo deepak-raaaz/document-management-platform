@@ -1,7 +1,7 @@
 import { isAuthenticate } from './../middleware/auth';
 import express from 'express';
 import { authorizeRoles } from './../middleware/auth';
-import { addMarCategory, allStudentDetails, deleteMarCategory, editMarCategory,  getMarListAdmin, getMoocsListAdmin, rejectStudent, singleStudentDetail, verifyMarDocument, verifyMoocsDocument, verifyStudent } from '../controllers/admin.controller';
+import { activateMarCategory, addMarCategory, allStudentDetails, deleteMarCategory, editMarCategory,  getAllMarData,  getAllMoocsData,  getMarListAdmin, getMoocsListAdmin, rejectMarDocument, rejectMoocsDocument, rejectStudent, singleStudentDetail, verifyMarDocument, verifyMoocsDocument, verifyStudent } from '../controllers/admin.controller';
 import { createMoocsCourse } from '../controllers/admin.controller';
 import { getMoocsList } from '../controllers/mocs.controller';
 
@@ -26,11 +26,30 @@ adminRouter.post("/add-mar-category", isAuthenticate,authorizeRoles("admin"), ad
 
 adminRouter.put("/edit-mar-category/:id", isAuthenticate,authorizeRoles("admin"), editMarCategory);
 
-adminRouter.put("/delete-mar-category/:id", isAuthenticate,authorizeRoles("admin"), deleteMarCategory);
+adminRouter.put("/deactivate-mar-category/:id", isAuthenticate,authorizeRoles("admin"), deleteMarCategory);
+
+adminRouter.put("/activate-mar-category/:id", isAuthenticate,authorizeRoles("admin"), activateMarCategory);
+
 
 adminRouter.put("/mar-verify/:id", isAuthenticate,authorizeRoles("admin"),verifyMarDocument );
 
 adminRouter.put("/moocs-verify/:id", isAuthenticate,authorizeRoles("admin"),verifyMoocsDocument );
+
+adminRouter.get("/all-moocs-list", isAuthenticate,authorizeRoles("admin"), getAllMoocsData  );
+
+adminRouter.get("/all-mar-list", isAuthenticate,authorizeRoles("admin"), getAllMarData  );
+
+adminRouter.put("/moocs-verify/:id", isAuthenticate,authorizeRoles("admin"), verifyMoocsDocument );
+
+adminRouter.put("/moocs-verify/:id", isAuthenticate,authorizeRoles("admin"), verifyMarDocument );
+
+
+adminRouter.put("/moocs-reject/:id", isAuthenticate,authorizeRoles("admin"), rejectMoocsDocument );
+
+adminRouter.put("/mar-reject/:id", isAuthenticate,authorizeRoles("admin"), rejectMarDocument );
+
+
+
 
 
 
