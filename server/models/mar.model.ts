@@ -10,12 +10,12 @@ interface IDocument extends Document {
   format: string;
 }
 
-interface IMarCourse extends Document {
-  title: string;
-  platform: string;
-  marPoint: number;
-  isActive: boolean;
-}
+// interface IMarCourse extends Document {
+//   title: string;
+//   platform: string;
+//   marPoint: number;
+//   isActive: boolean;
+// }
 
 interface IMarDb extends Document {
   user: object;
@@ -67,28 +67,28 @@ const documentsSchema = new Schema<IDocument>(
   { timestamps: true }
 );
 
-const marCourseSchema = new Schema<IMarCourse>(
-  {
-    title: {
-      type: String,
-      required: true,
-    },
-    platform: {
-      type: String,
-      required: true,
-    },
-    marPoint: {
-      type: Number,
-      required: true,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
+// const marCourseSchema = new Schema<IMarCourse>(
+//   {
+//     title: {
+//       type: String,
+//       required: true,
+//     },
+//     platform: {
+//       type: String,
+//       required: true,
+//     },
+//     marPoint: {
+//       type: Number,
+//       required: true,
+//     },
+//     isActive: {
+//       type: Boolean,
+//       default: true,
+//       required: true,
+//     },
+//   },
+//   { timestamps: true }
+// );
 
 const marDbSchema = new Schema<IMarDb>(
   {
@@ -159,13 +159,13 @@ const documentsModel: Model<IDocument> = mongoose.model(
   documentsSchema
 );
 
-const marCourseModel: Model<IMarCourse> = mongoose.model(
-  "MarCourse",
-  marCourseSchema
-);
+// const marCourseModel: Model<IMarCourse> = mongoose.model(
+//   "MarCourse",
+//   marCourseSchema
+// );
 
 const marModel: Model<IMarDb> = mongoose.model("Mar", marDbSchema);
 
 const categoryModel: Model<ICategory> = mongoose.model("MarCategory", categorySchema);
 
-export { marModel, documentsModel, marCourseModel, categoryModel };
+export { marModel, documentsModel, categoryModel };
