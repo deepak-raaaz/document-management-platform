@@ -1,7 +1,7 @@
 import { isAuthenticate } from './../middleware/auth';
 import express from 'express';
 import { authorizeRoles } from './../middleware/auth';
-import { activateMarCategory, addMarCategory, allStudentDetails, deleteMarCategory, editMarCategory,  getAllMarData,  getAllMoocsData,  getMarListAdmin, getMoocsListAdmin, rejectMarDocument, rejectMoocsDocument, rejectStudent, singleStudentDetail, verifyMarDocument, verifyMoocsDocument, verifyStudent } from '../controllers/admin.controller';
+import { activateMarCategory, activateMoocs, addMarCategory, allStudentDetails, deactivateMoocs, deleteMarCategory, editMarCategory,  editMoocsCourse,  getAllMarData,  getAllMoocsData,  getMarListAdmin, getMoocsListAdmin, rejectMarDocument, rejectMoocsDocument, rejectStudent, singleStudentDetail, verifyMarDocument, verifyMoocsDocument, verifyStudent } from '../controllers/admin.controller';
 import { createMoocsCourse } from '../controllers/admin.controller';
 
 const adminRouter = express.Router();
@@ -23,7 +23,14 @@ adminRouter.post("/create-moocs-course", isAuthenticate,authorizeRoles("admin"),
 
 adminRouter.get("/moocs-course-list", isAuthenticate,authorizeRoles("admin"), getMoocsListAdmin);
 
-// edit moocs course, activate moocs category, deactivate moocs category
+adminRouter.put("/edit-moocs-category/:id", isAuthenticate,authorizeRoles("admin"), editMoocsCourse);
+
+adminRouter.put("/activate-moocs-course/:id", isAuthenticate,authorizeRoles("admin"), activateMoocs);
+
+adminRouter.put("/deactivate-moocs-course/:id", isAuthenticate,authorizeRoles("admin"), deactivateMoocs);
+
+
+
 
 
 

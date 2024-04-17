@@ -477,7 +477,7 @@ export const activateMarCategory = CatchAsyncError(
     try {
       const categoryId = req.params.id;
 
-      // Check if categoryId is provided
+      // Check if categoryId is      
       if (!categoryId) {
         return next(new ErrorHandler("Category ID is required", 400));
       }
@@ -506,6 +506,81 @@ export const activateMarCategory = CatchAsyncError(
     }
   }
 );
+
+// activate moocs by admin:-
+
+
+export const activateMoocs = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const categoryId = req.params.id;
+
+      // Check if categoryId is provided
+      if (!categoryId) {
+        return next(new ErrorHandler("Category ID is required", 400));
+      }
+
+      // Update isActive field to true for the MOOCs category
+      const updatedCategory = await moocsModel.findByIdAndUpdate(
+        categoryId,
+        { isActive: true },
+        { new: true }
+      );
+
+      // If the category doesn't exist, return an error
+      if (!updatedCategory) {
+        return next(new ErrorHandler("Category not found", 404));
+      }
+
+      // Return success response
+      res.status(200).json({
+        success: true,
+        message: "MOOCs category activated successfully",
+        updatedCategory,
+      });
+    } catch (error: any) {
+      // Handle errors
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// deactivate moocs course :-
+export const deactivateMoocs = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const categoryId = req.params.id;
+
+      // Check if categoryId is provided
+      if (!categoryId) {
+        return next(new ErrorHandler("Category ID is required", 400));
+      }
+
+      // Update isActive field to false for the MOOCs category
+      const updatedCategory = await moocsModel.findByIdAndUpdate(
+        categoryId,
+        { isActive: false },
+        { new: true }
+      );
+
+      // If the category doesn't exist, return an error
+      if (!updatedCategory) {
+        return next(new ErrorHandler("Category not found", 404));
+      }
+
+      // Return success response
+      res.status(200).json({
+        success: true,
+        message: "MOOCs category deactivated successfully",
+        updatedCategory,
+      });
+    } catch (error: any) {
+      // Handle errors
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 
 // verify mar list uplaoded by student:-
 export const verifyMarDocument = CatchAsyncError(
