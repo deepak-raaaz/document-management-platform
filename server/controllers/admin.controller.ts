@@ -648,7 +648,38 @@ export const getMarListAdmin = CatchAsyncError(
 );
 
 
-// get moocs list by admin :-
+// get moocs list uplaoded by student by admin :-
+export const getAllMoocsData = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const moocsData = await moocsModel.find().populate('user').populate('moocsCourse').populate('document');
+
+      res.status(200).json({
+        success: true,
+        moocsData,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+
+export const getAllMarData = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const moocsData = await marModel.find().populate('user').populate('MarCategory').populate('document');
+
+      res.status(200).json({
+        success: true,
+        moocsData,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 
 
 

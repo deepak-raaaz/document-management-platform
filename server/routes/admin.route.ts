@@ -1,7 +1,7 @@
 import { isAuthenticate } from './../middleware/auth';
 import express from 'express';
 import { authorizeRoles } from './../middleware/auth';
-import { addMarCategory, allStudentDetails, deleteMarCategory, editMarCategory,  getMarListAdmin, getMoocsListAdmin, rejectStudent, singleStudentDetail, verifyMarDocument, verifyMoocsDocument, verifyStudent } from '../controllers/admin.controller';
+import { addMarCategory, allStudentDetails, deleteMarCategory, editMarCategory,  getAllMarData,  getAllMoocsData,  getMarListAdmin, getMoocsListAdmin, rejectStudent, singleStudentDetail, verifyMarDocument, verifyMoocsDocument, verifyStudent } from '../controllers/admin.controller';
 import { createMoocsCourse } from '../controllers/admin.controller';
 import { getMoocsList } from '../controllers/mocs.controller';
 
@@ -31,6 +31,12 @@ adminRouter.put("/delete-mar-category/:id", isAuthenticate,authorizeRoles("admin
 adminRouter.put("/mar-verify/:id", isAuthenticate,authorizeRoles("admin"),verifyMarDocument );
 
 adminRouter.put("/moocs-verify/:id", isAuthenticate,authorizeRoles("admin"),verifyMoocsDocument );
+
+adminRouter.get("/moocs-list", isAuthenticate,authorizeRoles("admin"), getAllMoocsData  );
+
+adminRouter.get("/mar-list", isAuthenticate,authorizeRoles("admin"), getAllMarData  );
+
+
 
 
 
