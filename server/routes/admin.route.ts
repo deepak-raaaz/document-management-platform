@@ -1,7 +1,7 @@
 import { isAuthenticate } from './../middleware/auth';
 import express from 'express';
 import { authorizeRoles } from './../middleware/auth';
-import { addMarCategory, allStudentDetails, deleteMarCategory, editMarCategory, rejectStudent, singleStudentDetail, verifyStudent } from '../controllers/admin.controller';
+import { addMarCategory, allStudentDetails, deleteMarCategory, editMarCategory, rejectStudent, singleStudentDetail, verifyMarDocument, verifyMoocsDocument, verifyStudent } from '../controllers/admin.controller';
 import { createMoocsCourse } from '../controllers/admin.controller';
 
 const adminRouter = express.Router();
@@ -22,6 +22,11 @@ adminRouter.post("/add-mar-category", isAuthenticate,authorizeRoles("admin"), ad
 adminRouter.put("/edit-mar-category/:id", isAuthenticate,authorizeRoles("admin"), editMarCategory);
 
 adminRouter.put("/delete-mar-category/:id", isAuthenticate,authorizeRoles("admin"), deleteMarCategory);
+
+adminRouter.put("/mar-verify/:id", isAuthenticate,authorizeRoles("admin"),verifyMarDocument );
+
+adminRouter.put("/moocs-verify/:id", isAuthenticate,authorizeRoles("admin"),verifyMoocsDocument );
+
 
 
 
