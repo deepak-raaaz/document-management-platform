@@ -571,6 +571,7 @@ export const verifyMoocsDocument = CatchAsyncError(
       // Find the MOOCs document by ID
       const moocsDoc = (await moocsModel
         .findById(req.params.id)
+        .populate("user")
         .populate("moocsCourse")) as any;
       if (!moocsDoc) {
         return next(new Error("MOOCs document not found"));
@@ -597,7 +598,7 @@ export const verifyMoocsDocument = CatchAsyncError(
 
         try {
           await sendMail({
-            email,
+            email:moocsDoc.user.email,
             subject: "MOOCs Document Verification",
             template: "moocs-verification-mail.ejs",
             data,
@@ -605,7 +606,7 @@ export const verifyMoocsDocument = CatchAsyncError(
 
           return res.status(200).json({
             success: true,
-            message: `MOOCs document "${moocsDoc.title}" has been successfully verified. An email notification has been sent.`,
+            message: `MOOCs document "${moocsDoc.moocsCourse.title}" has been successfully verified. An email notification has been sent.`,
           });
         } catch (error: any) {
           return next(new ErrorHandler(error.message, 400));
@@ -615,7 +616,7 @@ export const verifyMoocsDocument = CatchAsyncError(
       // Respond with success message
       res.status(200).json({
         success: true,
-        message: `MOOCs document "${moocsDoc.title}" has been successfully verified.`,
+        message: `MOOCs document "${moocsDoc.moocsCourse.title}" has been successfully verified.`,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -723,6 +724,7 @@ export const rejectMoocsDocument = CatchAsyncError(
       // Find the MOOCs document by ID
       const moocsDoc = (await moocsModel
         .findById(req.params.id)
+        .populate("user")
         .populate("moocsCourse")) as any;
       if (!moocsDoc) {
         return next(new Error("MOOCs document not found"));
@@ -749,7 +751,7 @@ export const rejectMoocsDocument = CatchAsyncError(
 
         try {
           await sendMail({
-            email,
+            email:moocsDoc.user.email,
             subject: "MOOCs Document rejected",
             template: "moocs-rejection-mail.ejs",
             data,
@@ -757,7 +759,7 @@ export const rejectMoocsDocument = CatchAsyncError(
 
           return res.status(200).json({
             success: true,
-            message: `MOOCs document "${moocsDoc.title}" has been successfully rejected. An email notification has been sent.`,
+            message: `MOOCs document "${moocsDoc.moocsCourse.title}" has been successfully rejected. An email notification has been sent.`,
           });
         } catch (error: any) {
           return next(new ErrorHandler(error.message, 400));
@@ -767,7 +769,7 @@ export const rejectMoocsDocument = CatchAsyncError(
       // Respond with success message
       res.status(200).json({
         success: true,
-        message: `MOOCs document "${moocsDoc.title}" has been successfully rejected.`,
+        message: `MOOCs document "${moocsDoc.moocsCourse.title}" has been successfully rejected.`,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));

@@ -137,21 +137,20 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
     setSelectedId(id);
   };
 
-  const handleReject = (id: string,email:string) => {
+  const handleReject = (id: string) => {
     setRoute("reject");
     setLayout("center");
     setSelectedId(id);
-    setSelectedEmail(email);
   };
-  const renderCell = React.useCallback((user: MarCategoryList, columnKey: React.Key) => {
-    const cellValue = user[columnKey as keyof MarCategoryList];
+  const renderCell = React.useCallback((marCategory: MarCategoryList, columnKey: React.Key) => {
+    const cellValue = marCategory[columnKey as keyof MarCategoryList];
 
     switch (columnKey) {
       case "status":
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[user.status]}
+            color={statusColorMap[marCategory.status]}
             size="sm"
             variant="flat"
           >
@@ -160,26 +159,30 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
         );
       case "actions":
         return (
-          <div className="relative flex items-center gap-2">
+          <div className="relative flex items-center justify-center gap-2">
             {/* <Tooltip content="View">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <FaRegEye onClick={() => handleView(user.universityRollNo)}/>
+                <FaRegEye onClick={() => handleView(marCategory.universityRollNo)}/>
               </span>
             </Tooltip> */}
-            <Tooltip content="Activate" color="success" className="text-white">
-              <span className="text-lg text-success cursor-pointer active:opacity-50">
-                <IoShieldCheckmarkOutline
-                  onClick={() => handleVerify(user._id)}
-                />
-              </span>
-            </Tooltip>
+            {
+              marCategory.status === "active" ? 
             <Tooltip color="danger" content="Deactivate">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
                 <MdOutlineCancel
-                  onClick={() => handleReject(user._id,user.email)}
+                  onClick={() => handleReject(marCategory._id)}
                 />
               </span>
             </Tooltip>
+            :
+            <Tooltip content="Activate" color="success" className="text-white">
+              <span className="text-lg text-success cursor-pointer active:opacity-50">
+                <IoShieldCheckmarkOutline
+                  onClick={() => handleVerify(marCategory._id)}
+                />
+              </span>
+            </Tooltip>
+            }
           </div>
         );
       default:

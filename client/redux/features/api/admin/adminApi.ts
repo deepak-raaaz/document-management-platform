@@ -104,15 +104,44 @@ export const adminApi = apiSlice.injectEndpoints({
     }),
     deactivteMoocsCourse: builder.mutation({
       query: ({ id }) => ({
-        url: `deactivate-mar-category/${id}`,
+        url: `deactivate-moocs-course/${id}`,
         method: "PUT",
         credentials: "include" as const,
       }),
     }),
     activateMoocsCourse: builder.mutation({
       query: ({ id }) => ({
-        url: `deactivate-mar-category/${id}`,
+        url: `activate-moocs-course/${id}`,
         method: "PUT",
+        credentials: "include" as const,
+      }),
+    }),
+
+    adminMoocsData: builder.query({
+      query: ({}) => ({
+        url: "all-moocs-list",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    verifyMoocs: builder.mutation({
+      query: ({ id,email}) => ({
+        url: `moocs-verify/${id}`,
+        method: "PUT",
+        body: {
+          email,
+        },
+        credentials: "include" as const,
+      }),
+    }),
+    rejectMoocs: builder.mutation({
+      query: ({ id,email,reason}) => ({
+        url: `moocs-reject/${id}`,
+        method: "PUT",
+        body: {
+          email,
+          reason
+        },
         credentials: "include" as const,
       }),
     }),
@@ -127,5 +156,12 @@ export const {
   useAdminMoocsCourseListQuery,
   useAdminMarCategoryListQuery,
   useUploadMoocsCourseMutation,
-  useUploadMarCategoryMutation
+  useUploadMarCategoryMutation,
+  useDeactivteMarCategoryMutation,
+  useActivateMarCategoryMutation,
+  useDeactivteMoocsCourseMutation,
+  useActivateMoocsCourseMutation,
+  useAdminMoocsDataQuery,
+  useVerifyMoocsMutation,
+  useRejectMoocsMutation
 } = adminApi;

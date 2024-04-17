@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -23,7 +23,7 @@ import {
 } from "@nextui-org/react";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import { SearchIcon } from "./SearchIcon";
-import { columns, users, statusOptions, batchOptions } from "./data";
+import { columns, statusOptions, batchOptions } from "./data";
 import { capitalize } from "./utils";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
 import PopUpModal from "@/app/utils/PopUpModal";
@@ -34,25 +34,37 @@ import { MdOutlineCancel } from "react-icons/md";
 import ViewPdf from "./ViewPdf";
 import { FaRegEye } from "react-icons/fa";
 
-
 const statusColorMap: Record<string, ChipProps["color"]> = {
+  pending: "warning",
   verified: "success",
-  not_submitted: "danger",
-  submitted: "warning",
+  rejected: "danger",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
+  "title",
+  "platform",
+  "credit",
   "universityRollNo",
   "name",
-  "classRollNo",
-  "moocsStatus",
+  "classroll",
+  "status",
   "actions",
 ];
 
-type User = (typeof users)[0];
+type Props = {
+  moocs: any;
+};
 
-export default function MoocsSubmissionList() {
+const MoocsSubmissionList: FC<Props> = ({ moocs }) => {
+  type Moocs = (typeof moocs)[0];
+
   const [filterValue, setFilterValue] = React.useState("");
+  const [selectedPdfUrl, setSelectedPdfUrl] = React.useState("");
+  const [selectedMoocsId, setSelectedMoocsId] = React.useState("");
+  const [selectedUserEmail, setSelectedUserEmail] = React.useState("");
+
+  const [selectedVerificationUrl, setSelectedVerificationUrl] =
+    React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
   );
@@ -63,7 +75,7 @@ export default function MoocsSubmissionList() {
   const [batchFilter, setBatchFilter] = React.useState<string>("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
-    column: "classRollNo",
+    column: "classrollno",
     direction: "ascending",
   });
 
@@ -80,19 +92,19 @@ export default function MoocsSubmissionList() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...users];
+    let filteredUsers = [...moocs];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase())
+      filteredUsers = filteredUsers.filter((moocs) =>
+        moocs.user.name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.moocsStatus)
+      filteredUsers = filteredUsers.filter((moocs) =>
+        Array.from(statusFilter).includes(moocs.status)
       );
     }
     if (batchFilter !== "all") {
@@ -103,7 +115,7 @@ export default function MoocsSubmissionList() {
     }
 
     return filteredUsers;
-  }, [users, filterValue, statusFilter, batchFilter]);
+  }, [moocs, filterValue, statusFilter, batchFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -115,56 +127,80 @@ export default function MoocsSubmissionList() {
   }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: User, b: User) => {
-      const first = a[sortDescriptor.column as keyof User] as number;
-      const second = b[sortDescriptor.column as keyof User] as number;
+    return [...items].sort((a: Moocs, b: Moocs) => {
+      const first = a[sortDescriptor.column as keyof Moocs] as number;
+      const second = b[sortDescriptor.column as keyof Moocs] as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const handleView = (roll: string) => {
+  const handleView = (pdfUrl: string, verificationUrl: string) => {
+    setSelectedPdfUrl(pdfUrl);
+    setSelectedVerificationUrl(verificationUrl);
     setRoute("viewPdf");
     setLayout("center");
   };
 
-  const handleVerify = (roll: string) => {
+  const handleVerify = (id: string,email:string) => {
     setRoute("verify");
     setLayout("center");
+    setSelectedMoocsId(id);
+    setSelectedUserEmail(email);
   };
 
-  const handleReject = (roll: string) => {
+  const handleReject = (id: string,email:string) => {
     setRoute("reject");
     setLayout("center");
+    setSelectedMoocsId(id);
+    setSelectedUserEmail(email);
   };
-  
-  const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
-    const cellValue = user[columnKey as keyof User];
+
+  const renderCell = React.useCallback((moocs: Moocs, columnKey: React.Key) => {
+    const cellValue = moocs[columnKey as keyof Moocs];
 
     switch (columnKey) {
       case "name":
         return (
           <User
             // avatarProps={undefined}
-            description={user.email}
-            name={cellValue}
+            description={moocs.user.email}
+            name={moocs.user.name}
           >
-            {user.email}
+            {moocs.user.email}
           </User>
         );
-      case "batch":
+      case "title":
+        return <span>{moocs.moocsCourse.title}</span>;
+      case "platform":
+        return (
+          <span className="text-center whitespace-nowrap">{moocs.moocsCourse.platform}</span>
+        );
+      case "credit":
+        return <span className="whitespace-nowrap">{moocs.moocsCourse.credit}</span>;
+      case "universityroll":
+        return <span>{moocs.user.universityroll}</span>;
+      case "classroll":
+        return <span>{moocs.user.classroll}</span>;
+      case "email":
+        return <span>{moocs.user.email}</span>;
+      case "startDate":
+        return <span className="whitespace-nowrap">{moocs.startDate}</span>;
+      case "endDate":
+        return <span className="whitespace-nowrap">{moocs.endDate}</span>;
+      case "year":
         return (
           <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
+            <p className="text-bold text-small capitalize">{moocs.year}</p>
             {/* <p className="text-bold text-tiny capitalize text-default-400">{user.name}</p> */}
           </div>
         );
-      case "moocsStatus":
+      case "status":
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[user.moocsStatus]}
+            color={statusColorMap[moocs.status]}
             size="sm"
             variant="flat"
           >
@@ -176,19 +212,25 @@ export default function MoocsSubmissionList() {
           <div className="relative flex items-center gap-2">
             <Tooltip content="View pdf">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <FaRegEye onClick={() => handleView(user.universityRollNo)}/>
+                <FaRegEye
+                  onClick={() =>
+                    handleView(moocs.document.url, moocs.verificationUrl)
+                  }
+                />
               </span>
             </Tooltip>
             <Tooltip content="Verify" color="success" className="text-white">
               <span className="text-lg text-success cursor-pointer active:opacity-50">
                 <IoShieldCheckmarkOutline
-                  onClick={() => handleVerify(user.universityRollNo)}
+                  onClick={() => handleVerify(moocs._id, moocs.user.email)}
                 />
               </span>
             </Tooltip>
             <Tooltip color="danger" content="Reject">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <MdOutlineCancel onClick={() => handleReject(user.universityRollNo)} />
+                <MdOutlineCancel
+                  onClick={() => handleReject(moocs._id, moocs.user.email)}
+                />
               </span>
             </Tooltip>
           </div>
@@ -320,7 +362,7 @@ export default function MoocsSubmissionList() {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {users.length} students
+            Total {moocs.length} students
           </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
@@ -343,7 +385,7 @@ export default function MoocsSubmissionList() {
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    users.length,
+    moocs.length,
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -392,7 +434,6 @@ export default function MoocsSubmissionList() {
   >(undefined);
   const [activeItem, setActiveItem] = useState(0);
 
-
   return (
     <>
       <Table
@@ -422,7 +463,7 @@ export default function MoocsSubmissionList() {
         </TableHeader>
         <TableBody emptyContent={"No users found"} items={sortedItems}>
           {(item) => (
-            <TableRow key={item.universityRollNo}>
+            <TableRow key={item._id}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
@@ -438,6 +479,8 @@ export default function MoocsSubmissionList() {
               setLayout={setLayout}
               setRoute={setRoute}
               component={Verify}
+              email={selectedUserEmail}
+              id={selectedMoocsId}
             />
           )}
         </>
@@ -450,6 +493,8 @@ export default function MoocsSubmissionList() {
               setLayout={setLayout}
               setRoute={setRoute}
               component={Reject}
+              email={selectedUserEmail}
+              id={selectedMoocsId}
             />
           )}
         </>
@@ -463,10 +508,14 @@ export default function MoocsSubmissionList() {
               setRoute={setRoute}
               component={ViewPdf}
               route="viewPdf"
+              pdfUrl={selectedPdfUrl}
+              verificationUrl={selectedVerificationUrl}
             />
           )}
         </>
       )}
     </>
   );
-}
+};
+
+export default MoocsSubmissionList;

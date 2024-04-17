@@ -1,17 +1,22 @@
 const columns = [
-  { name: "UNIVERSITY ROLL NO.", uid: "universityRollNo", sortable: true },
-  { name: "NAME", uid: "name", sortable: true },
-  { name: "CLASS ROLL NO", uid: "classRollNo", sortable: true },
+  { name: "COURSE TITLE", uid: "title", sortable: true },
+  { name: "PLATFORM", uid: "platform"},
+  { name: "CREDITS", uid: "credit", sortable: true },
+  { name: "START DATE", uid: "startDate", sortable: true },
+  { name: "END DATE", uid: "endDate", sortable: true },
+  { name: "STUDENT NAME", uid: "name", sortable: true },
+  { name: "UNIVERSITY ROLL NO", uid: "universityroll", sortable: true },
+  { name: "CLASS ROLL NO", uid: "classroll", sortable: true },
   { name: "EMAIL", uid: "email" },
-  { name: "BATCH", uid: "batch", sortable: true },
-  { name: "MOOCS STATUS", uid: "moocsStatus", sortable: true },
+  { name: "YEAR", uid: "year", sortable: true },
+  { name: "MOOCS STATUS", uid: "status", sortable: true },
   { name: "ACTIONS", uid: "actions" },
 ];
 
 const statusOptions = [
   { name: "verified", uid: "verified" },
-  { name: "not submitted", uid: "not_submitted" },
-  { name: "Submitted", uid: "submitted" },
+  { name: "pending", uid: "pending" },
+  { name: "rejected", uid: "rejected" },
 ];
 
 const batchOptions = [
