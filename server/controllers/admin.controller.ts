@@ -589,7 +589,7 @@ export const verifyMoocsDocument = CatchAsyncError(
 );
 
 // get all moocs course list :- by admin 
-export const getMoocsList = CatchAsyncError(
+export const getMoocsListAdmin = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
 
@@ -607,7 +607,7 @@ export const getMoocsList = CatchAsyncError(
 
 
 //  get all mar list by admin :
-export const getMarList = CatchAsyncError(
+export const getMarListAdmin = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
 
