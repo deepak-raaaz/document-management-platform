@@ -31,7 +31,6 @@ const MarTable = (props: Props) => {
 
 
   const [pdfUrl, setPdfUrl] = useState("");
-  const [verificationUrl, setVerificationUrl] = useState("");
 
   const { refetch } = useMyMarQuery({ refetchOnMountOrArgChange: true });
 
@@ -184,7 +183,6 @@ const MarTable = (props: Props) => {
               component={ViewPdf}
               route="viewPdf"
               pdfUrl={pdfUrl}
-              verificationUrl={verificationUrl}
             />
           )}
         </>

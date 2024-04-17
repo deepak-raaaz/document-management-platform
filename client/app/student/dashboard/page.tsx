@@ -5,6 +5,7 @@ import Protected from "../../hooks/useProtected";
 import { useSelector } from "react-redux";
 import Dashboard from "@/app/components/student/dashboard/Dashboard";
 import Header from "@/app/components/Header";
+import Footer from "@/app/utils/Footer";
 
 type Props = {};
 
@@ -28,6 +29,7 @@ const page: FC<Props> = (props) => {
           route={route}
         />
         <Dashboard />
+        {/* <Footer/> */}
     </>
   );
 };

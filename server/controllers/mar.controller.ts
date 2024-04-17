@@ -274,7 +274,7 @@ export const getMyMar = CatchAsyncError(
       mar.forEach((mar: any) => {
         if (mar.status === "verified") {
           // Ensure mooc is properly typed as MoocsDocument
-          totalMarPoints += mar.marCategory.marPoint;
+          totalMarPoints += mar.marCategory.perMarPoints;
         }
       });
 

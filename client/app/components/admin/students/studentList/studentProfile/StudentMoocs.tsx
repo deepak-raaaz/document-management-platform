@@ -1,14 +1,8 @@
 import {
     useDeleteMyMoocsMutation,
-    useMyMoocsQuery,
   } from "@/redux/features/api/moocs/moocsApi";
   import { ModalDialogProps } from "@mui/joy";
   import {
-    Button,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownTrigger,
     Tooltip,
   } from "@nextui-org/react";
   import React, { FC, useEffect, useState } from "react";
@@ -20,18 +14,15 @@ import {
     FaRegEye,
     FaUniversity,
   } from "react-icons/fa";
-  import { IoIosMore } from "react-icons/io";
   import {
     MdError,
     MdOutlineDeleteOutline,
     MdPending,
     MdVerifiedUser,
   } from "react-icons/md";
-  import { useSelector } from "react-redux";
   import { RiGraduationCapFill } from "react-icons/ri";
   import ViewPdf from "@/app/components/student/moocs/ViewPdf"; 
   import PopUpModal from "@/app/utils/PopUpModal";
-import { useStudentDetailsQuery } from "@/redux/features/api/admin/adminApi";
   
   type Props = {
     id:string;

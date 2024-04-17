@@ -2,7 +2,6 @@ import { Divider } from "@nextui-org/react";
 import React, { FC } from "react";
 import { useSelector } from "react-redux";
 import StudentMoocs from "./StudentMoocs";
-import MobileMoocsTable from "@/app/components/student/moocs/MobileMoocsTable";
 import { useStudentDetailsQuery } from "@/redux/features/api/admin/adminApi";
 
 type Props = {

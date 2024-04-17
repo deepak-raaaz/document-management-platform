@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { Fab } from "@mui/material";
 import { ThemeSwitcher } from "./utils/ThemeSwitcher";
 import adminAuth from "./hooks/adminAuth";
+import Footer from "./utils/Footer";
 
 interface Props {}
 
@@ -24,7 +25,7 @@ const Page: FC<Props> = (props) => {
   ) : isAdmin ? (
     redirect("/admin/dashboard")
   ) : (
-    <div className="">
+    <div className="h-full">
       <Heading
         title="Data Science HIT"
         description="Data Science HIT"
@@ -39,6 +40,7 @@ const Page: FC<Props> = (props) => {
         loginType={loginType} 
       />
       <LandingPage setOpen={setOpen} setRoute={setRoute} route={route} loginType={loginType} setLoginType={setLoginType} />
+      {/* <Footer/> */}
     </div>
   );
 };
