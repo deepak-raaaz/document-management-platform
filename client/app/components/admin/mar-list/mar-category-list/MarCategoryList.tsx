@@ -32,6 +32,7 @@ import Verify from "./Verify";
 import Reject from "./Reject";
 import { MdOutlineCancel } from "react-icons/md";
 import { useAllUsersQuery } from "@/redux/features/api/admin/adminApi";
+import AddMarCategory from "./AddMarCategory";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -229,7 +230,15 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            
+          <Button
+              color="primary"
+              onClick={() => {
+                setRoute("addMarCategory");
+                setLayout("center");
+              }}
+            >
+              Add Category
+            </Button>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -412,6 +421,20 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
               setLayout={setLayout}
               setRoute={setRoute}
               component={Reject}
+              id={selectedId}
+              email={selectedEmail}
+            />
+          )}
+        </>
+      )}
+      {route === "addMarCategory" && (
+        <>
+          {layout && (
+            <PopUpModal
+              layout={layout}
+              setLayout={setLayout}
+              setRoute={setRoute}
+              component={AddMarCategory}
               id={selectedId}
               email={selectedEmail}
             />

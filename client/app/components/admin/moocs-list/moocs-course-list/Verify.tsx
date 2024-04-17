@@ -49,21 +49,7 @@ const Verify: FC<Props> = ({ setRoute, id }) => {
         Account Activation!
       </h3>
       <div className="overflow-hidden">
-        <Checkbox
-          aria-label="name"
-          className="my-2"
-          isSelected={isSelected}
-          onValueChange={setIsSelected}
-        >
-          <div className="w-full flex flex-col ms-2">
-            <span className=" text-slate-800 text-base">
-              Send activation mail to{" "}
-            </span>
-            <span className="text-tiny text-slate-500">
-              deepakjamui26@gmail.com
-            </span>
-          </div>
-        </Checkbox>
+      Proceed with Activation?
       </div>
       <div className="flex justify-end mt-4">
         <Button

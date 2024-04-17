@@ -1,4 +1,4 @@
-import React, { useState,FC } from "react";
+import React, { useState, FC } from "react";
 import {
   Table,
   TableHeader,
@@ -21,7 +21,7 @@ import {
   Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
-import { ChevronDownIcon } from "../../new-registration/newRegistrationList/ChevronDownIcon"; 
+import { ChevronDownIcon } from "../../new-registration/newRegistrationList/ChevronDownIcon";
 import { SearchIcon } from "../../new-registration/newRegistrationList/SearchIcon";
 import { columns, statusOptions } from "./data";
 import { capitalize } from "../../new-registration/newRegistrationList/utils";
@@ -32,6 +32,7 @@ import Verify from "./Verify";
 import Reject from "./Reject";
 import { MdOutlineCancel } from "react-icons/md";
 import { useAllUsersQuery } from "@/redux/features/api/admin/adminApi";
+import AddMoocsCourse from "./AddMoocsCourse";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -50,9 +51,8 @@ type Props = {
   moocsCourse: any;
 };
 
-const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
+const MoocsCourseList: FC<Props> = ({ moocsCourse }) => {
   type MoocsCourse = (typeof moocsCourse)[0];
- 
 
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
@@ -69,8 +69,8 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
     direction: "ascending",
   });
 
-  const [selectedId, setSelectedId] = React.useState(""); 
-  const [selectedEmail, setSelectedEmail] = React.useState(""); 
+  const [selectedId, setSelectedId] = React.useState("");
+  const [selectedEmail, setSelectedEmail] = React.useState("");
 
   const [page, setPage] = React.useState(1);
 
@@ -89,7 +89,7 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((moocsCourse) =>
-      moocsCourse.title.toLowerCase().includes(filterValue.toLowerCase())
+        moocsCourse.title.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
@@ -100,7 +100,6 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
         Array.from(statusFilter).includes(moocsCourse.status)
       );
     }
-    
 
     return filteredUsers;
   }, [moocsCourse, filterValue, statusFilter, batchFilter]);
@@ -135,55 +134,62 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
     setSelectedId(id);
   };
 
-  const handleReject = (id: string,email:string) => {
+  const handleReject = (id: string, email: string) => {
     setRoute("reject");
     setLayout("center");
     setSelectedId(id);
     setSelectedEmail(email);
   };
-  const renderCell = React.useCallback((user: MoocsCourse, columnKey: React.Key) => {
-    const cellValue = user[columnKey as keyof MoocsCourse];
+  const renderCell = React.useCallback(
+    (user: MoocsCourse, columnKey: React.Key) => {
+      const cellValue = user[columnKey as keyof MoocsCourse];
 
-    switch (columnKey) {
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            {/* <Tooltip content="View">
+      switch (columnKey) {
+        case "status":
+          return (
+            <Chip
+              className="capitalize"
+              color={statusColorMap[user.status]}
+              size="sm"
+              variant="flat"
+            >
+              {cellValue}
+            </Chip>
+          );
+        case "actions":
+          return (
+            <div className="relative flex items-center gap-2">
+              {/* <Tooltip content="View">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <FaRegEye onClick={() => handleView(user.universityRollNo)}/>
               </span>
             </Tooltip> */}
-            <Tooltip content="Activate" color="success" className="text-white">
-              <span className="text-lg text-success cursor-pointer active:opacity-50">
-                <IoShieldCheckmarkOutline
-                  onClick={() => handleVerify(user._id)}
-                />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Deactivate">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <MdOutlineCancel
-                  onClick={() => handleReject(user._id,user.email)}
-                />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+              <Tooltip
+                content="Activate"
+                color="success"
+                className="text-white"
+              >
+                <span className="text-lg text-success cursor-pointer active:opacity-50">
+                  <IoShieldCheckmarkOutline
+                    onClick={() => handleVerify(user._id)}
+                  />
+                </span>
+              </Tooltip>
+              <Tooltip color="danger" content="Deactivate">
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                  <MdOutlineCancel
+                    onClick={() => handleReject(user._id, user.email)}
+                  />
+                </span>
+              </Tooltip>
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    []
+  );
 
   const onNextPage = React.useCallback(() => {
     if (page < pages) {
@@ -228,7 +234,15 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            
+            <Button
+              color="primary"
+              onClick={() => {
+                setRoute("addCourse");
+                setLayout("center");
+              }}
+            >
+              Add Course
+            </Button>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -417,9 +431,22 @@ const MoocsCourseList:FC<Props> = ({moocsCourse}) => {
           )}
         </>
       )}
+      {route === "addCourse" && (
+        <>
+          {layout && (
+            <PopUpModal
+              layout={layout}
+              setLayout={setLayout}
+              setRoute={setRoute}
+              component={AddMoocsCourse}
+              id={selectedId}
+              email={selectedEmail}
+            />
+          )}
+        </>
+      )}
     </>
   );
-}
-
+};
 
 export default MoocsCourseList;

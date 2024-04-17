@@ -59,8 +59,32 @@ export const adminApi = apiSlice.injectEndpoints({
     }),
     adminMarCategoryList: builder.query({
       query: ({}) => ({
-        url: "mar-category-list",
+        url: "mar-category",
         method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    uploadMoocsCourse: builder.mutation({
+      query: ({ title,platform,credit }) => ({
+        url: "create-moocs-course",
+        method: "POST",
+        body: {
+          title,
+          platform,
+          credit
+        },
+        credentials: "include" as const,
+      }),
+    }),
+    uploadMarCategory: builder.mutation({
+      query: ({ category,perMarPoints,maximumMarPoints }) => ({
+        url: "add-mar-category",
+        method: "POST",
+        body: {
+          category,
+          perMarPoints,
+          maximumMarPoints
+        },
         credentials: "include" as const,
       }),
     }),
@@ -73,5 +97,7 @@ export const {
   useDeactivateAccountMutation,
   useStudentDetailsQuery,
   useAdminMoocsCourseListQuery,
-  useAdminMarCategoryListQuery
+  useAdminMarCategoryListQuery,
+  useUploadMoocsCourseMutation,
+  useUploadMarCategoryMutation
 } = adminApi;
