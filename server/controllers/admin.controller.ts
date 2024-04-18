@@ -14,11 +14,67 @@ import path from "path";
 import sendMail from "../utlis/sendMail";
 import { marModel } from "../models/mar.model";
 
+
+// export const allStudentDetails = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const allStudentDetails = await userModel.find().sort({ createdAt: -1 });
+
+//       // Convert Mongoose documents to plain JavaScript objects
+//       const plainStudentDetails = allStudentDetails.map((student) =>
+//         student.toObject()
+//       );
+
+//       // Modify isVerified property to 'active' or 'inactive' and rename to 'status'
+//       const modifiedDetails = plainStudentDetails.map((student) => ({
+//         ...student,
+//         status: student.isVerfied ? "active" : "inactive",
+//       }));
+
+//       // Remove the isVerified property from the modified details
+//       const detailsWithoutIsVerified = modifiedDetails.map(
+//         ({ isVerfied, ...rest }) => rest
+//       );
+
+//       res.status(201).json({
+//         success: true,
+//         allStudentDetails: detailsWithoutIsVerified,
+//       });
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 400));
+//     }
+//   }
+// );
+
 // get all details of the student :-
 export const allStudentDetails = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const allStudentDetails = await userModel.find().sort({ createdAt: -1 });
+      const allStudentDetails = await userModel
+        .find({ role: "user" })
+        .populate({
+          path: "moocs",
+          populate: [
+            {
+              path: "moocsCourse",
+              model: "MoocsCourse",
+            },
+            {
+              path: "document",
+              model: "MoocsDocuments",
+            },
+          ],
+        })
+        .populate({
+          path: "mar",
+          populate: [
+            {
+              path: "marCategory",
+              model: "MarCategory",
+            },
+          ],
+        })
+        .sort({ createdAt: -1 });
 
       // Convert Mongoose documents to plain JavaScript objects
       const plainStudentDetails = allStudentDetails.map((student) =>
@@ -36,15 +92,62 @@ export const allStudentDetails = CatchAsyncError(
         ({ isVerfied, ...rest }) => rest
       );
 
+      // Calculate total MOOCs credits for each user
+      const usersWithMoocsCredits = detailsWithoutIsVerified.map((student) => {
+        let totalMoocsCredits = 0;
+        let moocsStatus = "verified";
+        if (student.moocs.length === 0) {
+          moocsStatus = "not submitted";
+        } else {
+          student.moocs.forEach((mooc: any) => {
+            if (mooc.status === "rejected") {
+              moocsStatus = "rejected";
+            } else if (mooc.status === "pending") {
+              moocsStatus = "pending";
+            }
+            if (mooc.status === "verified") {
+              totalMoocsCredits += mooc.moocsCourse.credit;
+            }
+          });
+        }
+        return { ...student, totalMoocs: totalMoocsCredits, moocsStatus };
+      });
+
+      // Add perMarPoints when the status of MAR is verified
+      const usersWithMARPointsAndStatus = usersWithMoocsCredits.map(
+        (student) => {
+          let totalMarPoints = 0;
+          let marStatus = "verified";
+          if (student.mar.length === 0) {
+            marStatus = "not submitted";
+          } else {
+            student.mar.forEach((mar: any) => {
+              if (mar.status === "rejected") {
+                marStatus = "rejected";
+              } else if (mar.status === "pending") {
+                marStatus = "pending";
+              }
+              if (mar.status === "verified") {
+                totalMarPoints += mar.marCategory.perMarPoints;
+              }
+            });
+          }
+          return { ...student, totalMar: totalMarPoints, marStatus };
+        }
+      );
+
       res.status(201).json({
         success: true,
-        allStudentDetails: detailsWithoutIsVerified,
+        allStudentDetails: usersWithMARPointsAndStatus,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
+
+
+
 
 // get single student detail.
 export const singleStudentDetail = CatchAsyncError(

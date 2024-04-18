@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -24,7 +24,7 @@ import { PlusIcon } from "./PlusIcon";
 import { VerticalDotsIcon } from "./VerticalDotsIcon";
 import { ChevronDownIcon } from "./ChevronDownIcon";
 import { SearchIcon } from "./SearchIcon";
-import { columns, users, statusOptions, batchOptions } from "./data";
+import { columns, statusOptions, batchOptions } from "./data";
 import { capitalize } from "./utils";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
 import { MdAccountCircle, MdOutlineCancel } from "react-icons/md";
@@ -32,26 +32,35 @@ import { FaRegEye } from "react-icons/fa";
 import { ModalDialogProps } from "@mui/joy";
 import StudentProfile from "./studentProfile/StudentProfile";
 import PopUpModal from "@/app/utils/PopUpModal";
+import { IoMdRefresh } from "react-icons/io";
 
-
-const statusColorMap: Record<string, ChipProps["color"]> = {
+const moocStatusColorMap: Record<string, ChipProps["color"]> = {
   verified: "success",
   not_submitted: "danger",
-  submitted: "warning",
+  pending: "primary",
+};
+
+const marStatusColorMap: Record<string, ChipProps["color"]> = {
+  verified: "success",
+  not_submitted: "danger",
+  pending: "primary",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "universityRollNo",
+  "universityroll",
   "name",
-  "classRollNo",
-  "marPoints",
-  "moocsCredits",
+  "classroll",
+  "totalMar",
+  "totalMoocs",
   "actions",
 ];
 
-type User = (typeof users)[0];
+type Props = {
+  users: any;
+};
 
-export default function StudentsList() {
+const StudentsList: FC<Props> = ({ users }) => {
+  type User = (typeof users)[0];
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
@@ -97,9 +106,7 @@ export default function StudentsList() {
     }
     if (batchFilter !== "all") {
       // Update: Apply batch filter if it's not "all"
-      filteredUsers = filteredUsers.filter(
-        (user) => user.batch === batchFilter
-      );
+      filteredUsers = filteredUsers.filter((user) => user.year === batchFilter);
     }
 
     return filteredUsers;
@@ -126,8 +133,6 @@ export default function StudentsList() {
 
   const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
     const cellValue = user[columnKey as keyof User];
-
-
 
     const handleProfileView = (id: string) => {
       setRoute("studentProfile");
@@ -157,7 +162,18 @@ export default function StudentsList() {
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[user.moocsStatus]}
+            color={moocStatusColorMap[user.moocsStatus]}
+            size="sm"
+            variant="flat"
+          >
+            {cellValue}
+          </Chip>
+        );
+      case "marStatus":
+        return (
+          <Chip
+            className="capitalize"
+            color={marStatusColorMap[user.marStatus]}
             size="sm"
             variant="flat"
           >
@@ -171,7 +187,7 @@ export default function StudentsList() {
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <MdAccountCircle
                   size={25}
-                   onClick={() => handleProfileView(user._id)}
+                  onClick={() => handleProfileView(user._id)}
                 />
               </span>
             </Tooltip>
@@ -384,13 +400,11 @@ export default function StudentsList() {
     );
   }, [selectedKeys, items.length, page, pages]);
 
-
   const [route, setRoute] = useState("");
   const [layout, setLayout] = React.useState<
     ModalDialogProps["layout"] | undefined
   >(undefined);
-  const [selectedId, setSelectedId] = React.useState(""); 
-
+  const [selectedId, setSelectedId] = React.useState("");
 
   return (
     <>
@@ -421,7 +435,7 @@ export default function StudentsList() {
         </TableHeader>
         <TableBody emptyContent={"No users found"} items={sortedItems}>
           {(item) => (
-            <TableRow key={item.universityRollNo}>
+            <TableRow key={item.universityroll}>
               {(columnKey) => (
                 <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
@@ -432,7 +446,7 @@ export default function StudentsList() {
       {route === "studentProfile" && (
         <>
           {layout && (
-            <PopUpModal 
+            <PopUpModal
               layout={layout}
               setLayout={setLayout}
               setRoute={setRoute}
@@ -445,4 +459,6 @@ export default function StudentsList() {
       )}
     </>
   );
-}
+};
+
+export default StudentsList;

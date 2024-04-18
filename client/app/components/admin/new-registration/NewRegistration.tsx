@@ -2,6 +2,7 @@ import React from "react";
 import NewRegistrationList from "./newRegistrationList/NewRegistrationList";
 import { useAllUsersQuery } from "@/redux/features/api/admin/adminApi";
 import { useSelector } from "react-redux";
+import AdminLoading from "@/app/utils/AdminLoading";
 
 type Props = {};
 
@@ -14,7 +15,11 @@ const NewRegistration = (props: Props) => {
       <h2 className="font-semibold text-lg text-slate-800 my-3 ">
         New Registration
       </h2>
-      {allUsers && <NewRegistrationList users={allUsers}/>}
+      {isLoading ? (
+        <AdminLoading />
+      ) : (
+        allUsers && <NewRegistrationList users={allUsers} />
+      )}
     </div>
   );
 };

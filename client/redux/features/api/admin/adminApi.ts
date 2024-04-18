@@ -174,6 +174,14 @@ export const adminApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+
+    allStudentData: builder.query({
+      query: ({}) => ({
+        url: "all-student-details",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
   }),
 });
 
@@ -195,5 +203,6 @@ export const {
   useRejectMoocsMutation,
   useAdminMarDataQuery,
   useVerifyMarMutation,
-  useRejectMarMutation
+  useRejectMarMutation,
+  useAllStudentDataQuery
 } = adminApi;
