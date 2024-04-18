@@ -1,73 +1,67 @@
+import { useDeleteMyMoocsMutation } from "@/redux/features/api/moocs/moocsApi";
+import { ModalDialogProps } from "@mui/joy";
+import { Tooltip } from "@nextui-org/react";
+import React, { FC, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import {
-    useDeleteMyMoocsMutation,
-  } from "@/redux/features/api/moocs/moocsApi";
-  import { ModalDialogProps } from "@mui/joy";
-  import {
-    Tooltip,
-  } from "@nextui-org/react";
-  import React, { FC, useEffect, useState } from "react";
-  import { toast } from "react-hot-toast";
-  import {
-    FaCalendar,
-    FaCoins,
-    FaLink,
-    FaRegEye,
-    FaUniversity,
-  } from "react-icons/fa";
-  import {
-    MdError,
-    MdOutlineDeleteOutline,
-    MdPending,
-    MdVerifiedUser,
-  } from "react-icons/md";
-  import { RiGraduationCapFill } from "react-icons/ri";
-  import ViewPdf from "@/app/components/student/moocs/ViewPdf"; 
-  import PopUpModal from "@/app/utils/PopUpModal";
-  
-  type Props = {
-    id:string;
-    moocs:any;
-  };
-  
-  const MobileMoocsTable:FC<Props> = ({id,moocs}) => {
+  FaCalendar,
+  FaCoins,
+  FaLink,
+  FaRegEye,
+  FaUniversity,
+} from "react-icons/fa";
+import {
+  MdError,
+  MdOutlineDeleteOutline,
+  MdPending,
+  MdVerifiedUser,
+} from "react-icons/md";
+import { RiGraduationCapFill } from "react-icons/ri";
+import ViewPdf from "@/app/components/student/moocs/ViewPdf";
+import PopUpModal from "@/app/utils/PopUpModal";
 
-    
-    const [route, setRoute] = useState("");
-    const [layout, setLayout] = React.useState<
-      ModalDialogProps["layout"] | undefined
-    >(undefined);
-  
-    const [pdfUrl, setPdfUrl] = useState("");
-    const [verificationUrl, setVerificationUrl] = useState("");
-  
-    // const { refetch } = useStudentDetailsQuery({ refetchOnMountOrArgChange: true });
-  
-    const [deleteMyMoocs, { isSuccess, error }] = useDeleteMyMoocsMutation({});
-  
-    useEffect(() => {
-      if (isSuccess) {
-        // refetch();
-        toast.success("Moocs Deleted Successfully");
+type Props = {
+  id: string;
+  moocs: any;
+};
+
+const MobileMoocsTable: FC<Props> = ({ id, moocs }) => {
+  const [route, setRoute] = useState("");
+  const [layout, setLayout] = React.useState<
+    ModalDialogProps["layout"] | undefined
+  >(undefined);
+
+  const [pdfUrl, setPdfUrl] = useState("");
+  const [verificationUrl, setVerificationUrl] = useState("");
+
+  // const { refetch } = useStudentDetailsQuery({ refetchOnMountOrArgChange: true });
+
+  const [deleteMyMoocs, { isSuccess, error }] = useDeleteMyMoocsMutation({});
+
+  useEffect(() => {
+    if (isSuccess) {
+      // refetch();
+      toast.success("Moocs Deleted Successfully");
+    }
+    if (error) {
+      if ("data" in error) {
+        const errorMessage = error as any;
+        toast.error(errorMessage.data.message);
       }
-      if (error) {
-        if ("data" in error) {
-          const errorMessage = error as any;
-          toast.error(errorMessage.data.message);
-        }
-      }
-    }, [isSuccess, error]);
-  
-    const handleDelete = async (id: any) => {
-      await deleteMyMoocs(id);
-    };
-  
-    return (
-      <div className="">
-        <h3 className="font-semibold text-lg ms-4 !my-3">Moocs</h3>
-        <div className="grid grid-cols-12 gap-4">
+    }
+  }, [isSuccess, error]);
+
+  const handleDelete = async (id: any) => {
+    await deleteMyMoocs(id);
+  };
+
+  return (
+    <div className="">
+      <h3 className="font-semibold text-lg ms-4 !my-3">Moocs</h3>
+      <div className="grid grid-cols-12 gap-4">
         {moocs &&
           moocs.map((moocs: any, index: number) => (
-            <div className="bg-slate-100 border-1 border-slate-300 mx-0 my-0 px-3 py-3 rounded-lg flex flex-col relative overflow-hidden col-span-6 max-md:col-span-12">
+            <div key={index} className="bg-slate-100 border-1 border-slate-300 mx-0 my-0 px-3 py-3 rounded-lg flex flex-col relative overflow-hidden col-span-6 max-md:col-span-12">
               <h3 className="font-semibold text-base">
                 {moocs.moocsCourse.title}{" "}
               </h3>
@@ -88,7 +82,10 @@ import {
                 Date of Completion: {moocs.endDate}
               </span>
               <span className="text-slate-600 flex items-center">
-                <RiGraduationCapFill className="text-slate-400 me-2" size={16} />
+                <RiGraduationCapFill
+                  className="text-slate-400 me-2"
+                  size={16}
+                />
                 Year: {moocs.year}
               </span>
               <span className="text-slate-600 flex items-center">
@@ -116,7 +113,7 @@ import {
                   ) : (
                     <></>
                   )}
-  
+
                   {moocs.status}
                 </span>
                 <div className="flex space-x-2 justify-end">
@@ -145,8 +142,7 @@ import {
                   )}
                 </div>
               </div>
-  
-  
+
               <div
                 className={`${
                   moocs.status === "pending"
@@ -160,26 +156,24 @@ import {
               ></div>
             </div>
           ))}
-
-        </div>
-        {route === "viewpdf" && (
-          <>
-            {layout && (
-              <PopUpModal
-                layout={layout}
-                setLayout={setLayout}
-                setRoute={setRoute}
-                component={ViewPdf}
-                route="viewPdf"
-                pdfUrl={pdfUrl}
-                verificationUrl={verificationUrl}
-              />
-            )}
-          </>
-        )}
       </div>
-    );
-  };
-  
-  export default MobileMoocsTable;
-  
+      {route === "viewpdf" && (
+        <>
+          {layout && (
+            <PopUpModal
+              layout={layout}
+              setLayout={setLayout}
+              setRoute={setRoute}
+              component={ViewPdf}
+              route="viewPdf"
+              pdfUrl={pdfUrl}
+              verificationUrl={verificationUrl}
+            />
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+export default MobileMoocsTable;

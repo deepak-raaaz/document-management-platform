@@ -8,7 +8,7 @@ import Mar from "@/app/components/student/mar/Mar";
 
 type Props = {};
 
-const page: FC<Props> = (props) => {
+const Page: FC<Props> = ({}) => {
   const [open, setOpen] = useState(false);
   const [activeItem, setActiveItem] = useState(0);
   const [route, setRoute] = useState("");
@@ -32,4 +32,4 @@ const page: FC<Props> = (props) => {
   );
 };
 
-export default page;
+export default Page;

@@ -5,6 +5,7 @@ import AdminSidebar from "../components/admin/sidebar/AdminSidebar";
 import TopHeader from "../components/student/dashboard/TopHeader";
 import Header from "../components/Header";
 import { useSelector } from "react-redux";
+import { BreadcrumbItem } from "@nextui-org/react";
 
 type Props = {};
 
@@ -30,7 +31,9 @@ export default function Layout({
         loginType={loginType} 
       />
       <div className="max-w-screen-1300px mx-auto min-h-[70vh] pb-10">
-        <TopHeader title="Admin Pannel" />
+      <TopHeader>
+        <BreadcrumbItem href="/admin">Admin Pannel</BreadcrumbItem>
+      </TopHeader>
         <div className="bg-white border-1 border-slate-300 rounded-lg mx-4 flex items-stretch h-auto">
           <div className="flex-1">
             <AdminSidebar />

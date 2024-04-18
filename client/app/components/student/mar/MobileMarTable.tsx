@@ -54,7 +54,7 @@ const MobileMarTable = (props: Props) => {
     <div className="bg-slate-100">
       {myMar &&
         myMar.map((mar: any, index: number) => (
-          <div className="bg-white mx-2 my-4 px-3 py-3 rounded-lg flex flex-col relative overflow-hidden">
+          <div className="bg-white mx-2 my-4 px-3 py-3 rounded-lg flex flex-col relative overflow-hidden" key={index}>
             <h3 className="font-semibold text-base">{mar.title} </h3>
             <span className="text-slate-600 flex items-center">
               <FaUniversity className="text-slate-400 me-2" size={16} />{" "}

@@ -26,8 +26,8 @@ const Dashboard: FC<Props> = ({}) => {
 
       <div className="bg-white border-1 border-slate-300 p-8 rounded-lg h-full mx-4">
         <div className="flex flex-wrap  gap-8 max-sm:justify-center">
-          {cardData.map((itmes) => (
-            <div className="w-28">
+          {cardData.map((itmes,index) => (
+            <div className="w-28" key={index}>
               <DashboardCard title={itmes.title} url={itmes.url} />
             </div>
           ))}

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import userAuth from "./userAuth";
+import UserAuth from "./userAuth";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -8,7 +8,7 @@ interface ProtectedProps{
 }
 
 export default function Protected({ children }: ProtectedProps) {
-  const isUser = userAuth();
+  const isUser = UserAuth();
   return isUser ? children : redirect("/");
   // const isAuthenticated = userAuth();
   // const { user } = useSelector((state: any) => state.auth);

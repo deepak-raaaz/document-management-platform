@@ -135,7 +135,6 @@ const MarSubmissionList: FC<Props> = ({ mar }) => {
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const handleView = (pdfUrl: string, verificationUrl: string) => {
     setSelectedPdfUrl(pdfUrl);
     setSelectedVerificationUrl(verificationUrl);

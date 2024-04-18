@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import React from "react";
 import { useSelector } from "react-redux";
-import adminAuth from "./adminAuth";
+import AdminAuth from "./adminAuth";
 
 interface ProtectedProps {
   children: React.ReactNode;
@@ -19,6 +19,6 @@ export default function AdminProtected({ children }: ProtectedProps) {
   // } else {
   //   redirect("/");
   // }
-  const isAdmin = adminAuth();
+  const isAdmin = AdminAuth();
   return isAdmin ? children : redirect("/");
 }
