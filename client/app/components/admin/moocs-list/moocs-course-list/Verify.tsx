@@ -4,7 +4,10 @@ import { Button, Checkbox } from "@nextui-org/react";
 import Link from "next/link";
 import {
   useActivateAccountMutation,
+  useActivateMoocsCourseMutation,
+  useAdminMoocsCourseListQuery,
   useAllUsersQuery,
+  useVerifyMoocsMutation,
 } from "@/redux/features/api/admin/adminApi";
 
 type Props = {
@@ -13,12 +16,11 @@ type Props = {
 };
 
 const Verify: FC<Props> = ({ setRoute, id }) => {
-  const [isSelected, setIsSelected] = React.useState(true);
 
-  const [activateAccount, { isSuccess, error, isLoading, data }] =
-    useActivateAccountMutation();
+  const [activateMoocsCourse, { isSuccess, error, isLoading, data }] =
+    useActivateMoocsCourseMutation();
 
-  const { refetch } = useAllUsersQuery({}, { refetchOnMountOrArgChange: true });
+  const { refetch } = useAdminMoocsCourseListQuery({}, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
     if (isSuccess) {
@@ -38,9 +40,8 @@ const Verify: FC<Props> = ({ setRoute, id }) => {
   }, [isSuccess, error]);
 
   const handleActivate = async () => {
-    await activateAccount({
-      email: isSelected,
-      id,
+    await activateMoocsCourse({
+      id
     });
   };
   return (

@@ -27,7 +27,7 @@ adminRouter.put("/edit-moocs-category/:id", isAuthenticate,authorizeRoles("admin
 
 adminRouter.put("/activate-moocs-course/:id", isAuthenticate,authorizeRoles("admin"), activateMoocs);
 
-adminRouter.put("/deactivate-moocs-course/:id", isAuthenticate,authorizeRoles("admin"), deactivateMoocs);
+adminRouter.put("/deactivate-moocs-course/:id", isAuthenticate, authorizeRoles("admin"), deactivateMoocs);
 
 
 

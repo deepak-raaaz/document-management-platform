@@ -1,25 +1,22 @@
 import {
-  useAllUsersQuery,
-  useDeactivateAccountMutation,
+  useAdminMoocsCourseListQuery,
+  useDeactivteMoocsCourseMutation,
 } from "@/redux/features/api/admin/adminApi";
-import { Button, Checkbox, Chip, Textarea, User, cn } from "@nextui-org/react";
-import Link from "next/link";
+import { Button} from "@nextui-org/react";
 import React, { FC, useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 type Props = {
   setRoute: (route: string) => void;
-  email: string;
   id: string;
 };
 
-const Reject: FC<Props> = ({ setRoute, id, email }) => {
-  const [isSelected, setIsSelected] = React.useState(false);
-  const [reason, setReason] = React.useState("");
-  const [deactivateAccount, { isSuccess, error, isLoading, data }] =
-    useDeactivateAccountMutation();
+const Reject: FC<Props> = ({ setRoute, id }) => {
 
-  const { refetch } = useAllUsersQuery({}, { refetchOnMountOrArgChange: true });
+  const [deactivteMoocsCourse, { isSuccess, error, isLoading, data }] =
+    useDeactivteMoocsCourseMutation();
+
+  const { refetch } = useAdminMoocsCourseListQuery({}, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
     if (isSuccess) {
@@ -39,10 +36,8 @@ const Reject: FC<Props> = ({ setRoute, id, email }) => {
   }, [isSuccess, error]);
 
   const handleDeativate = async () => {
-    await deactivateAccount({
-      email: isSelected,
+    await deactivteMoocsCourse({
       id,
-      reason,
     });
   };
 
@@ -75,7 +70,7 @@ const Reject: FC<Props> = ({ setRoute, id, email }) => {
             disabled={isLoading}
             isLoading={isLoading}
           >
-            {isLoading ? "Loading..." : "Reject"}
+            {isLoading ? "Loading..." : "Deactivate"}
           </Button>
         </div>
       </div>

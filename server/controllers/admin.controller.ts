@@ -521,7 +521,7 @@ export const activateMoocs = CatchAsyncError(
       }
 
       // Update isActive field to true for the MOOCs category
-      const updatedCategory = await moocsModel.findByIdAndUpdate(
+      const updatedCategory = await moocsCourseModel.findByIdAndUpdate(
         categoryId,
         { isActive: true },
         { new: true }
@@ -557,7 +557,7 @@ export const deactivateMoocs = CatchAsyncError(
       }
 
       // Update isActive field to false for the MOOCs category
-      const updatedCategory = await moocsModel.findByIdAndUpdate(
+      const updatedCategory = await moocsCourseModel.findByIdAndUpdate(
         categoryId,
         { isActive: false },
         { new: true }
