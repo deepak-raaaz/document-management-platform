@@ -158,7 +158,7 @@ const MoocsCourseList: FC<Props> = ({ moocsCourse }) => {
         case "actions":
           return (
             <div className="relative flex items-center gap-2">
-              {moocsCourse.status === "deactive" ? (
+              {moocsCourse.status === "inactive" ? (
                 <Tooltip
                   content="Activate"
                   color="success"
