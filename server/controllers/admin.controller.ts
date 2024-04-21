@@ -150,19 +150,34 @@ export const singleStudentDetail = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = req.params.id;
-      const singleStudent = await userModel.findById(id).populate({
-        path: "moocs",
-        populate: [
-          {
-            path: "moocsCourse",
-            model: "MoocsCourse",
-          },
-          {
-            path: "document",
-            model: "MoocsDocuments",
-          },
-        ],
-      });
+      const singleStudent = await userModel
+        .findById(id)
+        .populate({
+          path: "moocs",
+          populate: [
+            {
+              path: "moocsCourse",
+              model: "MoocsCourse",
+            },
+            {
+              path: "document",
+              model: "MoocsDocuments",
+            },
+          ],
+        })
+        .populate({
+          path: "mar",
+          populate: [
+            {
+              path: "marCategory",
+              model: "MarCategory",
+            },
+            {
+              path: "document",
+              model: "MarDocuments",
+            },
+          ],
+        });
 
       if (!singleStudent) {
         return next(new ErrorHandler("Not record found!", 400));

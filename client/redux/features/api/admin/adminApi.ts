@@ -182,6 +182,14 @@ export const adminApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+
+    moocsMarStatistics: builder.query({
+      query: ({year}) => ({
+        url: `moocs-mar-statistics/${year}`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
   }),
 });
 
@@ -204,5 +212,6 @@ export const {
   useAdminMarDataQuery,
   useVerifyMarMutation,
   useRejectMarMutation,
-  useAllStudentDataQuery
+  useAllStudentDataQuery,
+  useMoocsMarStatisticsQuery
 } = adminApi;

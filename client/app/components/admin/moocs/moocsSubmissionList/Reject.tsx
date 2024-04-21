@@ -104,7 +104,7 @@ const Reject: FC<Props> = ({ setRoute, id, email }) => {
             disabled={isLoading}
             isLoading={isLoading}
           >
-            Reject {isLoading ? "Loading..." : "Reject"}
+            {isLoading ? "Loading..." : "Reject"}
           </Button>
         </div>
       </div>

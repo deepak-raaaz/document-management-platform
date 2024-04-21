@@ -33,6 +33,8 @@ import { ModalDialogProps } from "@mui/joy";
 import StudentProfile from "./studentProfile/StudentProfile";
 import PopUpModal from "@/app/utils/PopUpModal";
 import { IoMdRefresh } from "react-icons/io";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const moocStatusColorMap: Record<string, ChipProps["color"]> = {
   verified: "success",
@@ -142,15 +144,7 @@ const StudentsList: FC<Props> = ({ users }) => {
 
     switch (columnKey) {
       case "name":
-        return (
-          <User
-            // avatarProps={undefined}
-            description={user.email}
-            name={cellValue}
-          >
-            {user.email}
-          </User>
-        );
+        return <span className="font-medium">{user.name}</span>;
       case "batch":
         return (
           <div className="flex flex-col">
@@ -241,6 +235,43 @@ const StudentsList: FC<Props> = ({ users }) => {
     }
   }, []);
 
+  const doc = new jsPDF({
+    orientation: "landscape", // Set document orientation to landscape
+  });
+  const exportHandler = () => {
+    const addCustomHeader = () => {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+
+      doc.text(
+        "Students List",
+        doc.internal.pageSize.getWidth() / 2,
+        15,
+        { align: "center" }
+      );
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      // doc.text("This is a custom header added to the PDF document.", 105, 20, {
+      //   align: "center",
+      // });
+    };
+
+    // Table configuration
+    const tableOptions = {
+      html: "#my-table",
+      startY: 30, // Y position after the header
+      didDrawPage: () => {
+        addCustomHeader();
+      },
+    };
+
+    // Generate the table using autoTable plugin
+    autoTable(doc, tableOptions);
+
+    // Save the PDF with filename 'table.pdf'
+    doc.save("students_list.pdf");
+  };
+
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
@@ -255,6 +286,14 @@ const StudentsList: FC<Props> = ({ users }) => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+            <Button
+              color="primary"
+              onClick={() => {
+                exportHandler();
+              }}
+            >
+              Export
+            </Button>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -345,6 +384,7 @@ const StudentsList: FC<Props> = ({ users }) => {
               <option value="5">5</option>
               <option value="10">10</option>
               <option value="15">15</option>
+              <option value={users.length}>{users.length}</option>
             </select>
           </label>
         </div>
@@ -421,6 +461,7 @@ const StudentsList: FC<Props> = ({ users }) => {
         topContentPlacement="outside"
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
+        id="my-table"
       >
         <TableHeader columns={headerColumns}>
           {(column) => (

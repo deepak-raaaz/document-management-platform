@@ -1,27 +1,27 @@
 import { Button } from "@nextui-org/react";
-import React from "react";
+import React, { FC } from "react";
 import { FaFileDownload } from "react-icons/fa";
 import { PieChart, Pie, Sector, Cell, Tooltip } from "recharts";
 
-const data = [
-  { name: "Verified", value: 400 },
-  { name: "Pending", value: 300 },
-  { name: "Rejected", value: 300 },
-  { name: "Not Submitted", value: 200 },
-];
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-export default function CustomPieChart() {
+const COLORS = ["#00c41d", "#003bc4", "#ff2828", "#9f9f9f"];
+
+type Props = {
+  title:string
+  data:any;
+};
+
+const CustomPieChart:FC<Props> = ({title,data}) => {
   return (
     <div className="flex flex-col justify-center items-center">
       <div className="w-full flex justify-between items-center">
-        <span className=" font-medium">Mar Report</span>
-        <Button
+        <span className=" font-medium">{title}</span>
+        {/* <Button
           endContent={<FaFileDownload className="text-slate-500"/>}
           variant="bordered"
         >
-          Export
-        </Button>
+          View List
+        </Button> */}
       </div>
       <PieChart width={300} height={300}>
         <Tooltip contentStyle={{ background: "white", borderRadius: "5px" }} />
@@ -33,7 +33,7 @@ export default function CustomPieChart() {
           paddingAngle={5}
           dataKey="value"
         >
-          {data.map((entry, index) => (
+          {data.map((entry:any, index:number) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
@@ -55,3 +55,5 @@ export default function CustomPieChart() {
     </div>
   );
 }
+
+export default CustomPieChart;

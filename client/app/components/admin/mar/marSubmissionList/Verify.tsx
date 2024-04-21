@@ -72,7 +72,7 @@ const handleActivate = async () => {
             disabled={isLoading}
             isLoading={isLoading}
           >
-            {isLoading ? "Loading..." : "Activate"}
+            {isLoading ? "Loading..." : "Verify"}
           </Button>
         </div>
     </div>

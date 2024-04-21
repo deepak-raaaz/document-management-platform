@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import TopHeader from "../../student/dashboard/TopHeader";
 import AdminSidebar from "../sidebar/AdminSidebar";
 import CustomPieChart from "./CustomPieChart";
@@ -12,6 +12,7 @@ import {
 } from "@nextui-org/react";
 import { batchOptions } from "../students/studentList/data";
 import { ChevronDownIcon } from "../new-registration/newRegistrationList/ChevronDownIcon";
+import { useMoocsMarStatisticsQuery } from "@/redux/features/api/admin/adminApi";
 
 type Props = {};
 const data = [
@@ -36,6 +37,11 @@ const marCategory = [
 ];
 
 const Dashboard: FC<Props> = ({}) => {
+  const [year, setYear] = useState(2023);
+  const { data,isFetching,isLoading,refetch } = useMoocsMarStatisticsQuery({year});
+
+
+
   return (
     <section className="mx-2">
       <h2 className="font-semibold text-lg text-slate-800 my-3 ">Dashboard</h2>
@@ -52,18 +58,15 @@ const Dashboard: FC<Props> = ({}) => {
               endContent={<ChevronDownIcon className="text-small" />}
               variant="flat"
             >
-              Batch
+              Batch : {year}
             </Button>
           </DropdownTrigger>
           <DropdownMenu
             disallowEmptySelection
             aria-label="Batch Filter" // Update: Correct aria-label
-            closeOnSelect={false} // Update: Pass batchFilter as an array
+            closeOnSelect={true} // Update: Pass batchFilter as an array
             selectionMode="single" // Update: Set selectionMode to "single"
-            // onSelectionChange={(selection) => {
-            //   const selectedValue = Array.from(selection as Set<string>); // Convert Set to array of strings
-            //   setBatchFilter(selectedValue[0]); // Safely extract the first element
-            // }}
+            onAction={(key:any) => {setYear(key); refetch();}}
           >
             {batchOptions.map((batch) => (
               <DropdownItem key={batch.uid} className="capitalize">
@@ -73,14 +76,16 @@ const Dashboard: FC<Props> = ({}) => {
           </DropdownMenu>
         </Dropdown>
       </div>
-      <div className=" grid grid-cols-2 gap-4">
-        <div className="flex justify-center items-center bg-slate-100 relative py-4">
-          <CustomPieChart />
+      {data && (
+        <div className=" grid grid-cols-2 gap-4">
+          <div className="flex justify-center items-center bg-slate-100 relative py-4">
+            <CustomPieChart data={data.moocsCounts} title="Moocs Report"/>
+          </div>
+          <div className="flex justify-center items-center bg-slate-100 relative">
+            <CustomPieChart data={data.marCounts} title="Mar Report"/>
+          </div>
         </div>
-        <div className="flex justify-center items-center bg-slate-100 relative">
-          <CustomPieChart />
-        </div>
-      </div>
+      )}
     </section>
   );
 };
