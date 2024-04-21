@@ -9,25 +9,22 @@ import AdminLoading from "@/app/utils/AdminLoading";
 type Props = {};
 
 const MoocsList = (props: Props) => {
-  const { data,error,isLoading, } = useAdminMoocsCourseListQuery({});
+  const { data, error, isLoading, refetch } = useAdminMoocsCourseListQuery({});
   useEffect(() => {
     if (error) {
       if ("data" in error) {
         const errorData = error as any;
-        if(errorData.data.message === "jwt expired"){
-          toast.error(errorData.data.message);
-          initializeApp();
-        }
+        toast.error(errorData.data.message);
       }
     }
-  }, [ error]);
+  }, [error]);
   return (
     <div className="mx-2">
       <h2 className="font-semibold text-lg text-slate-800 my-3 ">
         Moocs Course List
       </h2>
       {isLoading ? (
-        <AdminLoading/>
+        <AdminLoading />
       ) : (
         data && <MoocsCourseList moocsCourse={data.moocsList} />
       )}

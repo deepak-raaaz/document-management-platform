@@ -33,6 +33,9 @@ import Reject from "./Reject";
 import { MdOutlineCancel } from "react-icons/md";
 import { useAllUsersQuery } from "@/redux/features/api/admin/adminApi";
 import AddMarCategory from "./AddMarCategory";
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -142,6 +145,19 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
     setLayout("center");
     setSelectedId(id);
   };
+
+  const doc = new jsPDF()
+
+ const exportHandler = () => {
+  autoTable(doc, { html: '#my-table' });
+  doc.save('table.pdf');
+ }
+
+
+
+
+
+
   const renderCell = React.useCallback((marCategory: MarCategoryList, columnKey: React.Key) => {
     const cellValue = marCategory[columnKey as keyof MarCategoryList];
 
@@ -233,6 +249,14 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+          <Button
+              color="primary"
+              onClick={() => {
+                exportHandler();
+              }}
+            >
+             Export
+            </Button>
           <Button
               color="primary"
               onClick={() => {
@@ -381,6 +405,7 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
         topContentPlacement="outside"
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
+        id="my-table"
       >
         <TableHeader columns={headerColumns}>
           {(column) => (

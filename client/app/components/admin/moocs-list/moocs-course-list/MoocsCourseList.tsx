@@ -31,8 +31,9 @@ import { ModalDialogProps } from "@mui/joy";
 import Verify from "./Verify";
 import Reject from "./Reject";
 import { MdOutlineCancel } from "react-icons/md";
-import { useAllUsersQuery } from "@/redux/features/api/admin/adminApi";
 import AddMoocsCourse from "./AddMoocsCourse";
+import ExportPdfViewModal from "@/app/utils/ExportPdfViewModal";
+import ExportPdfView from "./ExportPdfView";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -139,6 +140,14 @@ const MoocsCourseList: FC<Props> = ({ moocsCourse }) => {
     setLayout("center");
     setSelectedId(id);
   };
+
+
+  const exportHandler = () => {
+    setRoute("exportPdfView");
+    setLayout("fullscreen");
+   }
+  
+   
   const renderCell = React.useCallback(
     (moocsCourse: MoocsCourse, columnKey: React.Key) => {
       const cellValue = moocsCourse[columnKey as keyof MoocsCourse];
@@ -231,6 +240,14 @@ const MoocsCourseList: FC<Props> = ({ moocsCourse }) => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+          <Button
+              color="primary"
+              onClick={() => {
+                exportHandler();
+              }}
+            >
+             Export
+            </Button>
             <Button
               color="primary"
               onClick={() => {
@@ -437,6 +454,19 @@ const MoocsCourseList: FC<Props> = ({ moocsCourse }) => {
               component={AddMoocsCourse}
               id={selectedId}
               email={selectedEmail}
+            />
+          )}
+        </>
+      )}
+      {route === "exportPdfView" && (
+        <>
+          {layout && (
+            <ExportPdfViewModal
+              layout={layout}
+              setLayout={setLayout}
+              setRoute={setRoute}
+              component={ExportPdfView}
+              data={moocsCourse}
             />
           )}
         </>
