@@ -14,7 +14,6 @@ import path from "path";
 import sendMail from "../utlis/sendMail";
 import { marModel } from "../models/mar.model";
 
-
 // export const allStudentDetails = CatchAsyncError(
 //   async (req: Request, res: Response, next: NextFunction) => {
 //     try {
@@ -145,9 +144,6 @@ export const allStudentDetails = CatchAsyncError(
     }
   }
 );
-
-
-
 
 // get single student detail.
 export const singleStudentDetail = CatchAsyncError(
@@ -580,7 +576,7 @@ export const activateMarCategory = CatchAsyncError(
     try {
       const categoryId = req.params.id;
 
-      // Check if categoryId is      
+      // Check if categoryId is
       if (!categoryId) {
         return next(new ErrorHandler("Category ID is required", 400));
       }
@@ -611,7 +607,6 @@ export const activateMarCategory = CatchAsyncError(
 );
 
 // activate moocs by admin:-
-
 
 export const activateMoocs = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -684,13 +679,14 @@ export const deactivateMoocs = CatchAsyncError(
   }
 );
 
-
 // verify mar list uplaoded by student:-
 export const verifyMarDocument = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Find the MAR document by ID
-      const marDoc = await marModel.findById(req.params.id).populate('user') as any;
+      const marDoc = (await marModel
+        .findById(req.params.id)
+        .populate("user")) as any;
       if (!marDoc) {
         return next(new Error("MAR document not found"));
       }
@@ -716,7 +712,7 @@ export const verifyMarDocument = CatchAsyncError(
 
         try {
           await sendMail({
-            email:marDoc.user.email,
+            email: marDoc.user.email,
             subject: "MAR Document Verification",
             template: "mar-verification-mail.ejs",
             data,
@@ -776,7 +772,7 @@ export const verifyMoocsDocument = CatchAsyncError(
 
         try {
           await sendMail({
-            email:moocsDoc.user.email,
+            email: moocsDoc.user.email,
             subject: "MOOCs Document Verification",
             template: "moocs-verification-mail.ejs",
             data,
@@ -848,13 +844,11 @@ export const getMarListAdmin = CatchAsyncError(
       }));
 
       // Remove the isVerified property from the modified details
-      const FinalMarList = modifiedDetails.map(
-        ({ isActive, ...rest }) => rest
-      );
+      const FinalMarList = modifiedDetails.map(({ isActive, ...rest }) => rest);
 
       res.status(201).json({
         success: true,
-        marList:FinalMarList,
+        marList: FinalMarList,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -862,12 +856,15 @@ export const getMarListAdmin = CatchAsyncError(
   }
 );
 
-
 // get moocs list uplaoded by student by admin :-
 export const getAllMoocsData = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const moocsData = await moocsModel.find().populate('user').populate('moocsCourse').populate('document');
+      const moocsData = await moocsModel
+        .find()
+        .populate("user")
+        .populate("moocsCourse")
+        .populate("document");
 
       res.status(200).json({
         success: true,
@@ -883,7 +880,11 @@ export const getAllMoocsData = CatchAsyncError(
 export const getAllMarData = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const marData = await marModel.find().populate('user').populate('marCategory').populate('document');
+      const marData = await marModel
+        .find()
+        .populate("user")
+        .populate("marCategory")
+        .populate("document");
 
       res.status(200).json({
         success: true,
@@ -895,7 +896,7 @@ export const getAllMarData = CatchAsyncError(
   }
 );
 
-// reject moocs uploaded by student by admin 
+// reject moocs uploaded by student by admin
 export const rejectMoocsDocument = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -918,9 +919,9 @@ export const rejectMoocsDocument = CatchAsyncError(
       await moocsDoc.save();
 
       // Send notification email if requested
-      const { email ,reason } = req.body;
+      const { email, reason } = req.body;
       if (email) {
-        const data = { moocsTitle: moocsDoc.moocsCourse.title ,reason:reason};
+        const data = { moocsTitle: moocsDoc.moocsCourse.title, reason: reason };
 
         const html = await ejs.renderFile(
           path.join(__dirname, "../mails/moocs-rejection-mail.ejs"),
@@ -929,7 +930,7 @@ export const rejectMoocsDocument = CatchAsyncError(
 
         try {
           await sendMail({
-            email:moocsDoc.user.email,
+            email: moocsDoc.user.email,
             subject: "MOOCs Document rejected",
             template: "moocs-rejection-mail.ejs",
             data,
@@ -955,12 +956,15 @@ export const rejectMoocsDocument = CatchAsyncError(
   }
 );
 
-// rejecting mar document 
+// rejecting mar document
 export const rejectMarDocument = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Find the MOOCs document by ID
-      const marDoc = await marModel.findById(req.params.id).populate("marCategory").populate("user") as any;
+      const marDoc = (await marModel
+        .findById(req.params.id)
+        .populate("marCategory")
+        .populate("user")) as any;
       if (!marDoc) {
         return next(new Error("MAR document not found"));
       }
@@ -975,9 +979,9 @@ export const rejectMarDocument = CatchAsyncError(
       await marDoc.save();
 
       // Send notification email if requested
-      const { email ,reason } = req.body;
+      const { email, reason } = req.body;
       if (email) {
-        const data = { marTitle: marDoc.marCategory.category ,reason:reason};
+        const data = { marTitle: marDoc.marCategory.category, reason: reason };
 
         const html = await ejs.renderFile(
           path.join(__dirname, "../mails/mar-rejection-mail.ejs"),
@@ -986,7 +990,7 @@ export const rejectMarDocument = CatchAsyncError(
 
         try {
           await sendMail({
-            email:marDoc.user.email,
+            email: marDoc.user.email,
             subject: "Mar Document rejected",
             template: "mar-rejection-mail.ejs",
             data,
@@ -1012,8 +1016,116 @@ export const rejectMarDocument = CatchAsyncError(
   }
 );
 
+export const moocsMarStatistics = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const year: string = req.params.year;
 
+      // Query the database to get user data for the specified year
+      const userData = await userModel
+        .find({ year: year })
+        .populate({
+          path: "moocs",
+        })
+        .populate({
+          path: "mar",
+        });
 
+      // Initialize counters for different statuses
+      let moocsVerifiedCount: number = 0;
+      let moocsPendingCount: number = 0;
+      let moocsRejectedCount: number = 0;
+      let moocsNotSubmittedCount: number = 0;
 
+      let marVerifiedCount: number = 0;
+      let marPendingCount: number = 0;
+      let marRejectedCount: number = 0;
+      let marNotSubmittedCount: number = 0;
 
+      // Iterate through user data and count statuses for MOOCs and MAR
+      userData.forEach((user: any) => {
+        if (user.role === "user") {
+          // Count statuses for MOOCs
+          if (user.moocs.length === 0) {
+            moocsNotSubmittedCount++;
+          } else {
+            let allVerified: boolean = true;
+            let hasPending: boolean = false;
+            let hasRejected: boolean = false;
+            user.moocs.forEach((mooc: any) => {
+              switch (mooc.status) {
+                case "verified":
+                  break;
+                case "pending":
+                  allVerified = false;
+                  moocsPendingCount++;
+                  hasPending = true;
+                  break;
+                case "rejected":
+                  allVerified = false;
+                  moocsRejectedCount++;
+                  hasRejected = true;
+                  break;
+              }
+            });
+            if (allVerified) {
+              moocsVerifiedCount++;
+            } else if (hasPending || !hasRejected) {
+              moocsPendingCount--;
+            }
+          }
 
+          // Count statuses for MAR
+          if (user.mar.length === 0) {
+            marNotSubmittedCount++;
+          } else {
+            let allVerified: boolean = true;
+            let hasPending: boolean = false;
+            let hasRejected: boolean = false;
+            user.mar.forEach((mar: any) => {
+              switch (mar.status) {
+                case "verified":
+                  break;
+                case "pending":
+                  allVerified = false;
+                  marPendingCount++;
+                  hasPending = true;
+                  break;
+                case "rejected":
+                  allVerified = false;
+                  marRejectedCount++;
+                  hasRejected = true;
+                  break;
+              }
+            });
+            if (allVerified) {
+              marVerifiedCount++;
+            } else if (hasPending || !hasRejected) {
+              marPendingCount--;
+            }
+          }
+        }
+      });
+
+      // Return the counts in the response
+      res.status(200).json({
+        success: true,
+        year: year,
+        moocsCounts: [
+          { name: "Verified", value: moocsVerifiedCount },
+          { name: "Pending", value: moocsPendingCount },
+          { name: "Rejected", value: moocsRejectedCount },
+          { name: "Not Submitted", value: moocsNotSubmittedCount },
+        ],
+        marCounts: [
+          { name: "Verified", value: marVerifiedCount },
+          { name: "Pending", value: marPendingCount },
+          { name: "Rejected", value: marRejectedCount },
+          { name: "Not Submitted", value: marNotSubmittedCount },
+        ],
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);

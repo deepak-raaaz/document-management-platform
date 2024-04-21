@@ -33,6 +33,8 @@ import Reject from "./Reject";
 import { MdOutlineCancel } from "react-icons/md";
 import ViewPdf from "./ViewPdf";
 import { FaRegEye } from "react-icons/fa";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   pending: "warning",
@@ -110,7 +112,7 @@ const MoocsSubmissionList: FC<Props> = ({ moocs }) => {
     if (batchFilter !== "all") {
       // Update: Apply batch filter if it's not "all"
       filteredUsers = filteredUsers.filter(
-        (user) => user.batch === batchFilter
+        (moocs) => moocs.user.year === batchFilter
       );
     }
 
@@ -157,20 +159,44 @@ const MoocsSubmissionList: FC<Props> = ({ moocs }) => {
     setSelectedUserEmail(email);
   };
 
+  const doc = new jsPDF({
+    orientation: 'landscape' // Set document orientation to landscape
+  });
+  const exportHandler = () => {
+    const addCustomHeader = () => {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+
+      doc.text("Moocs Submission List", doc.internal.pageSize.getWidth() / 2, 15, { align: "center" });
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      // doc.text("This is a custom header added to the PDF document.", 105, 20, {
+      //   align: "center",
+      // });
+    };
+
+    // Table configuration
+    const tableOptions = {
+      html: "#my-table",
+      startY: 30, // Y position after the header
+      didDrawPage: () => {
+        addCustomHeader();
+      },
+    };
+
+    // Generate the table using autoTable plugin
+    autoTable(doc, tableOptions);
+
+    // Save the PDF with filename 'table.pdf'
+    doc.save("moocs_course_list.pdf");
+  };
+
   const renderCell = React.useCallback((moocs: Moocs, columnKey: React.Key) => {
     const cellValue = moocs[columnKey as keyof Moocs];
 
     switch (columnKey) {
       case "name":
-        return (
-          <User
-            // avatarProps={undefined}
-            description={moocs.user.email}
-            name={moocs.user.name}
-          >
-            {moocs.user.email}
-          </User>
-        );
+        return <span className="whitespace-nowrap">{moocs.user.name}</span>;
       case "title":
         return <span>{moocs.moocsCourse.title}</span>;
       case "platform":
@@ -283,6 +309,14 @@ const MoocsSubmissionList: FC<Props> = ({ moocs }) => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+          <Button
+              color="primary"
+              onClick={() => {
+                exportHandler();
+              }}
+            >
+              Export
+            </Button>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -373,6 +407,7 @@ const MoocsSubmissionList: FC<Props> = ({ moocs }) => {
               <option value="5">5</option>
               <option value="10">10</option>
               <option value="15">15</option>
+              <option value={moocs.length}>{moocs.length}</option>
             </select>
           </label>
         </div>
@@ -449,6 +484,7 @@ const MoocsSubmissionList: FC<Props> = ({ moocs }) => {
         topContentPlacement="outside"
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
+        id="my-table"
       >
         <TableHeader columns={headerColumns}>
           {(column) => (

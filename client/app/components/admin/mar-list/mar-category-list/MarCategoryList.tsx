@@ -1,4 +1,4 @@
-import React, { useState,FC } from "react";
+import React, { useState, FC } from "react";
 import {
   Table,
   TableHeader,
@@ -21,7 +21,7 @@ import {
   Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
-import { ChevronDownIcon } from "../../new-registration/newRegistrationList/ChevronDownIcon"; 
+import { ChevronDownIcon } from "../../new-registration/newRegistrationList/ChevronDownIcon";
 import { SearchIcon } from "../../new-registration/newRegistrationList/SearchIcon";
 import { columns, statusOptions } from "./data";
 import { capitalize } from "../../new-registration/newRegistrationList/utils";
@@ -33,9 +33,8 @@ import Reject from "./Reject";
 import { MdOutlineCancel } from "react-icons/md";
 import { useAllUsersQuery } from "@/redux/features/api/admin/adminApi";
 import AddMarCategory from "./AddMarCategory";
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
-
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   active: "success",
@@ -52,12 +51,11 @@ const INITIAL_VISIBLE_COLUMNS = [
 ];
 
 type Props = {
-    marCategoryList: any;
+  marCategoryList: any;
 };
 
-const MarCategoryList:FC<Props> = ({marCategoryList}) => {
+const MarCategoryList: FC<Props> = ({ marCategoryList }) => {
   type MarCategoryList = (typeof marCategoryList)[0];
- 
 
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
@@ -74,8 +72,8 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
     direction: "ascending",
   });
 
-  const [selectedId, setSelectedId] = React.useState(""); 
-  const [selectedEmail, setSelectedEmail] = React.useState(""); 
+  const [selectedId, setSelectedId] = React.useState("");
+  const [selectedEmail, setSelectedEmail] = React.useState("");
 
   const [page, setPage] = React.useState(1);
 
@@ -94,7 +92,9 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((marCategoryList) =>
-      marCategoryList.category.toLowerCase().includes(filterValue.toLowerCase())
+        marCategoryList.category
+          .toLowerCase()
+          .includes(filterValue.toLowerCase())
       );
     }
     if (
@@ -105,7 +105,6 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
         Array.from(statusFilter).includes(marCategoryList.status)
       );
     }
-    
 
     return filteredUsers;
   }, [marCategoryList, filterValue, statusFilter, batchFilter]);
@@ -122,7 +121,9 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a: MarCategoryList, b: MarCategoryList) => {
       const first = a[sortDescriptor.column as keyof MarCategoryList] as number;
-      const second = b[sortDescriptor.column as keyof MarCategoryList] as number;
+      const second = b[
+        sortDescriptor.column as keyof MarCategoryList
+      ] as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
@@ -146,65 +147,91 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
     setSelectedId(id);
   };
 
-  const doc = new jsPDF()
+  const doc = new jsPDF();
+  const exportHandler = () => {
+    const addCustomHeader = () => {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
 
- const exportHandler = () => {
-  autoTable(doc, { html: '#my-table' });
-  doc.save('table.pdf');
- }
+      doc.text("Mar Category List", doc.internal.pageSize.getWidth() / 2, 15, {
+        align: "center",
+      });
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      // doc.text("This is a custom header added to the PDF document.", 105, 20, {
+      //   align: "center",
+      // });
+    };
 
+    // Table configuration
+    const tableOptions = {
+      html: "#my-table",
+      startY: 30, // Y position after the header
+      didDrawPage: () => {
+        addCustomHeader();
+      },
+    };
 
+    // Generate the table using autoTable plugin
+    autoTable(doc, tableOptions);
 
+    // Save the PDF with filename 'table.pdf'
+    doc.save("mar_category_list.pdf");
+  };
 
+  const renderCell = React.useCallback(
+    (marCategory: MarCategoryList, columnKey: React.Key) => {
+      const cellValue = marCategory[columnKey as keyof MarCategoryList];
 
-
-  const renderCell = React.useCallback((marCategory: MarCategoryList, columnKey: React.Key) => {
-    const cellValue = marCategory[columnKey as keyof MarCategoryList];
-
-    switch (columnKey) {
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[marCategory.status]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-center justify-center gap-2">
-            {/* <Tooltip content="View">
+      switch (columnKey) {
+        case "status":
+          return (
+            <Chip
+              className="capitalize"
+              color={statusColorMap[marCategory.status]}
+              size="sm"
+              variant="flat"
+            >
+              {cellValue}
+            </Chip>
+          );
+        case "actions":
+          return (
+            <div className="relative flex items-center justify-center gap-2">
+              {/* <Tooltip content="View">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                 <FaRegEye onClick={() => handleView(marCategory.universityRollNo)}/>
               </span>
             </Tooltip> */}
-            {
-              marCategory.status === "active" ? 
-            <Tooltip color="danger" content="Deactivate">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <MdOutlineCancel
-                  onClick={() => handleReject(marCategory._id)}
-                />
-              </span>
-            </Tooltip>
-            :
-            <Tooltip content="Activate" color="success" className="text-white">
-              <span className="text-lg text-success cursor-pointer active:opacity-50">
-                <IoShieldCheckmarkOutline
-                  onClick={() => handleVerify(marCategory._id)}
-                />
-              </span>
-            </Tooltip>
-            }
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+              {marCategory.status === "active" ? (
+                <Tooltip color="danger" content="Deactivate">
+                  <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <MdOutlineCancel
+                      onClick={() => handleReject(marCategory._id)}
+                    />
+                  </span>
+                </Tooltip>
+              ) : (
+                <Tooltip
+                  content="Activate"
+                  color="success"
+                  className="text-white"
+                >
+                  <span className="text-lg text-success cursor-pointer active:opacity-50">
+                    <IoShieldCheckmarkOutline
+                      onClick={() => handleVerify(marCategory._id)}
+                    />
+                  </span>
+                </Tooltip>
+              )}
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    []
+  );
 
   const onNextPage = React.useCallback(() => {
     if (page < pages) {
@@ -249,15 +276,15 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-          <Button
+            <Button
               color="primary"
               onClick={() => {
                 exportHandler();
               }}
             >
-             Export
+              Export
             </Button>
-          <Button
+            <Button
               color="primary"
               onClick={() => {
                 setRoute("addMarCategory");
@@ -329,6 +356,9 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
               <option value="5">5</option>
               <option value="10">10</option>
               <option value="15">15</option>
+              <option value={marCategoryList.length}>
+                {marCategoryList.length}
+              </option>
             </select>
           </label>
         </div>
@@ -471,7 +501,6 @@ const MarCategoryList:FC<Props> = ({marCategoryList}) => {
       )}
     </>
   );
-}
-
+};
 
 export default MarCategoryList;

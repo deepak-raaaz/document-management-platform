@@ -1,7 +1,7 @@
 import { isAuthenticate } from './../middleware/auth';
 import express from 'express';
 import { authorizeRoles } from './../middleware/auth';
-import { activateMarCategory, activateMoocs, addMarCategory, allStudentDetails, deactivateMoocs, deleteMarCategory, editMarCategory,  editMoocsCourse,  getAllMarData,  getAllMoocsData,  getMarListAdmin, getMoocsListAdmin, rejectMarDocument, rejectMoocsDocument, rejectStudent, singleStudentDetail, verifyMarDocument, verifyMoocsDocument, verifyStudent } from '../controllers/admin.controller';
+import { activateMarCategory, activateMoocs, addMarCategory, allStudentDetails, deactivateMoocs, deleteMarCategory, editMarCategory,  editMoocsCourse,  getAllMarData,  getAllMoocsData,  getMarListAdmin, getMoocsListAdmin, moocsMarStatistics, rejectMarDocument, rejectMoocsDocument, rejectStudent, singleStudentDetail, verifyMarDocument, verifyMoocsDocument, verifyStudent } from '../controllers/admin.controller';
 import { createMoocsCourse } from '../controllers/admin.controller';
 
 const adminRouter = express.Router();
@@ -28,6 +28,10 @@ adminRouter.put("/edit-moocs-category/:id", isAuthenticate,authorizeRoles("admin
 adminRouter.put("/activate-moocs-course/:id", isAuthenticate,authorizeRoles("admin"), activateMoocs);
 
 adminRouter.put("/deactivate-moocs-course/:id", isAuthenticate, authorizeRoles("admin"), deactivateMoocs);
+
+
+// Dashboard Statistics -------------------------
+adminRouter.get("/moocs-mar-statistics/:year", isAuthenticate, authorizeRoles("admin"), moocsMarStatistics);
 
 
 
