@@ -9,13 +9,10 @@
 # testing
 /coverage
 
-# next.js
-.next/
-/out/
 
 # production
 /build
-server/dist
+
 # misc
 .DS_Store
 *.pem
@@ -27,8 +24,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
-client/.env
-server/.env
+.env
 *.env.example
 *.env.local
 *.env.staging
