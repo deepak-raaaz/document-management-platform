@@ -30,14 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body
-        className={`${poppins.variable} ${josefin.variable} min-h-[100vh] font-Poppins text-black dark:text-white !bg-slate-100 bg-gradient-to-b bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to-black duration-300`}
+        className={`${poppins.variable} ${josefin.variable} min-h-[100vh] font-Poppins text-black dark:text-white !bg-slate-100 bg-gradient-to-b bg-no-repeat `}
       >
         <Providers>
           <SessionProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <Custom>{children}</Custom>
               <Toaster position="top-center" reverseOrder={false} />
-            </ThemeProvider>
           </SessionProvider>
         </Providers>
       </body>

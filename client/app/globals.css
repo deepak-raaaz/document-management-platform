@@ -43,19 +43,19 @@ body{
 
 
 .title{
-    @apply text-[25px] text-black dark:text-white font-[500] font-Poppins text-center py-2
+    @apply text-[25px] text-black font-[500] font-Poppins text-center py-2
 }
 .label{
-    @apply text-[16px] font-Poppins text-slate-500 dark:text-white
+    @apply text-[16px] font-Poppins text-slate-500
 }
 .input{
-    @apply w-full text-black dark:text-white bg-slate-100 border rounded h-[40px] px-2 outline-none mt-[10px] font-Poppins
+    @apply w-full text-black bg-slate-100 border rounded h-[40px] px-2 outline-none mt-[10px] font-Poppins
 }
 .button{
     @apply flex flex-row justify-center items-center py-3 text-white cursor-pointer gradient-bg rounded-sm min-h-[45px] w-full text-[16px] font-Poppins font-semibold
 }
 .ps-menu-button{
-    @apply hover:!bg-[#00000015] dark:hover:!bg-[#ffffff13] !font-[500]
+    @apply hover:!bg-[#00000015]  !font-[500]
 }
 .ps-submenu-expand-icon span{
     @apply h-2 w-2
@@ -66,20 +66,9 @@ body{
 .avatar-tiny span{
     @apply !h-6 !w-6
 }
-.MuiBottomNavigationAction-root{
-    @apply dark:text-white
-}
 
 /* Modal Styling  */
-.MuiModalDialog-root{
-    @apply dark:bg-slate-900 dark:border-slate-800
-}
-.MuiDialogTitle-root{
-    @apply dark:text-white
-}
-.MuiModalClose-root{
-    @apply dark:hover:bg-slate-700 dark:hover:text-white
-}
+
 
 .gradient-bg{
     @apply bg-gradient-to-r from-orange-600 to-orange-400

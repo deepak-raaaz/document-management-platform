@@ -38,7 +38,7 @@ const TopHeader: FC<Props> = ({ children}) => {
           classNames={{
             base: [
               // arrow color
-              "before:bg-neutral-400 dark:before:bg-white",
+              "before:bg-neutral-400 ",
             ],
             content: ["py-2 px-4 shadow-xl", "bg-slate-800 text-white"],
           }}
